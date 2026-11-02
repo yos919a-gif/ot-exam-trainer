@@ -1592,9 +1592,17 @@ function textbookUi(){
   const pick = `<input type="file" id="tbFile" accept=".json,application/json" style="display:none" onchange="importTextbook(this)">`;
   if(!i) return `${pick}<button class="btn small primary" onclick="document.getElementById('tbFile').click()">📚 教科書データを取り込む</button>
     <div class="muted">配られた ot-textbook-data.json を選びます（スマホなら Google Drive の中から選べます）。用語をタップしたときに、教科書での説明・ページが出るようになります。${window.SYNC && SYNC.signedIn() ? "自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。</div>`;
+  const bs = TEXTBOOK.books(), nOn = bs.filter(b=>b.on).length;
+  const list = bs.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px">
+      <input type="checkbox" ${b.on?"checked":""} onchange="TEXTBOOK.setBook(this.dataset.k, this.checked); document.getElementById('tbCount').textContent = TEXTBOOK.books().filter(x=>x.on).length" data-k="${esc(b.key)}">
+      ${esc(b.name)} <span class="muted" style="margin:0">${b.count}</span></label>`).join("");
   return `${pick}📚 取り込み済み（版 ${esc(i.version)}・${i.words}語、教科書の関係あり ${i.withRel}語）
     <button class="btn small" onclick="document.getElementById('tbFile').click()">取り込み直す</button>
-    <button class="btn small" onclick="if(confirm('この端末と Google Drive から教科書データを消します。よろしいですか？')) TEXTBOOK.remove().then(home)">消す</button>`;
+    <button class="btn small" onclick="if(confirm('この端末と Google Drive から教科書データを消します。よろしいですか？')) TEXTBOOK.remove().then(home)">消す</button>
+    <div style="margin-top:10px"><b>用語の説明に出す本</b>（<span id="tbCount">${nOn}</span>/${bs.length}冊）
+      <button class="btn small" onclick="TEXTBOOK.setAll(true); home()">すべて選ぶ</button><button class="btn small" onclick="TEXTBOOK.setAll(false); home()">すべて外す</button>
+      <div class="muted" style="margin:2px 0 6px">チェックを外した本の説明は出しません。選んだ状態は同期されます。数字は説明の数です。</div>
+      <div style="columns:2 220px;column-gap:20px">${list}</div></div>`;
 }
 function importTextbook(inp){
   const f = inp.files[0]; if(!f) return;

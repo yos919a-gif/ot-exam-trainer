@@ -4,7 +4,7 @@
 //  - 図（content/images/）: 開いた問題のものから順に保存される
 //  - /api/（serve.py の学習記録）と Google など外部は触らない
 "use strict";
-const SHELL_CACHE = "ot-shell-v5";
+const SHELL_CACHE = "ot-shell-v6";
 const DATA_CACHE = "ot-data-v1";
 const SHELL = ["./", "./index.html", "./appbar.css", "./content.js", "./config.js", "./sync.js", "./textbook.js", "./drill.js", "./print.js",
   "./graph.html", "./sakuin.html", "./dendrogram.html", "./lib/d3.v7.8.5.min.js",
@@ -59,7 +59,7 @@ async function cacheFirst(req, name){
 async function networkFirst(req, name){
   const c = await caches.open(name);
   try{
-    const r = await fetch(req);
+    const r = await fetch(req.url, {cache: "no-cache", credentials: "same-origin"});   // ブラウザの HTTP キャッシュも毎回サーバーに確かめる（更新を確実に届ける）
     if(r.ok) c.put(req, r.clone());
     return r;
   }catch(e){
