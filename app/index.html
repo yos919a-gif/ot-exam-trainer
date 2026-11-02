@@ -542,7 +542,8 @@ function markBtn(id){
 
 let EXPL = {};   // 選択肢の誤り理由 {id:{c:{番号:一言}, flag:{番号:指摘}, ex:除外}}
 let DISEASES = [];  // 疾患別模試のグループ [{name, words, ids}]（content/exam/diseases.json、tools/tag_diseases.py が作る）
-let ADL = {categories: [], notes: {}};  // 疾患ごとの ADL（content/exam/adl.json、tools/tag_adl.py が作る）
+let ADL = {categories: [], notes: {}};
+let NOTES = [];  // まとめノート（content/exam/notes.json、tools/build_notes.py が作る）  // 疾患ごとの ADL（content/exam/adl.json、tools/tag_adl.py が作る）
 let ASSESS = [], ASSESS_IDS = new Set();  // 評価の問題 [{name, ids}]（content/exam/assessments.json、tools/tag_assessments.py が作る）
 function whyHtml(q, num){
   const e = EXPL[q.id]; if(!e || !e.c || !e.c[num]) return "";
@@ -656,6 +657,7 @@ async function loadAll(){
     ASSESS.forEach(t=>t.ids.forEach(i=>ASSESS_IDS.add(i)));
   }catch(e){ console.warn("評価タグなし", e); }
   try{ ADL = await cfetch("exam/adl.json"); }catch(e){ console.warn("ADL のまとめなし", e); }
+  try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
   try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); }
   catch(e){ console.warn("用語集なし", e); }
   try{
@@ -948,6 +950,38 @@ function renderDzAdl(){
   <div style="margin:12px 0"><button class="btn primary" onclick="home()">ホームへ</button></div>`;
   window.scrollTo(0,0);
 }
+// まとめノート：テーマごとの表と要点、そのテーマの過去問（ラベルをタップで解く）
+function startNoteLink(nid, i){
+  const n = NOTES.find(x=>x.id===nid), l = n && n.links[i];
+  if(!l || !l.ids.length) return;
+  startList(l.ids, "range");
+  if(session) session.label = l.label;
+  renderQuestion();
+}
+function renderSummaryNotes(openId){
+  session = null;
+  const list = NOTES.map(n=>{
+    const t = n.table;
+    const table = t ? `<div style="overflow-x:auto"><table class="note-t"><tr>${t.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr>
+      ${t.rows.map(r=>`<tr>${r.map((c,j)=>j ? `<td>${esc(c)}</td>` : `<th>${esc(c)}</th>`).join("")}</tr>`).join("")}</table></div>` : "";
+    const pts = (n.points||[]).map(x=>`<li>${esc(x)}</li>`).join("");
+    const links = (n.links||[]).map((l,i)=>l.ids.length ? `<button class="btn small" onclick="startNoteLink('${esc(n.id)}',${i})">${esc(l.label)} <b>${l.ids.length}</b></button>` : "").join(" ");
+    return `<details class="card" style="margin:12px 0" ${openId===n.id || NOTES.length===1 ? "open" : ""}><summary style="cursor:pointer"><h3 style="display:inline;margin:0">${esc(n.title)}</h3></summary>
+      <div style="margin-top:10px">${table}
+      ${pts ? `<ul style="margin:10px 0;padding-left:20px;line-height:1.85">${pts}</ul>` : ""}
+      ${links ? `<div class="muted" style="margin:6px 0 4px">過去問（タップで解く）</div><div style="line-height:2.3">${links}</div>` : ""}</div></details>`;
+  }).join("");
+  app.innerHTML = `
+  <style>.note-t{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;line-height:1.7}
+    .note-t th,.note-t td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
+    .note-t tr:first-child th{background:var(--card2)} .note-t td{background:var(--card)}</style>
+  <div class="card"><h2>まとめノート</h2>
+    <p class="muted">テーマごとの要点と、その過去問です。要点は過去問の正答で確かめられる点を中心にまとめていますが、最後は教科書で確かめてください。</p>
+    <button class="btn primary" onclick="home()">ホームへ</button></div>
+  ${list || `<div class="card">まだノートがありません</div>`}
+  <div style="margin:12px 0"><button class="btn primary" onclick="home()">ホームへ</button></div>`;
+  window.scrollTo(0,0);
+}
 function renderDzTable(){
   const rows = DISEASES.map(g=>{
     const a = dzAssess(g, 10);
@@ -1050,7 +1084,7 @@ function home(){
       <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div>
       <div class="acts" style="margin-top:8px"><span class="muted" style="margin:0 6px 0 0">全範囲：</span><button class="btn primary" onclick="DRILL.start('rom')">ROM 全範囲ドリル</button><button class="btn primary" onclick="DRILL.start('mmtok')">MMT 正しい図（15）</button><button class="btn" onclick="DRILL.start('mmtng')">MMT 間違い探し（30）</button></div></div>
     <div class="tile c5 wide" id="rangeCard"><div class="top"><span class="ic">🏥</span><h3>条件を選んで解く</h3>
-        <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button><button class="btn small" onclick="renderDzAdl()">疾患×ADL のまとめ</button></span></div>
+        <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button><button class="btn small" onclick="renderDzAdl()">疾患×ADL のまとめ</button><button class="btn small" onclick="renderSummaryNotes()">まとめノート</button></span></div>
       <p>分野・疾患・評価・回・問題の種類を組み合わせて出題。何も選ばなければ全問から。疾患と評価は問題文の語で自動分類しています。</p>
       ${rangeForm()}
       <div class="acts"><button class="btn primary" id="rangeStart" onclick="startRange()">この条件で解く</button><button class="btn" id="rangePrint" onclick="printRange()">🖨 印刷・PDF</button><span class="pill" id="rangeCount"></span></div></div>
