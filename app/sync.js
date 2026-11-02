@@ -98,7 +98,7 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
       del[kind] = {};
       for(const k of keys(da, db)) del[kind][k] = Math.max(da[k] || 0, db[k] || 0);
     }
-    const out = {attempts: {}, explain: {}, marks: {}, notes: {}, srs: {}, wsrs: {}, sessions: [], pref: {},
+    const out = {attempts: {}, explain: {}, marks: {}, notes: {}, srs: {}, wsrs: {}, sessions: [], pref: {}, drill: {},
                  srsInit: Math.max(a.srsInit || 0, b.srsInit || 0), del, resetAt: reset,
                  _updated: Math.max(a._updated || 0, b._updated || 0)};
     for(const id of keys(a.attempts, b.attempts)){
@@ -106,6 +106,12 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
       [...((a.attempts || {})[id] || []), ...((b.attempts || {})[id] || [])].forEach(x => { if(x.t >= reset) m.set(`${x.t}|${x.m || ""}`, x); });
       const arr = [...m.values()].sort((x, y) => x.t - y.t);
       if(arr.length) out.attempts[id] = arr;
+    }
+    for(const k of keys(a.drill, b.drill)){   // ROM・MMT ドリルの記録も回答履歴と同じく和集合
+      const m = new Map();
+      [...((a.drill || {})[k] || []), ...((b.drill || {})[k] || [])].forEach(x => { if(x.t >= reset) m.set(x.t, x); });
+      const arr = [...m.values()].sort((x, y) => x.t - y.t);
+      if(arr.length) out.drill[k] = arr;
     }
     for(const id of keys(a.explain, b.explain)){ const v = newer((a.explain || {})[id], (b.explain || {})[id]); if(v && (v.t || 0) >= reset) out.explain[id] = v; }
     for(const id of keys(a.notes, b.notes)){ const v = newer((a.notes || {})[id], (b.notes || {})[id]); if(v && (v.t || 0) >= reset && (v.t || 0) > (del.notes[id] || 0)) out.notes[id] = v; }

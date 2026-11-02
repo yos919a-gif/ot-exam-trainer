@@ -425,6 +425,7 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 <script src="config.js"></script>
 <script src="sync.js"></script>
 <script src="textbook.js"></script>
+<script src="drill.js"></script>
 <script>
 "use strict";
 /* ================= データ ================= */
@@ -445,7 +446,8 @@ function normS(j){
   return {attempts: j.attempts||{}, explain: j.explain||{}, marks: j.marks||{}, notes: j.notes||{},
           srs: j.srs||{}, sessions: j.sessions||[], pref: j.pref||{}, srsInit: j.srsInit||0,
           wsrs: j.wsrs||{},   // wsrs: 暗記カードの復習予定 {語:{b:段階, due:期日, u:更新時刻}}
-          del: j.del||{}, resetAt: j.resetAt||0, _updated: j._updated||0};   // del: 消した記録の墓標（同期用）
+          del: j.del||{}, resetAt: j.resetAt||0, _updated: j._updated||0,   // del: 消した記録の墓標（同期用）
+          drill: j.drill||{}};   // drill: ROM・MMT ドリルの記録 {キー:[{t, ok}]}（過去問の記録とは別）
 }
 function tomb(kind, key, t=Date.now()){ (S.del[kind] = S.del[kind] || {})[key] = t; }   // 消したことを同期に伝える
 let fileBacked = false, saveTimer = null;
@@ -607,7 +609,7 @@ document.addEventListener("click", e=>{
 async function loadAll(){
   await initStore();
   if(window.SYNC) SYNC.init({get: ()=>store(), put: s=>save(normS(s)),
-    onMerged: ()=>{ if(!session && !wsess && typeof home==="function") home(); }});
+    onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && typeof home==="function") home(); }});
   srsMigrate();
   if(window.TEXTBOOK) TEXTBOOK.load().catch(()=>{});
   const qs = await cfetch("exam/questions.json");
@@ -932,7 +934,7 @@ function ringSvg(pct){ // 正答率の輪
 }
 function barCls(p){ return p===null ? "" : p<50 ? "lo" : p<70 ? "mid" : "hi"; } // 科目の成績バーの色（50%未満・70%未満・それ以上）
 function home(){
-  session = null; wsess = null;
+  session = null; wsess = null; if(window.DRILL) DRILL.reset();
   const s = store();
   const answered = Object.keys(s.attempts).length;
   const attempts = Object.values(s.attempts).reduce((a,b)=>a+b.length,0);
@@ -974,8 +976,9 @@ function home(){
       <p>正答率の低い科目と、最近まちがえた問題を優先。</p>
       <div class="acts"><button class="btn primary" onclick="startWeak(20)">20問</button><button class="btn" onclick="startWeak(50)">50問</button></div></div>
     <div class="tile c4 wide"><div class="top"><span class="ic">💪</span><h3>ROM・MMT</h3></div>
-      <p>午前・午後の第1問目（実地3点）はほぼ ROM か MMT。第50〜61回の該当問題を回の順に。</p>
-      <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div></div>
+      <p>午前・午後の第1問目（実地3点）はほぼ ROM か MMT。上の段は第50〜61回の過去問、下の段は入力して答えるドリル（ROMは2022年改訂の表の全範囲、MMTは過去問の図を正しい図と誤りの図に分けて）。</p>
+      <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div>
+      <div class="acts" style="margin-top:8px"><span class="muted" style="margin:0 6px 0 0">全範囲：</span><button class="btn primary" onclick="DRILL.start('rom')">ROM 全範囲ドリル</button><button class="btn primary" onclick="DRILL.start('mmtok')">MMT 正しい図（15）</button><button class="btn" onclick="DRILL.start('mmtng')">MMT 間違い探し（30）</button></div></div>
     <div class="tile c5 wide" id="rangeCard"><div class="top"><span class="ic">🏥</span><h3>条件を選んで解く</h3>
         <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button></span></div>
       <p>分野・疾患・評価・回・問題の種類を組み合わせて出題。何も選ばなければ全問から。疾患と評価は問題文の語で自動分類しています。</p>
