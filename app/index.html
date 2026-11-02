@@ -404,6 +404,9 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 #termBox .mn{padding:12px 13px;border:0;border-left:3px solid var(--accent3);border-radius:4px;background:var(--card2);font-size:15px;line-height:1.9}
 #termBox>.st{line-height:1.8}
 #termBox>.st:last-child{margin-top:7px;color:var(--accent)}
+#termBox .tb{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+#termBox .tb ul{margin:6px 0 0;padding-left:18px}#termBox .tb li{margin:0 0 8px;font-size:13.5px;line-height:1.7}
+#termBox .tbq{color:var(--ink);font-size:13px}#termBox .tbs{color:var(--sub);font-size:11.5px}
 </style>
 </head>
 <body>
@@ -421,6 +424,7 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 <script src="content.js"></script>
 <script src="config.js"></script>
 <script src="sync.js"></script>
+<script src="textbook.js"></script>
 <script>
 "use strict";
 /* ================= データ ================= */
@@ -587,7 +591,8 @@ function showTerm(el){
     ${g.別名?`<div class="st">＝ ${esc(g.別名)}</div>`:""}
     <div class="mn">${esc(g.意味||"（意味は準備中）")}</div>
     <div class="st">${g.出題数}問に出題（第${g.初出}〜${g.最終}回）・${esc(subs)}</div>
-    ${g.出典?`<div class="st">📖 ${esc(g.出典)}</div>`:""}`;
+    ${g.出典?`<div class="st">📖 ${esc(g.出典)}</div>`:""}
+    ${window.TEXTBOOK && TEXTBOOK.has() ? TEXTBOOK.termHtml(el.dataset.w) || TEXTBOOK.termHtml(g.別名) : ""}`;
   const r = el.getBoundingClientRect();
   box.style.display = "block";
   box.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - box.offsetWidth - 8)) + "px";
@@ -604,6 +609,7 @@ async function loadAll(){
   if(window.SYNC) SYNC.init({get: ()=>store(), put: s=>save(normS(s)),
     onMerged: ()=>{ if(!session && !wsess && typeof home==="function") home(); }});
   srsMigrate();
+  if(window.TEXTBOOK) TEXTBOOK.load().catch(()=>{});
   const qs = await cfetch("exam/questions.json");
   Q = qs.filter(q => !q.採点除外);           // 採点除外(全員正解)は出題対象外
   qs.forEach(q => byId[q.id] = q);
@@ -969,6 +975,7 @@ function home(){
   <div class="sec">科目別の成績 <span style="margin-left:auto"><button class="btn small" onclick="renderTrend()">📈 成績の推移</button></span></div>
   <div class="card">
     <details class="opts" style="border-top:0;margin:0;padding:0"><summary>18科目の正答率を見る</summary><div class="subj" style="margin-top:10px">${rows}</div></details>
+    <details class="opts"><summary>教科書データ${window.TEXTBOOK && TEXTBOOK.has() ? "（取り込み済み）" : ""}</summary><div style="margin-top:8px">${textbookUi()}</div></details>
     <details class="opts"><summary>学習記録（同期・書き出し・取り込み）</summary>
       <div style="margin-top:8px">${syncUi()}
         <button class="btn small" onclick="exportProgress()">書き出す（JSON）</button>
@@ -1545,6 +1552,21 @@ function endWords(){
 }
 
 /* ---------- 記録の入出力 ---------- */
+function textbookUi(){
+  if(!window.TEXTBOOK) return "";
+  const i = TEXTBOOK.info();
+  const pick = `<input type="file" id="tbFile" accept=".json,application/json" style="display:none" onchange="importTextbook(this)">`;
+  if(!i) return `${pick}<button class="btn small primary" onclick="document.getElementById('tbFile').click()">📚 教科書データを取り込む</button>
+    <div class="muted">配られた ot-textbook-data.json を選びます（スマホなら Google Drive の中から選べます）。用語をタップしたときに、教科書での説明・ページが出るようになります。${window.SYNC && SYNC.signedIn() ? "自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。</div>`;
+  return `${pick}📚 取り込み済み（版 ${esc(i.version)}・${i.words}語、教科書の関係あり ${i.withRel}語）
+    <button class="btn small" onclick="document.getElementById('tbFile').click()">取り込み直す</button>
+    <button class="btn small" onclick="if(confirm('この端末と Google Drive から教科書データを消します。よろしいですか？')) TEXTBOOK.remove().then(home)">消す</button>`;
+}
+function importTextbook(inp){
+  const f = inp.files[0]; if(!f) return;
+  f.text().then(t=>TEXTBOOK.importText(t)).then(i=>{ alert(`教科書データを取り込みました（${i.words}語）`); home(); })
+    .catch(e=>alert("取り込めませんでした: " + e.message));
+}
 function syncUi(){
   if(!window.SYNC) return "";
   if(!SYNC.available()) return `<div class="muted">端末間の同期（Google Drive）を使うには、config.js に Google のクライアントIDを設定します。</div>`;

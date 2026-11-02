@@ -5,3 +5,5 @@ content/dictionary/
 # Windows 用の起動ファイル
 *.exe
 start.bat
+# 教科書データのまとめ（各自の Google Drive で配る。公開しない）
+private/

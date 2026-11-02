@@ -4,9 +4,9 @@
 //  - 図（content/images/）: 開いた問題のものから順に保存される
 //  - /api/（serve.py の学習記録）と Google など外部は触らない
 "use strict";
-const SHELL_CACHE = "ot-shell-v1";
+const SHELL_CACHE = "ot-shell-v2";
 const DATA_CACHE = "ot-data-v1";
-const SHELL = ["./", "./index.html", "./appbar.css", "./content.js", "./config.js", "./sync.js",
+const SHELL = ["./", "./index.html", "./appbar.css", "./content.js", "./config.js", "./sync.js", "./textbook.js",
   "./graph.html", "./sakuin.html", "./dendrogram.html", "./lib/d3.v7.8.5.min.js",
   "./icon.png", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest"];
 

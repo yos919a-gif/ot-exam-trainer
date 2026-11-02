@@ -52,33 +52,38 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
     return r;
   }
 
-  /* ---------- Drive のファイル ---------- */
-  async function findFile(){
-    if(st.fileId) return st.fileId;
-    const q = encodeURIComponent(`name='${FILE}' and trashed=false`);
+  /* ---------- Drive のファイル（appDataFolder。学習記録と教科書データ） ---------- */
+  async function findFile(name = FILE){
+    st.ids = st.ids || {};
+    if(st.ids[name]) return st.ids[name];
+    const q = encodeURIComponent(`name='${name}' and trashed=false`);
     const j = await (await call(`${API}/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)`)).json();
-    st.fileId = (j.files && j.files[0]) ? j.files[0].id : null; persist();
-    return st.fileId;
+    st.ids[name] = (j.files && j.files[0]) ? j.files[0].id : null; persist();
+    return st.ids[name];
   }
-  async function download(){
-    const id = await findFile();
+  async function download(name = FILE){
+    const id = await findFile(name);
     if(!id) return null;
     try{ return await (await call(`${API}/drive/v3/files/${id}?alt=media`)).json(); }
-    catch(e){ if(/404/.test(String(e.message))){ st.fileId = null; persist(); return null; } throw e; }
+    catch(e){ if(/404/.test(String(e.message))){ st.ids[name] = null; persist(); return null; } throw e; }
   }
-  async function upload(data){
-    const body = JSON.stringify(data);
-    const id = await findFile();
+  async function upload(data, name = FILE){
+    const body = typeof data === "string" ? data : JSON.stringify(data);
+    const id = await findFile(name);
     if(id){
       await call(`${API}/upload/drive/v3/files/${id}?uploadType=media`, {method: "PATCH", headers: {"Content-Type": "application/json"}, body});
       return;
     }
     const b = "otx" + Date.now();
-    const meta = JSON.stringify({name: FILE, parents: ["appDataFolder"], mimeType: "application/json"});
+    const meta = JSON.stringify({name, parents: ["appDataFolder"], mimeType: "application/json"});
     const mp = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
     const j = await (await call(`${API}/upload/drive/v3/files?uploadType=multipart&fields=id`,
       {method: "POST", headers: {"Content-Type": `multipart/related; boundary=${b}`}, body: mp})).json();
-    st.fileId = j.id; persist();
+    st.ids[name] = j.id; persist();
+  }
+  async function removeFile(name){
+    const id = await findFile(name);
+    if(id){ await call(`${API}/drive/v3/files/${id}`, {method: "DELETE"}).catch(()=>{}); st.ids[name] = null; persist(); }
   }
 
   /* ---------- マージ ---------- */
@@ -171,5 +176,11 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
   }
   const lastSyncText = () => st.lastSync ? new Date(st.lastSync).toLocaleString("ja-JP", {month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"}) : "まだ";
   const status = () => ({busy, lastErr, lastSync: st.lastSync || 0, on: signedIn()});
-  return {available, signedIn, signIn, signOut, syncNow, schedule, init, lastSyncText, status, merge};
+  // 教科書データなど、学習記録以外のファイルを Drive のアプリ専用領域に置く・読む（ログインしていなければ何もしない）
+  const files = {
+    get: name => signedIn() && navigator.onLine ? download(name) : Promise.resolve(null),
+    put: (name, data) => signedIn() && navigator.onLine ? upload(data, name) : Promise.resolve(),
+    remove: name => signedIn() && navigator.onLine ? removeFile(name) : Promise.resolve(),
+  };
+  return {available, signedIn, signIn, signOut, syncNow, schedule, init, lastSyncText, status, merge, files};
 })();
