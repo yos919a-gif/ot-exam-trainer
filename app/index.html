@@ -1606,25 +1606,32 @@ function endWords(){
 function textbookUi(){
   if(!window.TEXTBOOK) return "";
   const i = TEXTBOOK.info();
-  const pick = `<input type="file" id="tbFile" accept=".json,application/json" style="display:none" onchange="importTextbook(this)">`;
+  const pick = `<input type="file" id="tbFile" accept=".json,application/json" multiple style="display:none" onchange="importTextbook(this)">`;
+  const note = `${window.SYNC && SYNC.signedIn() ? "取り込んだ本は自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。`;
   if(!i) return `${pick}<button class="btn small primary" onclick="document.getElementById('tbFile').click()">📚 教科書データを取り込む</button>
-    <div class="muted">配られた ot-textbook-data.json を選びます（スマホなら Google Drive の中から選べます）。用語をタップしたときに、教科書での説明・ページが出るようになります。${window.SYNC && SYNC.signedIn() ? "自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。</div>`;
+    <div class="muted">配られた「辞書データ」の中の 辞書_○○.json を選びます（複数まとめて選べます。スマホなら Google Drive の中から選べます）。取り込むと、用語の吹き出しに教科書での説明が出て、総合索引も使えるようになります。${note}</div>`;
   const bs = TEXTBOOK.books(), nOn = bs.filter(b=>b.on).length;
-  const list = bs.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px">
-      <input type="checkbox" ${b.on?"checked":""} onchange="TEXTBOOK.setBook(this.dataset.k, this.checked); document.getElementById('tbCount').textContent = TEXTBOOK.books().filter(x=>x.on).length" data-k="${esc(b.key)}">
-      ${esc(b.name)} <span class="muted" style="margin:0">${[b.words ? `索引${b.words}` : "", b.rels ? `説明${b.rels}` : ""].filter(Boolean).join("・")}</span></label>`).join("");
-  return `${pick}📚 取り込み済み（版 ${esc(i.version)}・${i.words}語、教科書の関係あり ${i.withRel}語）
-    <button class="btn small" onclick="document.getElementById('tbFile').click()">取り込み直す</button>
-    <button class="btn small" onclick="if(confirm('この端末と Google Drive から教科書データを消します。よろしいですか？')) TEXTBOOK.remove().then(home)">消す</button>
+  const list = bs.map(b=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;break-inside:avoid">
+      <label style="display:flex;align-items:center;gap:8px;flex:1;min-width:0"><input type="checkbox" ${b.on?"checked":""} data-k="${esc(b.key)}"
+        onchange="TEXTBOOK.setBook(this.dataset.k, this.checked); document.getElementById('tbCount').textContent = TEXTBOOK.books().filter(x=>x.on).length">
+        <span>${esc(b.name)} <span class="muted" style="margin:0">${[b.words ? `索引${b.words}` : "", b.rels ? `説明${b.rels}` : ""].filter(Boolean).join("・")}</span></span></label>
+      <button class="btn small ghost" title="この本を削除" data-k="${esc(b.key)}" data-n="${esc(b.name)}"
+        onclick="if(confirm('「'+this.dataset.n+'」をこの端末と Google Drive から削除します。よろしいですか？')) TEXTBOOK.removeBook(this.dataset.k).then(home)">削除</button></div>`).join("");
+  return `${pick}📚 取り込み済み：${i.books}冊（版 ${esc(i.version)}）
+    <button class="btn small" onclick="document.getElementById('tbFile').click()">本を追加する</button>
+    <button class="btn small" onclick="if(confirm('取り込んだ教科書データをすべて、この端末と Google Drive から削除します。よろしいですか？')) TEXTBOOK.remove().then(home)">すべて削除</button>
+    <div class="muted">${note}</div>
     <div style="margin-top:10px"><b>使う本</b>（<span id="tbCount">${nOn}</span>/${bs.length}冊）
       <button class="btn small" onclick="TEXTBOOK.setAll(true); home()">すべて選ぶ</button><button class="btn small" onclick="TEXTBOOK.setAll(false); home()">すべて外す</button>
-      <div class="muted" style="margin:2px 0 6px">チェックした本だけが、用語の吹き出しと総合索引に出ます。選んだ状態は同期されます。「索引」は総合索引の語の数、「説明」は吹き出しに出る説明の数です。</div>
-      <div style="columns:2 220px;column-gap:20px">${list}</div></div>`;
+      <div class="muted" style="margin:2px 0 6px">チェックした本だけが、用語の吹き出しと総合索引に出ます（外しても消えません）。いらない本は「削除」。「索引」は総合索引の語の数、「説明」は吹き出しに出る説明の数です。</div>
+      <div style="columns:2 260px;column-gap:20px">${list}</div></div>`;
 }
 function importTextbook(inp){
-  const f = inp.files[0]; if(!f) return;
-  f.text().then(t=>TEXTBOOK.importText(t)).then(i=>{ alert(`教科書データを取り込みました（${i.words}語）`); home(); })
-    .catch(e=>alert("取り込めませんでした: " + e.message));
+  const files = [...inp.files]; if(!files.length) return;
+  TEXTBOOK.importFiles(files).then(r=>{
+    alert(`${r.names.length}冊を取り込みました。${r.errors.length ? "\n\n取り込めなかったファイル:\n" + r.errors.join("\n") : ""}`);
+    inp.value = ""; home();
+  });
 }
 function syncUi(){
   if(!window.SYNC) return "";

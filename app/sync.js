@@ -83,6 +83,13 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
       {method: "POST", headers: {"Content-Type": `multipart/related; boundary=${b}`}, body: mp})).json();
     st.ids[name] = j.id; persist();
   }
+  async function listFiles(prefix){
+    const q = encodeURIComponent(`name contains '${prefix}' and trashed=false`);
+    const j = await (await call(`${API}/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,name)&pageSize=1000`)).json();
+    st.ids = st.ids || {};
+    (j.files || []).forEach(f => { st.ids[f.name] = f.id; }); persist();
+    return (j.files || []).map(f => f.name).filter(n => n.startsWith(prefix));
+  }
   async function removeFile(name){
     const id = await findFile(name);
     if(id){ await call(`${API}/drive/v3/files/${id}`, {method: "DELETE"}).catch(()=>{}); st.ids[name] = null; persist(); }
@@ -189,6 +196,7 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
     get: name => signedIn() && navigator.onLine ? download(name) : Promise.resolve(null),
     put: (name, data) => signedIn() && navigator.onLine ? upload(data, name) : Promise.resolve(),
     remove: name => signedIn() && navigator.onLine ? removeFile(name) : Promise.resolve(),
+    list: prefix => signedIn() && navigator.onLine ? listFiles(prefix) : Promise.resolve([]),
   };
   return {available, signedIn, signIn, signOut, syncNow, schedule, init, lastSyncText, status, merge, files};
 })();

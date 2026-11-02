@@ -1,12 +1,15 @@
-// 教科書データ（各自が取り込む。公開サイトには入っていない）
-//  - 取り込み: 「教科書データを取り込む」で ot-textbook-data.json（tools/bundle_textbook.py が作る）を選ぶ
-//  - 保存: 端末の IndexedDB。Google ログインしていれば Drive のアプリ専用領域にも置き、ほかの端末はそこから読む
-//  - 使い道: 用語をタップしたときに「教科書では」（本・ページ・関係・根拠の文）を出す。総合索引のページ（sakuin.html）もこのデータを使う
-//  - 本の選択: 出す本をチェックボックスで選べる（外した本は S.pref.tbOff。学習記録と一緒に同期される）
+// 教科書データ（辞書データ。各自が取り込む。公開サイトには入っていない）
+//  - 取り込み: 1冊ずつのファイル（tools/bundle_textbook.py が作る 辞書_<id>_<書名>.json）を、まとめて選んで取り込む。
+//    本を足すときはファイルを足して取り込み、外すときは一覧から削除する。以前の全冊入りのファイルも本ごとに分けて取り込める
+//  - 保存: 端末の IndexedDB に本ごと。Google ログインしていれば Drive のアプリ専用領域にも本ごと（ot-tb-<id>.json）に置き、
+//    ほかの端末はそこから読む
+//  - 使い道: 用語の吹き出しの「教科書では」と、総合索引のページ（sakuin.html）
+//  - 本の選択: チェックボックスで一時的に外せる（外した本は S.pref.tbOff。学習記録と一緒に同期される）
 "use strict";
 window.TEXTBOOK = (() => {
-  const DB = "ot-textbook", STORE = "kv", KEY = "bundle", DRIVE_FILE = "ot-textbook-data.json";
-  let data = null;   // {kind, version, entries:{id:{w, n, r:[[本, p, rel, 相手, 根拠]]}}, index:{表記:[id]}}
+  const DB = "ot-textbook", STORE = "kv", PREFIX = "book:", DRIVE_PREFIX = "ot-tb-";
+  let bookMap = {};   // {本id: 1冊のデータ {kind, version, id, name, terms, entries, index}}
+  let data = null;    // 全冊をまとめたもの {version, entries:{項目id:{w, n, r:[[本id, p, rel, 相手, 根拠]]}}, index:{表記:[項目id]}, sakuin:{books, terms}}
 
   function idb(mode, fn){
     return new Promise((ok, ng) => {
@@ -21,37 +24,109 @@ window.TEXTBOOK = (() => {
       };
     });
   }
-  const valid = j => j && j.kind === "ot-textbook-data" && j.entries && j.index;
+  const idbPut = (key, v) => idb("readwrite", st => st.put(v, key));
+  const idbDel = key => idb("readwrite", st => st.delete(key));
+  const idbBooks = () => idb("readonly", st => st.getAll(IDBKeyRange.bound(PREFIX, PREFIX + "￿")));
+  const isBook = j => j && j.kind === "ot-textbook-book" && j.id && j.terms && j.entries && j.index;
+  const isOldBundle = j => j && j.kind === "ot-textbook-data" && j.entries && j.index;
+  // 本の名前の見せ方（以前の版の出どころの名前は、スキャンの画質の注記を外し、誤記を直す）
+  const bookName = b => String(b).replace(/[\s　]*普通画質$/, "").replace("作業療法評価額", "作業療法評価学").replace(/　/g, " ");
+
+  // 以前の全冊入りのファイルを本ごとに分ける（総合索引の入っていない古いものは、説明だけを出どころの名前ごとに）
+  function splitBundle(j){
+    const out = {}, get = (id, name) => out[id] || (out[id] = {kind: "ot-textbook-book", version: j.version || "", id, name, terms: {}, entries: {}, index: {}});
+    if(j.sakuin) Object.entries(j.sakuin.books).forEach(([id, name]) => get(id, name));
+    if(j.sakuin) Object.entries(j.sakuin.terms).forEach(([w, t]) => t.e.forEach(([id, ...rest]) => {
+      const x = get(id, j.sakuin.books[id] || id).terms;
+      (x[w] = x[w] || {r: t.r, n: t.n, al: t.al, e: []}).e.push(rest);
+    }));
+    Object.entries(j.entries).forEach(([eid, e]) => e.r.forEach(([src, ...rest]) => {
+      const id = (j.srcBook && j.srcBook[src]) || src, b = get(id, (j.sakuin && j.sakuin.books[id]) || bookName(src));
+      (b.entries[eid] = b.entries[eid] || {w: e.w, n: e.n, r: []}).r.push(rest);
+    }));
+    Object.values(out).forEach(b => Object.entries(j.index).forEach(([k, ids]) => {
+      const v = ids.filter(i => b.entries[i]); if(v.length) b.index[k] = v;
+    }));
+    return Object.values(out);
+  }
+  // 取り込んだ本をまとめ直す（本を足したり消したりするたびに）
+  function rebuild(){
+    const ids = Object.keys(bookMap);
+    if(!ids.length){ data = null; return; }
+    const entries = {}, index = {}, terms = {}, books = {};
+    let version = "";
+    ids.forEach(id => {
+      const b = bookMap[id];
+      books[id] = b.name; version = version || b.version;
+      Object.entries(b.entries).forEach(([eid, e]) => {
+        const t = entries[eid] || (entries[eid] = {w: e.w, n: e.n, r: []});
+        e.r.forEach(r => t.r.push([id, ...r]));
+      });
+      Object.entries(b.index).forEach(([k, v]) => { const a = index[k] || (index[k] = []); v.forEach(i => { if(!a.includes(i)) a.push(i); }); });
+      Object.entries(b.terms).forEach(([w, t]) => {
+        const x = terms[w] || (terms[w] = {r: t.r, n: t.n, al: t.al, e: []});
+        t.e.forEach(e => x.e.push([id, ...e]));
+      });
+    });
+    data = {version, entries, index, sakuin: {books, terms}};
+  }
 
   async function load(){
-    try{ const j = await idb("readonly", st => st.get(KEY)); if(valid(j)){ data = j; return true; } }catch(e){ console.warn("教科書データ（端末）", e); }
-    // この端末に無ければ、ログインしていれば Drive から
+    try{ ((await idbBooks()) || []).forEach(b => { if(isBook(b)) bookMap[b.id] = b; }); }catch(e){ console.warn("教科書データ（端末）", e); }
+    // 以前の全冊入りのデータが端末に残っていれば、本ごとに分けて入れ直す
     try{
-      if(window.SYNC){
-        const j = await SYNC.files.get(DRIVE_FILE);
-        if(valid(j)){ data = j; await idb("readwrite", st => st.put(j, KEY)); return true; }
+      const old = await idb("readonly", st => st.get("bundle"));
+      if(isOldBundle(old)){
+        for(const b of splitBundle(old)){ bookMap[b.id] = b; await idbPut(PREFIX + b.id, b); }
+        await idbDel("bundle");
+      }
+    }catch(e){ console.warn("教科書データ（以前の版）", e); }
+    // ログインしていれば、ほかの端末で取り込んだ本を Drive から
+    try{
+      if(window.SYNC && SYNC.signedIn()){
+        for(const name of await SYNC.files.list(DRIVE_PREFIX)){
+          const id = name.slice(DRIVE_PREFIX.length).replace(/\.json$/, "");
+          if(bookMap[id]) continue;
+          const b = await SYNC.files.get(name);
+          if(isBook(b)){ bookMap[b.id] = b; await idbPut(PREFIX + b.id, b); }
+        }
       }
     }catch(e){ console.warn("教科書データ（Drive）", e); }
-    return false;
+    rebuild();
+    return !!data;
   }
+  // 1ファイル分を取り込む（1冊のファイルか、以前の全冊入りのファイル）。取り込んだ本の名前を返す
   async function importText(text){
     let j;
     try{ j = JSON.parse(text); }catch(e){ throw new Error("JSON として読めません"); }
-    if(!valid(j)) throw new Error("OT国試トレーナーの教科書データではありません");
-    data = j;
-    await idb("readwrite", st => st.put(j, KEY));
-    try{ if(window.SYNC) await SYNC.files.put(DRIVE_FILE, text); }catch(e){ console.warn("Drive に保存できませんでした", e); }
-    return info();
+    const list = isBook(j) ? [j] : isOldBundle(j) ? splitBundle(j) : null;
+    if(!list) throw new Error("OT国試トレーナーの教科書データではありません");
+    for(const b of list){
+      bookMap[b.id] = b;
+      await idbPut(PREFIX + b.id, b);
+      try{ if(window.SYNC) await SYNC.files.put(DRIVE_PREFIX + b.id + ".json", b); }catch(e){ console.warn("Drive に保存できませんでした", b.id, e); }
+    }
+    rebuild();
+    return list.map(b => b.name);
   }
-  async function remove(){
-    data = null;
-    await idb("readwrite", st => st.delete(KEY));
-    try{ if(window.SYNC) await SYNC.files.remove(DRIVE_FILE); }catch(e){}
+  async function importFiles(files){
+    const names = [], errors = [];
+    for(const f of files){
+      try{ names.push(...await importText(await f.text())); }catch(e){ errors.push(`${f.name}: ${e.message}`); }
+    }
+    return {names, errors};
   }
+  async function removeBook(id){
+    delete bookMap[id];
+    await idbDel(PREFIX + id);
+    try{ if(window.SYNC) await SYNC.files.remove(DRIVE_PREFIX + id + ".json"); }catch(e){}
+    rebuild();
+  }
+  async function remove(){ for(const id of Object.keys(bookMap)) await removeBook(id); }
   function info(){
     if(!data) return null;
     const ids = Object.keys(data.entries);
-    return {version: data.version || "", words: ids.length, withRel: ids.filter(i => data.entries[i].r.length).length};
+    return {version: data.version || "", books: Object.keys(bookMap).length, words: ids.length, withRel: ids.filter(i => data.entries[i].r.length).length};
   }
   // 語（用語集の見出しや別名）から教科書の項目を探す。表記ゆれは空白の有無まで吸収
   function lookup(word){
@@ -60,28 +135,17 @@ window.TEXTBOOK = (() => {
     if(!ids || !ids.length) return null;
     return data.entries[ids[0]] || null;
   }
-  // 本の名前の見せ方（スキャンの画質の注記を外し、誤記を直す）
-  const bookName = b => String(b).replace(/[\s　]*普通画質$/, "").replace("作業療法評価額", "作業療法評価学").replace(/　/g, " ");
-  // 本の鍵: 総合索引の入ったデータでは総合索引の本の id（説明の出どころは srcBook で id に直す）。古いデータでは出どころの名前
-  const keyOfSrc = src => (data && data.srcBook && data.srcBook[src]) || src;
   // 外した本。ホーム（index.html の let S）ではそこから、総合索引など S の無いページでは保存済みの学習記録から読む
   const offSet = () => {
-    let off = [];
-    if(typeof S !== "undefined") off = (S.pref && S.pref.tbOff) || [];
-    else{ try{ off = ((JSON.parse(localStorage.getItem("ot-exam-progress-v1")) || {}).pref || {}).tbOff || []; }catch(e){} }
-    return new Set(off.map(keyOfSrc));   // 以前の版で出どころの名前のまま外した本も id に直す
+    if(typeof S !== "undefined") return new Set((S.pref && S.pref.tbOff) || []);
+    try{ return new Set(((JSON.parse(localStorage.getItem("ot-exam-progress-v1")) || {}).pref || {}).tbOff || []); }catch(e){ return new Set(); }
   };
-  // 取り込んだデータに入っている本（総合索引の語数・説明の数つき、多い順）
+  // 取り込んだ本（総合索引の語数・説明の数つき、多い順）
   function books(){
-    if(!data) return [];
-    const off = offSet(), rel = {}, idx = {};
-    Object.values(data.entries).forEach(e => e.r.forEach(r => { const k = keyOfSrc(r[0]); rel[k] = (rel[k] || 0) + 1; }));
-    if(data.sakuin){
-      Object.values(data.sakuin.terms).forEach(t => t.e.forEach(e => { idx[e[0]] = (idx[e[0]] || 0) + 1; }));
-      return Object.entries(data.sakuin.books).map(([key, name]) => ({key, name, words: idx[key] || 0, rels: rel[key] || 0, on: !off.has(key)}))
-        .sort((a, b) => (b.words + b.rels) - (a.words + a.rels));
-    }
-    return Object.entries(rel).sort((a, b) => b[1] - a[1]).map(([key, n]) => ({key, name: bookName(key), words: 0, rels: n, on: !off.has(key)}));
+    const off = offSet();
+    return Object.values(bookMap).map(b => ({key: b.id, name: b.name, words: Object.keys(b.terms).length,
+      rels: Object.values(b.entries).reduce((n, e) => n + e.r.length, 0), on: !off.has(b.id)}))
+      .sort((a, b) => (b.words + b.rels) - (a.words + a.rels));
   }
   function setBook(key, on){
     const off = offSet();
@@ -94,14 +158,14 @@ window.TEXTBOOK = (() => {
     const e0 = lookup(word);
     if(!e0) return "";
     const off = offSet();
-    const e = Object.assign({}, e0, {r: e0.r.filter(r => !off.has(keyOfSrc(r[0])))});
+    const e = Object.assign({}, e0, {r: e0.r.filter(r => !off.has(r[0]))});
     if(!e.r.length) return "";
     const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
-    const rows = e.r.slice(0, max).map(([book, p, rel, other, quote]) =>
-      `<li><b>${esc(rel)}</b>：${esc(other)}${quote ? `<div class="tbq">「${esc(quote)}」</div>` : ""}<div class="tbs">${esc(bookName(book))}${p ? ` p.${esc(p)}` : ""}</div></li>`).join("");
+    const rows = e.r.slice(0, max).map(([id, p, rel, other, quote]) =>
+      `<li><b>${esc(rel)}</b>：${esc(other)}${quote ? `<div class="tbq">「${esc(quote)}」</div>` : ""}<div class="tbs">${esc(data.sakuin.books[id] || bookName(id))}${p ? ` p.${esc(p)}` : ""}</div></li>`).join("");
     const more = e.r.length > max ? `<div class="st">ほか ${e.r.length - max}件</div>` : "";
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
-  return {load, importText, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+  return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet()};
 })();
