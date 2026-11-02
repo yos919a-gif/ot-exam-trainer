@@ -101,7 +101,7 @@ label.ck{gap:7px;min-height:34px}label.ck input{width:17px;height:17px;accent-co
 <script src="textbook.js"></script>
 <script>
 "use strict";
-// 総合索引 data/refs/総合索引.json（tools/build_master_index.py が作る）: 語 → [本, 補足, ページ]
+// 総合索引（tools/build_master_index.py が作り、tools/bundle_textbook.py が教科書データに入れる）: 語 → [本, 補足, ページ]
 let D = {books:{}, terms:{}}, KEYS = [];
 const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const kata = s => s.replace(/[ぁ-ゖ]/g, c=>String.fromCharCode(c.charCodeAt(0)+0x60)); // ひらがな→カタカナ（読みで引く）
@@ -177,19 +177,36 @@ if(matchMedia("(hover: hover) and (pointer: fine)").matches){
 Promise.all([
   cfetch("glossary/glossary.json").then(g=>{ GLOSS = g;
     Object.entries(g).forEach(([k, v])=>{ [].concat(v.別名 || []).forEach(a=>{ if(a) GALIAS[a] = k; }); }); }).catch(e=>console.warn("用語集なし", e)),
-  window.TEXTBOOK ? TEXTBOOK.load().catch(()=>{}) : null,
 ]).then(()=>{ if(KEYS.length) render(); });
 
-cfetch("refs/総合索引.json").then(d=>{
-  D = d; KEYS = Object.keys(d.terms);
-  document.getElementById("info").textContent = `${Object.keys(d.books).length}冊・${KEYS.length.toLocaleString()}語`;
+// 総合索引は教科書データの一部（公開サイトには置かない）。取り込んでいない端末では案内だけ出す
+function gate(msg){
+  document.querySelector(".bar").style.display = "none";
+  document.getElementById("info").textContent = "";
+  document.getElementById("list").innerHTML = `<div class="item">${msg}<div style="margin-top:10px"><a href="index.html">ホームへ</a>
+    （ホームの一番下「教科書データ」から取り込めます。Google でログインしていれば、ほかの端末で取り込んだデータも使えます）</div></div>`;
+}
+(window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
+  const d = window.TEXTBOOK && TEXTBOOK.sakuin();
+  if(!d){
+    gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データが古い版で、総合索引が入っていません。新しい ot-textbook-data.json を取り込み直してください。"
+                                          : "📚 総合索引は、教科書データを取り込んだ人だけが使えます。");
+    return;
+  }
+  // ホームの「教科書データ」で選んだ本だけにする（外した本のページは出さず、ページが残らない語は一覧から外す）
+  const off = TEXTBOOK.offIds(), books = {}, terms = {};
+  Object.entries(d.books).forEach(([id, name])=>{ if(!off.has(id)) books[id] = name; });
+  Object.entries(d.terms).forEach(([k, t])=>{ const e = t.e.filter(x=>books[x[0]]); if(e.length) terms[k] = Object.assign({}, t, {e}); });
+  if(!Object.keys(books).length){ gate("📚 使う本がひとつも選ばれていません。ホームの「教科書データ」で本を選んでください。"); return; }
+  D = {books, terms}; KEYS = Object.keys(terms);
+  document.getElementById("info").textContent = `${Object.keys(books).length}冊・${KEYS.length.toLocaleString()}語${off.size ? `（${Object.keys(d.books).length}冊のうち選んだ本）` : ""}`;
   const sel = document.getElementById("book");
-  Object.entries(d.books).sort((a,b)=>a[1].localeCompare(b[1],"ja")).forEach(([id,name])=>{
+  Object.entries(books).sort((a,b)=>a[1].localeCompare(b[1],"ja")).forEach(([id,name])=>{
     const o = document.createElement("option"); o.value = id; o.textContent = name; sel.appendChild(o); });
   const q0 = new URLSearchParams(location.search).get("q"); if(q0) document.getElementById("q").value = q0;
   ["q","book","exam"].forEach(id=>document.getElementById(id).addEventListener("input", render));
   render();
-}).catch(e=>{ document.getElementById("list").textContent = "総合索引を読み込めませんでした（start.bat から開いてください）: " + e; });
+}).catch(e=>{ document.getElementById("list").textContent = "総合索引を読み込めませんでした: " + e; });
 </script>
 </body>
 </html>

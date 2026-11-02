@@ -1,7 +1,7 @@
 // 教科書データ（各自が取り込む。公開サイトには入っていない）
 //  - 取り込み: 「教科書データを取り込む」で ot-textbook-data.json（tools/bundle_textbook.py が作る）を選ぶ
 //  - 保存: 端末の IndexedDB。Google ログインしていれば Drive のアプリ専用領域にも置き、ほかの端末はそこから読む
-//  - 使い道: 用語をタップしたときに「教科書では」（本・ページ・関係・根拠の文）を出す
+//  - 使い道: 用語をタップしたときに「教科書では」（本・ページ・関係・根拠の文）を出す。総合索引のページ（sakuin.html）もこのデータを使う
 //  - 本の選択: 出す本をチェックボックスで選べる（外した本は S.pref.tbOff。学習記録と一緒に同期される）
 "use strict";
 window.TEXTBOOK = (() => {
@@ -60,20 +60,28 @@ window.TEXTBOOK = (() => {
     if(!ids || !ids.length) return null;
     return data.entries[ids[0]] || null;
   }
-  // 本の名前の見せ方（スキャンの画質の注記を外し、誤記を直す）。選ぶときの鍵は元の名前のまま
+  // 本の名前の見せ方（スキャンの画質の注記を外し、誤記を直す）
   const bookName = b => String(b).replace(/[\s　]*普通画質$/, "").replace("作業療法評価額", "作業療法評価学").replace(/　/g, " ");
+  // 本の鍵: 総合索引の入ったデータでは総合索引の本の id（説明の出どころは srcBook で id に直す）。古いデータでは出どころの名前
+  const keyOfSrc = src => (data && data.srcBook && data.srcBook[src]) || src;
   // 外した本。ホーム（index.html の let S）ではそこから、総合索引など S の無いページでは保存済みの学習記録から読む
   const offSet = () => {
-    if(typeof S !== "undefined") return new Set((S.pref && S.pref.tbOff) || []);
-    try{ return new Set(((JSON.parse(localStorage.getItem("ot-exam-progress-v1")) || {}).pref || {}).tbOff || []); }catch(e){ return new Set(); }
+    let off = [];
+    if(typeof S !== "undefined") off = (S.pref && S.pref.tbOff) || [];
+    else{ try{ off = ((JSON.parse(localStorage.getItem("ot-exam-progress-v1")) || {}).pref || {}).tbOff || []; }catch(e){} }
+    return new Set(off.map(keyOfSrc));   // 以前の版で出どころの名前のまま外した本も id に直す
   };
-  // 取り込んだデータに入っている本と、それぞれの説明の数（多い順）
+  // 取り込んだデータに入っている本（総合索引の語数・説明の数つき、多い順）
   function books(){
     if(!data) return [];
-    const n = {};
-    Object.values(data.entries).forEach(e => e.r.forEach(r => { n[r[0]] = (n[r[0]] || 0) + 1; }));
-    const off = offSet();
-    return Object.entries(n).sort((a, b) => b[1] - a[1]).map(([key, count]) => ({key, name: bookName(key), count, on: !off.has(key)}));
+    const off = offSet(), rel = {}, idx = {};
+    Object.values(data.entries).forEach(e => e.r.forEach(r => { const k = keyOfSrc(r[0]); rel[k] = (rel[k] || 0) + 1; }));
+    if(data.sakuin){
+      Object.values(data.sakuin.terms).forEach(t => t.e.forEach(e => { idx[e[0]] = (idx[e[0]] || 0) + 1; }));
+      return Object.entries(data.sakuin.books).map(([key, name]) => ({key, name, words: idx[key] || 0, rels: rel[key] || 0, on: !off.has(key)}))
+        .sort((a, b) => (b.words + b.rels) - (a.words + a.rels));
+    }
+    return Object.entries(rel).sort((a, b) => b[1] - a[1]).map(([key, n]) => ({key, name: bookName(key), words: 0, rels: n, on: !off.has(key)}));
   }
   function setBook(key, on){
     const off = offSet();
@@ -86,7 +94,7 @@ window.TEXTBOOK = (() => {
     const e0 = lookup(word);
     if(!e0) return "";
     const off = offSet();
-    const e = Object.assign({}, e0, {r: e0.r.filter(r => !off.has(r[0]))});
+    const e = Object.assign({}, e0, {r: e0.r.filter(r => !off.has(keyOfSrc(r[0])))});
     if(!e.r.length) return "";
     const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
     const rows = e.r.slice(0, max).map(([book, p, rel, other, quote]) =>
@@ -94,5 +102,6 @@ window.TEXTBOOK = (() => {
     const more = e.r.length > max ? `<div class="st">ほか ${e.r.length - max}件</div>` : "";
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
-  return {load, importText, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data};
+  return {load, importText, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+          sakuin: () => (data && data.sakuin) || null, offIds: () => offSet()};
 })();

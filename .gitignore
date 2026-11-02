@@ -7,3 +7,5 @@ content/dictionary/
 start.bat
 # 教科書データのまとめ（各自の Google Drive で配る。公開しない）
 private/
+# 教科書の総合索引（教科書データに入れて配る。公開しない）
+content/refs/

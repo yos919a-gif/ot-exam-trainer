@@ -25,7 +25,7 @@ async function cfetch(path){
 // 圏外でも使えるように、図以外のデータを Service Worker に先に保存してもらう（content/manifest.json の一覧）
 function precacheContent(){
   if(!("serviceWorker" in navigator) || !MANIFEST || !MANIFEST.files) return;
-  const urls = Object.keys(MANIFEST.files).filter(p=>!p.startsWith("images/") && !p.startsWith("dictionary/"))   // 辞書はアプリが使わない（公開版には入れない）.map(p=>new URL(curl(p), location.href).href);
+  const urls = Object.keys(MANIFEST.files).filter(p=>!p.startsWith("images/") && !p.startsWith("dictionary/") && !p.startsWith("refs/"))   // 辞書・総合索引は教科書データで配る（公開版には入れない）.map(p=>new URL(curl(p), location.href).href);
   urls.push(new URL(`${CONTENT}/manifest.json`, location.href).href);
   navigator.serviceWorker.ready.then(reg=>{ if(reg.active) reg.active.postMessage({type:"precache", urls, version: MANIFEST.version}); }).catch(()=>{});
 }
