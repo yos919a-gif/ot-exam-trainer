@@ -62,7 +62,11 @@ window.TEXTBOOK = (() => {
   }
   // 本の名前の見せ方（スキャンの画質の注記を外し、誤記を直す）。選ぶときの鍵は元の名前のまま
   const bookName = b => String(b).replace(/[\s　]*普通画質$/, "").replace("作業療法評価額", "作業療法評価学").replace(/　/g, " ");
-  const offSet = () => new Set((typeof S !== "undefined" && S.pref && S.pref.tbOff) || []);   // S は index.html の let（window には載らない）
+  // 外した本。ホーム（index.html の let S）ではそこから、総合索引など S の無いページでは保存済みの学習記録から読む
+  const offSet = () => {
+    if(typeof S !== "undefined") return new Set((S.pref && S.pref.tbOff) || []);
+    try{ return new Set(((JSON.parse(localStorage.getItem("ot-exam-progress-v1")) || {}).pref || {}).tbOff || []); }catch(e){ return new Set(); }
+  };
   // 取り込んだデータに入っている本と、それぞれの説明の数（多い順）
   function books(){
     if(!data) return [];
