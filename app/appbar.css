@@ -1,0 +1,104 @@
+/* 上の帯（ロゴ・タブ）。語マップ・総合索引の画面で共通に使う（トレーナー本体 index.html は同じ指定を内蔵）。
+   色は各画面の --card / --line / --ink / --sub / --accent を使い、無いものは既定値 */
+header.appbar{display:block;max-width:none;padding:0;position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--card) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);margin:0 -16px 8px} /* 各画面の header{max-width…} の指定より強く */
+.appbar .wrap{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;letter-spacing:.5px;
+  color:#fff;background:linear-gradient(135deg,var(--accent),var(--violet,#7c5cff))}
+.brand b{display:block;font-size:16px;line-height:1.2}
+.brand small{display:block;color:var(--sub,var(--ink2,#5b6577));font-size:11px;line-height:1.2}
+.tabs{display:flex;gap:4px;background:var(--card2,color-mix(in srgb,var(--card) 92%,var(--line)));border:1px solid var(--line);border-radius:12px;padding:3px}
+.tabs a{padding:5px 14px;border-radius:9px;font-size:14px;color:var(--sub,var(--ink2,#5b6577));text-decoration:none;white-space:nowrap}
+.tabs a.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.06),0 4px 12px rgba(16,24,40,.06)}
+@media (max-width:560px){ .brand small{display:none} .appbar .wrap{gap:10px;padding:8px 12px} .tabs a{padding:5px 10px} }
+
+/* 発注53：紙面の色と科目の色。装飾のみ、外部リソース不要。 */
+:root{
+  color-scheme:light;
+  --bg:#f5f3ed;--surface:var(--bg);--card:#fffefd;--card2:#f3f4ef;
+  --ink:#213247;--sub:#5c6b79;--ink2:var(--sub);--faint:#687789;--muted:var(--faint);
+  --line:#d6ddd9;--accent:#285f8b;--accent-ink:#fff;--accent2:#e8f0f6;--accent3:#adc7d9;
+  --teal:#227b70;--teal2:#e5f2ed;--violet:#7754a0;--violet2:#f0ebf6;
+  --amber:#946117;--amber2:#f8efdf;--rose:#a74660;--rose2:#f9eaf0;
+  --ok:#147347;--ok2:#e9f4ec;--ng:#b73549;--ng2:#fcecef;--status-ink:#fff;--warn:#926117;
+  --subject-anatomy:#285f8b;--subject-physiology:#1b7867;--subject-kinesiology:#7754a0;
+  --subject-internal:#a35332;--subject-neurology:#705894;--subject-orthopedics:#587040;
+  --subject-psychiatry:#a34869;--subject-pediatrics:#927022;--subject-psychology:#886277;
+  --subject-rehabilitation:#3c7478;--subject-ot:#246d78;--subject-assessment:#556d9a;
+  --subject-physical:#46714c;--subject-mental:#865590;--subject-development:#9d6637;
+  --subject-geriatric:#6c7144;--subject-cognitive:#6064a0;--subject-community:#856229;
+  --g1:var(--subject-anatomy);--g2:var(--subject-internal);--g3:var(--subject-ot);--g4:var(--subject-mental);--g5:var(--subject-community);
+  --r:14px;--r-sm:9px;--page-width:1040px;--appbar-height:73px;
+  --shadow:0 2px 5px #23324609;--shadow-lg:0 8px 22px #2332461c;--series:var(--accent);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#121b24;--card:#1a2733;--card2:#21313e;--ink:#edf2f4;--sub:#b0bec9;--faint:#a2b2bf;
+  --line:#3a4c59;--accent:#9dc8ed;--accent-ink:#142330;--accent2:#253f53;--accent3:#52758e;
+  --teal:#8bd5c4;--teal2:#213f3c;--violet:#c7ace9;--violet2:#373047;
+  --amber:#e7c080;--amber2:#403724;--rose:#eaa4ba;--rose2:#432e3c;
+  --ok:#88ddb1;--ok2:#203d31;--ng:#ffb0ba;--ng2:#482e39;--status-ink:#142330;--warn:#e7c080;
+  --subject-anatomy:#9dc8ed;--subject-physiology:#8bd5bf;--subject-kinesiology:#c7ace9;
+  --subject-internal:#e8b395;--subject-neurology:#c0b0e4;--subject-orthopedics:#b9cf99;
+  --subject-psychiatry:#eaa4ba;--subject-pediatrics:#dec591;--subject-psychology:#d3b2c6;
+  --subject-rehabilitation:#99d0d4;--subject-ot:#95cfda;--subject-assessment:#adc3ea;
+  --subject-physical:#abd2ad;--subject-mental:#d0afe3;--subject-development:#e3bd94;
+  --subject-geriatric:#c9cc9c;--subject-cognitive:#b7b8ed;--subject-community:#d9c28e;
+  --shadow:0 2px 5px #00000018;--shadow-lg:0 8px 22px #00000040;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121b24;--card:#1a2733;--card2:#21313e;--ink:#edf2f4;--sub:#b0bec9;--faint:#a2b2bf;
+  --line:#3a4c59;--accent:#9dc8ed;--accent-ink:#142330;--accent2:#253f53;--accent3:#52758e;
+  --teal:#8bd5c4;--teal2:#213f3c;--violet:#c7ace9;--violet2:#373047;
+  --amber:#e7c080;--amber2:#403724;--rose:#eaa4ba;--rose2:#432e3c;
+  --ok:#88ddb1;--ok2:#203d31;--ng:#ffb0ba;--ng2:#482e39;--status-ink:#142330;--warn:#e7c080;
+  --subject-anatomy:#9dc8ed;--subject-physiology:#8bd5bf;--subject-kinesiology:#c7ace9;
+  --subject-internal:#e8b395;--subject-neurology:#c0b0e4;--subject-orthopedics:#b9cf99;
+  --subject-psychiatry:#eaa4ba;--subject-pediatrics:#dec591;--subject-psychology:#d3b2c6;
+  --subject-rehabilitation:#99d0d4;--subject-ot:#95cfda;--subject-assessment:#adc3ea;
+  --subject-physical:#abd2ad;--subject-mental:#d0afe3;--subject-development:#e3bd94;
+  --subject-geriatric:#c9cc9c;--subject-cognitive:#b7b8ed;--subject-community:#d9c28e;
+  --shadow:0 2px 5px #00000018;--shadow-lg:0 8px 22px #00000040;
+}
+[data-subject="解剖学"]{--subject:var(--subject-anatomy)}
+[data-subject="生理学"]{--subject:var(--subject-physiology)}
+[data-subject="運動学"]{--subject:var(--subject-kinesiology)}
+[data-subject="病理学・内科学"]{--subject:var(--subject-internal)}
+[data-subject="神経内科学"]{--subject:var(--subject-neurology)}
+[data-subject="整形外科学"]{--subject:var(--subject-orthopedics)}
+[data-subject="精神医学"]{--subject:var(--subject-psychiatry)}
+[data-subject="小児科学・人間発達学"]{--subject:var(--subject-pediatrics)}
+[data-subject="臨床心理学"]{--subject:var(--subject-psychology)}
+[data-subject="リハビリテーション医学"]{--subject:var(--subject-rehabilitation)}
+[data-subject="作業療法概論"]{--subject:var(--subject-ot)}
+[data-subject="作業療法評価学"]{--subject:var(--subject-assessment)}
+[data-subject="身体障害作業療法"]{--subject:var(--subject-physical)}
+[data-subject="精神障害作業療法"]{--subject:var(--subject-mental)}
+[data-subject="発達障害作業療法"]{--subject:var(--subject-development)}
+[data-subject="老年期作業療法"]{--subject:var(--subject-geriatric)}
+[data-subject="高次脳機能障害"]{--subject:var(--subject-cognitive)}
+[data-subject="地域・社会制度"]{--subject:var(--subject-community)}
+.appbar{background:var(--card);backdrop-filter:none;border-bottom:1px solid var(--line)}
+.appbar .wrap{max-width:var(--page-width);padding:12px 20px;gap:18px}
+.brand{gap:10px;min-width:0}
+.brand .logo{width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--accent-ink);box-shadow:inset 0 0 0 3px var(--card),inset 0 0 0 4px var(--accent)}
+.brand b{font-size:16px;letter-spacing:.025em}.brand small{font-size:11px;margin-top:3px}
+.tabs{background:var(--card2);border-radius:10px;gap:2px}
+.tabs a{display:flex;align-items:center;justify-content:center;min-height:36px;padding:5px 14px;border-radius:7px;font-weight:500}
+.tabs a.on{box-shadow:0 1px 3px #21324712;border:1px solid var(--line);padding:4px 13px}
+:where(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+button,input,select,textarea{font-family:inherit}
+@media(max-width:560px){
+  :root{--appbar-height:70px}
+  .appbar .wrap{gap:8px;padding:9px 12px;flex-wrap:wrap}
+  .brand{gap:7px}.brand .logo{width:32px;height:32px;border-radius:8px}.brand b{font-size:14px}.brand small{display:none}
+  .tabs{gap:0;flex:1}.tabs a{min-height:42px;flex:1;padding:4px 7px;font-size:12px}.tabs a.on{padding:3px 6px}
+}
+@media(max-width:360px){:root{--appbar-height:110px}.appbar .tabs{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:0s!important}}
+
+/* 発注53：既存の暗色指定にも共有色の別名を適用する。 */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--surface:var(--bg);--ink2:var(--sub);--muted:var(--faint);--g1:var(--subject-anatomy);--g2:var(--subject-internal);--g3:var(--subject-ot);--g4:var(--subject-mental);--g5:var(--subject-community);}}
+:root[data-theme="dark"]{--surface:var(--bg);--ink2:var(--sub);--muted:var(--faint);--g1:var(--subject-anatomy);--g2:var(--subject-internal);--g3:var(--subject-ot);--g4:var(--subject-mental);--g5:var(--subject-community);}

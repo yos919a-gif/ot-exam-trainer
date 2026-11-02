@@ -1,0 +1,18 @@
+{
+  "am": {
+    "5": "q005_am_clip.png",
+    "10": "q010_am_clip.png",
+    "8": "q008_am_clip.png",
+    "2": "q002_am_clip.png",
+    "3": "q003_am_clip.png"
+  },
+  "pm": {
+    "12": "q112_pm_clip.png",
+    "1": "q101_pm_clip.png",
+    "72": "q172_pm_clip.png",
+    "42": "q142_pm_clip.png",
+    "2": "q102_pm_clip.png",
+    "3": "q103_pm_clip.png",
+    "8": "q108_pm_clip.png"
+  }
+}

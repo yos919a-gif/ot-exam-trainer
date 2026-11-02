@@ -1,0 +1,106 @@
+{
+ "version": "20261102-0801-abb383",
+ "published_at": "2026-11-02T08:01:01",
+ "files": {
+  "exam/questions.json": {
+   "説明": "国家試験の問題（第50〜61回）",
+   "件数": 2400,
+   "bytes": 1793277,
+   "sha1": "dcd2092154"
+  },
+  "exam/explanations.json": {
+   "説明": "選択肢の誤り理由",
+   "件数": 2400,
+   "bytes": 772712,
+   "sha1": "e3edf2bc8d"
+  },
+  "glossary/glossary.json": {
+   "説明": "用語集（暗記カード）",
+   "件数": 4563,
+   "bytes": 1342515,
+   "sha1": "4061558faf"
+  },
+  "dictionary/entries.json": {
+   "説明": "アプリ辞書（教科書2冊以上・Fable確認）",
+   "件数": 6337,
+   "bytes": 7016498,
+   "sha1": "f2cc18bec7"
+  },
+  "dictionary/index.json": {
+   "説明": "アプリ辞書の索引",
+   "件数": 7680,
+   "bytes": 301317,
+   "sha1": "20054a857c"
+  },
+  "dictionary/meta.json": {
+   "説明": "アプリ辞書の版情報",
+   "件数": 10,
+   "bytes": 1306,
+   "sha1": "dfcf775b96"
+  },
+  "analysis/word_graph.json": {
+   "説明": "語ネットワーク",
+   "件数": 3,
+   "bytes": 466917,
+   "sha1": "dcdcc2bc28"
+  },
+  "analysis/choice_words.json": {
+   "説明": "問題ごとの語",
+   "件数": 2400,
+   "bytes": 380890,
+   "sha1": "389db187ca"
+  },
+  "analysis/word_readings.json": {
+   "説明": "語の読み",
+   "件数": 4418,
+   "bytes": 163137,
+   "sha1": "26ab583280"
+  },
+  "analysis/word_families.json": {
+   "説明": "語族",
+   "件数": 1232,
+   "bytes": 34285,
+   "sha1": "7dd5f1adfc"
+  },
+  "analysis/confusion_graph.json": {
+   "説明": "引っ掛け分析",
+   "件数": 5,
+   "bytes": 1461034,
+   "sha1": "ed5ed5e314"
+  },
+  "analysis/anomalies.json": {
+   "説明": "類問",
+   "件数": 7,
+   "bytes": 60076,
+   "sha1": "f6ff98eaef"
+  },
+  "analysis/dendrogram.json": {
+   "説明": "デンドログラム",
+   "件数": 2,
+   "bytes": 11361,
+   "sha1": "9885bf193f"
+  },
+  "refs/総合索引.json": {
+   "説明": "教科書の総合索引",
+   "件数": 24163,
+   "bytes": 3984750,
+   "sha1": "4bb2e68f03"
+  },
+  "images/": {
+   "説明": "問題の図（別冊・切り抜き）",
+   "件数": 597
+  },
+  "exam/diseases.json": {
+   "説明": "疾患別模試のグループ",
+   "件数": 19,
+   "bytes": 31419,
+   "sha1": "0c82a16367"
+  },
+  "exam/assessments.json": {
+   "説明": "評価の問題（評価法ごとの問題id）",
+   "件数": 134,
+   "bytes": 16888,
+   "sha1": "5f98905ebf"
+  }
+ }
+}

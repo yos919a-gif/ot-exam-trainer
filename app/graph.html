@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="icon.png">
+<title>国試 語マップ</title>
+<script src="lib/d3.v7.8.5.min.js"></script>  <!-- 同梱（電波なしでも語マップが動くように。11/01） -->
+<style>
+  :root{
+    --surface:#fcfcfb; --ink:#1d2433; --ink2:#5b6577; --muted:#8a93a6;
+    --line:#e3e7ef; --card:#ffffff; --accent:#2a78d6;
+    --g1:#2a78d6; --g2:#eb6834; --g3:#1baf7a; --g4:#eda100; --g5:#e87ba4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --surface:#1a1a19; --ink:#e8ecf4; --ink2:#9aa5b8; --muted:#6d7789;
+      --line:#2c3547; --card:#20242e; --accent:#3987e5;
+      --g1:#3987e5; --g2:#d95926; --g3:#199e70; --g4:#c98500; --g5:#d55181;
+    }
+  }
+  :root[data-theme="dark"]{
+    --surface:#1a1a19; --ink:#e8ecf4; --ink2:#9aa5b8; --muted:#6d7789;
+    --line:#2c3547; --card:#20242e; --accent:#3987e5;
+    --g1:#3987e5; --g2:#d95926; --g3:#199e70; --g4:#c98500; --g5:#d55181;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--ink);
+       font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
+       padding:0 16px 40px}
+  header{max-width:1100px;margin:0 auto;padding:14px 0;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  h1{font-size:18px;margin:0}
+  a{color:var(--accent);text-decoration:none}
+  main{max-width:1100px;margin:0 auto}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+  select{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+       padding:6px 8px;color:var(--ink);font-size:14px}
+  .filters{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:10px;font-size:14px}
+  .filters label{display:flex;gap:6px;align-items:center;color:var(--ink2)}
+  input[type=text]{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+       padding:7px 10px;color:var(--ink);font-size:14px;min-width:220px}
+  svg{display:block;width:100%}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-top:6px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  #tip{position:fixed;pointer-events:none;background:var(--card);border:1px solid var(--line);
+       border-radius:8px;padding:8px 10px;font-size:13px;display:none;z-index:9;max-width:300px;
+       box-shadow:0 4px 14px rgba(0,0,0,.18);color:var(--ink)}
+  .edge{stroke:var(--muted);stroke-opacity:.45;fill:none}
+  .edge.idiom{stroke-dasharray:4 4;stroke-opacity:.3}
+  .nodelabel{font-size:11px;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3px}
+  .hint{color:var(--ink2);font-size:13px}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  th{color:var(--ink2);font-weight:600;font-size:12.5px}
+  .bar{height:14px;border-radius:0 4px 4px 0;background:var(--g2);min-width:2px}
+  .bar.c{background:var(--g3)}
+  .num{font-variant-numeric:tabular-nums;color:var(--ink2)}
+  .word{cursor:pointer;color:var(--accent)}
+  .ex{color:var(--muted);font-size:12px}
+  .kw{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;
+      font-size:13px;cursor:pointer;background:var(--surface);line-height:1.6}
+  .kw:hover{border-color:var(--accent);color:var(--accent)}
+  .kw.hit{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .kw.hit .num{color:#fff}
+  .kw.fam{border-style:solid;border-color:var(--accent);padding-right:4px}
+  .kw.fam .tgl{cursor:pointer;color:var(--ink2);padding:0 4px;font-weight:400}
+  .kw.fam .tgl:hover{color:var(--accent)}
+  .kw.sub{border-style:dashed;font-size:12.5px}
+  .facet{max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;
+         padding:8px;display:flex;flex-wrap:wrap;gap:5px 7px;margin:6px 0;align-content:flex-start}
+  .fhead{flex-basis:100%;font-weight:600;color:var(--ink2);font-size:12.5px;
+         border-bottom:1px solid var(--line);padding-bottom:2px;margin-top:6px}
+  .fidx{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px}
+  .fidx button{border:1px solid var(--line);background:var(--surface);color:var(--accent);
+         border-radius:6px;padding:2px 9px;font-size:13px;cursor:pointer}
+  .fidx button:hover{border-color:var(--accent)}
+  .qscroll{max-height:380px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;
+         padding:4px 10px;margin:6px 0}
+  details.sub{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+  details.sub summary{cursor:pointer;font-weight:600;color:var(--ink2);font-size:14.5px}
+  details.sub summary:hover{color:var(--accent)}
+  .dscroll{max-height:540px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin:8px 0}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-top:6px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-size:12px;color:var(--ink2)}
+  mark{background:rgba(237,161,0,.4);color:inherit;border-radius:3px;padding:0 1px}
+/* 発注53：語マップを参考書の索引ページと同じ紙面に。 */
+body{line-height:1.8}
+body>header:not(.appbar),main{max-width:1000px}
+body>header:not(.appbar){padding:25px 0 15px;gap:8px 16px}
+body>header:not(.appbar) h1{font-size:21px;letter-spacing:.02em;border-left:4px solid var(--accent);padding-left:12px}
+.panel{position:relative;border-top:3px solid var(--accent);border-radius:14px;padding:22px;outline:1px solid color-mix(in srgb,var(--line) 65%,transparent);outline-offset:-6px;box-shadow:var(--shadow)}
+.filters{gap:12px 18px;padding-bottom:17px;margin-bottom:16px;align-items:flex-start}
+.filters label{gap:8px;line-height:1.8;max-width:100%}
+input[type=text],select{min-height:42px;border-radius:8px;max-width:100%;background:var(--card);font-family:inherit}
+input[type=text]{min-width:0;width:290px}
+.hint{line-height:1.85}.facet{border-radius:9px;background:var(--card2);padding:12px;gap:7px;max-height:330px}
+.fhead{font-size:13px;padding-bottom:6px;margin:8px 0 3px}.kw{padding:4px 10px;min-height:32px;line-height:1.7;background:var(--card);font-size:13px}
+.kw.hit{color:var(--accent-ink)}.kw.hit .num{color:var(--accent-ink)}
+.fidx{gap:6px}.fidx button{min-height:34px;padding:4px 9px;border-radius:7px}
+.qscroll,.dscroll{background:var(--card2);border-radius:9px;border-color:var(--line)}
+.qscroll{padding:10px 13px}.word{line-height:1.9;overflow-wrap:anywhere}.ex{color:var(--sub)}
+details.sub{padding-top:15px;margin-top:20px;border-top-style:dashed}details.sub summary{min-height:34px;font-size:14px}
+td,th{padding:9px;line-height:1.8;overflow-wrap:anywhere}table{table-layout:fixed}
+#tip{box-shadow:var(--shadow-lg);border-top:3px solid var(--accent);line-height:1.8;max-width:min(330px,calc(100vw - 24px))}
+@media(max-width:560px){
+  .panel{padding:18px}body>header:not(.appbar){padding:20px 0 13px}body>header:not(.appbar) h1{font-size:19px}
+  .filters{gap:12px;font-size:13px}.filters label{width:100%;flex-wrap:wrap}input[type=text]{width:100%;font-size:16px}
+  .filters select{flex:1;min-width:0;font-size:16px}.facet{padding:9px;max-height:360px}.kw{font-size:12.5px;min-height:35px}
+  .qscroll{padding:9px;max-height:420px}.hint{font-size:12.5px}td,th{padding:7px 5px;font-size:12px}
+}
+
+/* 発注53：幅の狭い語マップでは、語・件数と比較バーを二段にする。 */
+@media(max-width:560px){
+  #confBody>table,#confBody>table tbody{display:block;width:100%}
+  #confBody>table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  #confBody>table tr:has(th){display:none}
+  #confBody>table td{padding:0;border:0;min-width:0}
+  #confBody>table td:first-child{grid-column:1;grid-row:1;font-size:14px}
+  #confBody>table td:nth-child(2){grid-column:1/-1;grid-row:2}
+  #confBody>table td:nth-child(3){grid-column:2;grid-row:1;text-align:right;font-size:12px}
+  #confBody>table .ex{display:block;font-size:11px}
+  #confBody>table .bar{min-width:0}
+}
+</style>
+<link rel="stylesheet" href="appbar.css">
+</head>
+<body>
+<header class="appbar"><div class="wrap">
+  <a class="brand" href="index.html"><span class="logo">OT</span><span><b>国試トレーナー</b><small>第50〜61回・2,400問（公式正答準拠）</small></span></a>
+  <nav class="tabs"><a href="index.html">ホーム</a><a href="graph.html" class="on">語マップ</a><a href="sakuin.html">総合索引</a></nav>
+</div></header>
+<header>
+  <h1>国試 語マップ</h1>
+  <span class="hint">2,400問から抽出した語の関連と「引っ掛け」構造</span>
+</header>
+<main>
+  <div class="panel" id="panelConf">
+    <div class="filters">
+      <label>語を選ぶ <input type="text" id="confWord" list="confVocab" placeholder="例: 前鋸筋 ／ AND検索: 肩関節 外旋"></label>
+      <datalist id="confVocab"></datalist>
+      <label>並び順 <select id="sortMode">
+        <option value="kana">あいうえお順</option>
+        <option value="freq">登場回数順</option>
+      </select></label>
+      <span class="hint">下のリストをクリックで絞り込み（AND）／空欄に戻すと全語リスト</span>
+    </div>
+    <div id="confBody"></div>
+    <details class="sub" id="secEntropy"><summary>エントロピー分析（語の科目横断度）</summary>
+      <div id="entropyBody"></div></details>
+    <p style="margin:14px 0 0;border-top:1px solid var(--line);padding-top:10px">
+      <a href="dendrogram.html" target="otdendro" style="font-weight:600">デンドログラム（語の階層クラスタリング・上位120語）を別窓で開く ↗</a></p>
+  </div>
+</main>
+<div id="tip"></div>
+
+<script src="content.js"></script>
+<script>
+"use strict";
+let qMeta={}, cWords={}, R={}, FAM={};
+const expandedFams = new Set();
+const GROUPS = [
+  ["基礎医学",   ["解剖学","生理学","運動学"],                             "var(--g1)"],
+  ["臨床医学",   ["病理学・内科学","神経内科学","整形外科学","精神医学",
+                  "小児科学・人間発達学","臨床心理学","リハビリテーション医学"], "var(--g2)"],
+  ["OT基盤",     ["作業療法概論","作業療法評価学"],                         "var(--g3)"],
+  ["治療学",     ["身体障害作業療法","精神障害作業療法","発達障害作業療法",
+                  "老年期作業療法","高次脳機能障害"],                        "var(--g4)"],
+  ["制度・地域", ["地域・社会制度"],                                        "var(--g5)"],
+];
+function groupColor(subj){
+  for(const [,list,color] of GROUPS) if(list.includes(subj)) return color;
+  return "var(--muted)";
+}
+const tip = document.getElementById("tip");
+function esc(t){ return String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function qLines(ids, limit){
+  const out = [];
+  for(const id of (ids||[]).slice(0, limit)){
+    const m = qMeta[id]; if(!m) continue;
+    out.push(`<div class="word" style="margin-top:4px;border-top:1px solid var(--line);padding-top:3px" onclick="showQ('${id}')">`+
+      `<b>第${m.回}回${m.区分}問${m.番号}</b> ${esc(m.文.slice(0,44))}…</div>`);
+  }
+  const rest = (ids||[]).length - limit;
+  if(rest > 0) out.push(`<div style="color:var(--muted)">…他${rest}問</div>`);
+  return out.join("");
+}
+function showTip(html, ev){ tip.innerHTML=html; tip.style.display="block";
+  tip.style.left=Math.min(ev.clientX+14, innerWidth-320)+"px"; tip.style.top=(ev.clientY+12)+"px"; }
+function hideTip(){ tip.style.display="none"; }
+
+async function load(){
+  let QS;
+  [QS, cWords, R, FAM] = await Promise.all([
+    cfetch("exam/questions.json").catch(()=>[]),
+    cfetch("analysis/choice_words.json").catch(()=>({})),
+    cfetch("analysis/word_readings.json").catch(()=>({})),
+    cfetch("analysis/word_families.json").catch(()=>({})),
+  ]);
+  QS.forEach(q=>qMeta[q.id]={回:q.回, 区分:q.区分, 番号:q.問題番号, 文:q.問題文, 正答:q.正答, 選択肢:q.選択肢, 画像:q.画像, 採点方式:q.採点方式});
+  // 入力欄の候補 = 全ファセット語（登場回数の多い順）
+  const {cand} = andSearch([]);
+  const cv = document.getElementById("confVocab");
+  Object.entries(cand).sort((a,b)=>b[1]-a[1]).forEach(([w])=>{
+    const o=document.createElement("option"); o.value=w; cv.appendChild(o);
+  });
+  // デンドログラム等からの ?q=語 で検索条件を初期設定
+  const q = new URLSearchParams(location.search).get("q");
+  if(q) document.getElementById("confWord").value = q;
+  drawConf();
+}
+
+/* ---------- 引っ掛けマップ ---------- */
+document.getElementById("confWord").addEventListener("change", drawConf);
+document.getElementById("sortMode").addEventListener("change", drawConf);
+/* 「嚥下*」のような語幹条件は語族全体（前方一致）にマッチする */
+function termMatch(t, w){
+  return t.endsWith("*") ? w.startsWith(t.slice(0, -1)) : w === t;
+}
+function andSearch(terms){
+  const star = terms.filter(t=>t.endsWith("*"));
+  const exact = terms.filter(t=>!t.endsWith("*"));
+  const ids = Object.keys(cWords).filter(id=>{
+    const cw = cWords[id];
+    const all = new Set(cw.s); cw.c.forEach(a=>a.forEach(x=>all.add(x)));
+    return exact.every(t=>all.has(t))
+        && star.every(t=>{ for(const w of all) if(termMatch(t,w)) return true; return false; });
+  });
+  const hit = w => exact.includes(w) || star.some(t=>termMatch(t,w));
+  const stat = {};           // 選択肢語 -> [正答側, 誤答側]
+  const cand = {};           // 絞り込み候補 -> 出現問題数
+  const famCand = {};        // 語幹 -> 語族のどれかを含む問題数
+  ids.forEach(id=>{
+    const cw = cWords[id], ans = new Set(qMeta[id]?.正答||[]);
+    const seen = new Set(), famSeen = new Set();
+    const bump = w => {
+      if(seen.has(w)) return;
+      seen.add(w); cand[w]=(cand[w]||0)+1;
+      const f = FAM[w] || w;
+      if(!famSeen.has(f)){ famSeen.add(f); famCand[f]=(famCand[f]||0)+1; }
+    };
+    cw.s.forEach(w=>{ if(!hit(w)) bump(w); });
+    cw.c.forEach((ws,i)=>{
+      const ok = ans.has(i+1);
+      new Set(ws).forEach(w=>{
+        if(hit(w)) return;
+        (stat[w]=stat[w]||[0,0])[ok?0:1]++;
+        bump(w);
+      });
+    });
+  });
+  const rows = Object.entries(stat).map(([w,[c,x]])=>({語:w, 正答側:c, 誤答側:x}))
+    .sort((a,b)=>(b.正答側+b.誤答側)-(a.正答側+a.誤答側));
+  return {ids, rows, cand, famCand};
+}
+function setTerms(ts){
+  document.getElementById("confWord").value = ts.join(" ");
+  drawConf();
+}
+function addTerm(w){
+  const ts = document.getElementById("confWord").value.split(/[\s　]+/).filter(Boolean);
+  if(!ts.includes(w)) ts.push(w);
+  setTerms(ts);
+}
+function delTerm(w){
+  setTerms(document.getElementById("confWord").value.split(/[\s　]+/).filter(x=>x&&x!==w));
+}
+/* --- 五十音グループ --- */
+const KROWS = [["ア","アイウエオァィゥェォヴ"],["カ","カキクケコガギグゲゴヵヶ"],
+  ["サ","サシスセソザジズゼゾ"],["タ","タチツテトダヂヅデドッ"],["ナ","ナニヌネノ"],
+  ["ハ","ハヒフヘホバビブベボパピプペポ"],["マ","マミムメモ"],["ヤ","ヤユヨャュョ"],
+  ["ラ","ラリルレロ"],["ワ","ワヲン"]];
+const KORDER = ["英数","ア","カ","サ","タ","ナ","ハ","マ","ヤ","ラ","ワ","他"];
+function readKey(w){ return R[w] || w; }
+function rowOf(w){
+  const c = readKey(w)[0] || "";
+  if(/[A-Za-z0-9０-９]/.test(c)) return "英数";
+  for(const [lab, chars] of KROWS) if(chars.includes(c)) return lab;
+  return "他";
+}
+/* 2階層ファセット: 第一階層=語幹（語族まとめ検索「語*」）、第二階層=個別語（正確検索）。
+   第二階層は従属ではなく、展開すればどちらの階層からでも拾える */
+function facetList(cand, famCand, forceMode){
+  const mode = forceMode || document.getElementById("sortMode").value;
+  // 語族ごとにまとめる（現在の結果集合に2語以上あるものだけ族として表示）
+  const fams = {};
+  for(const [w,n] of Object.entries(cand)){
+    const f = FAM[w] || w;
+    (fams[f] = fams[f] || []).push([w,n]);
+  }
+  const items = [];
+  for(const [f, members] of Object.entries(fams)){
+    if(members.length >= 2){
+      members.sort((a,b)=>b[1]-a[1] || readKey(a[0]).localeCompare(readKey(b[0]),"ja"));
+      items.push({fam:f, n:(famCand&&famCand[f])||members[0][1], members});
+    }else{
+      items.push({fam:null, w:members[0][0], n:members[0][1]});
+    }
+  }
+  const keyOf = it => it.fam || it.w;
+  if(mode === "freq") items.sort((a,b)=>b.n-a.n || readKey(keyOf(a)).localeCompare(readKey(keyOf(b)),"ja"));
+  else items.sort((a,b)=>{
+    const ra = rowOf(keyOf(a)), rb = rowOf(keyOf(b));
+    if(ra !== rb) return KORDER.indexOf(ra) - KORDER.indexOf(rb);
+    return readKey(keyOf(a)).localeCompare(readKey(keyOf(b)), "ja");
+  });
+  const chip = it => {
+    if(!it.fam)
+      return `<span class="kw" onclick="addTerm('${it.w}')">${it.w} <span class="num">${it.n}</span></span>`;
+    const open = expandedFams.has(it.fam);
+    let h = `<span class="kw fam"><span onclick="addTerm('${it.fam}*')" title="語族まとめて検索">${it.fam}＊ <span class="num">${it.n}</span></span>`
+          + `<b class="tgl" onclick="toggleFam('${it.fam}')">${open?"▾":"▸"}</b></span>`;
+    if(open) h += it.members.map(([w,n])=>
+      `<span class="kw sub" onclick="addTerm('${w}')">${w} <span class="num">${n}</span></span>`).join("");
+    return h;
+  };
+  let out = [], cur = null;
+  for(const it of items){
+    if(mode !== "freq"){
+      const g = rowOf(keyOf(it));
+      if(g !== cur){ cur = g; out.push(`<div class="fhead" data-row="${g}">${g}</div>`); }
+    }
+    out.push(chip(it));
+  }
+  const idx = mode === "freq" ? "" :
+    `<div class="fidx">${[...new Set(items.map(it=>rowOf(keyOf(it))))].map(g=>
+      `<button onclick="jumpRow('${g}')">${g}</button>`).join("")}</div>`;
+  return idx + `<div class="facet" id="facetBox">${out.join("")}</div>`;
+}
+function toggleFam(f){
+  expandedFams.has(f) ? expandedFams.delete(f) : expandedFams.add(f);
+  const box = document.getElementById("facetBox");
+  const st = box ? box.scrollTop : 0;
+  drawConf();
+  const nb = document.getElementById("facetBox");
+  if(nb) nb.scrollTop = st;
+}
+function jumpRow(g){
+  const box = document.getElementById("facetBox"); if(!box) return;
+  const h = box.querySelector(`.fhead[data-row="${g}"]`); if(!h) return;
+  box.scrollTop = h.offsetTop - box.offsetTop - 4;
+}
+function drawConf(){
+  const w = document.getElementById("confWord").value.trim();
+  const body = document.getElementById("confBody");
+  const terms = w.split(/[\s　]+/).filter(Boolean);
+  const {ids, rows, cand, famCand} = andSearch(terms);
+  const nWords = Object.keys(cand).length;
+  if(terms.length === 0){
+    body.innerHTML = `<p class="hint">単語リストから語をクリックすると、その語を含む問題に絞り込まれ、
+      リストも<b>共起する語だけ</b>（数字＝共起する問題数）になります。クリックを重ねるとAND。
+      「語＊」は語族（嚥下＊＝嚥下機能・嚥下障害…）のまとめ検索、▸で個別の語を展開できます。</p>
+      <h4>単語リスト（${nWords}語）</h4>${facetList(cand, famCand)}`;
+    const det = document.getElementById("qDetail"); if(det) det.innerHTML = "";
+    return;
+  }
+  const mA = Math.max(1,...rows.map(r=>r.正答側+r.誤答側));
+  const chips = terms.map(t=>`<span class="kw hit" onclick="delTerm('${t}')" title="クリックで外す">${t} ✕</span>`).join(" ");
+  body.innerHTML = `
+    <div style="margin:6px 0">条件: ${chips}　<span class="hint">該当 ${ids.length}問</span></div>
+    <svg id="confNet" height="340" role="img" aria-label="絞り込み中の語の共起ネットワーク"></svg>
+    <p class="hint" style="margin-top:0">線＝この${ids.length}問の中で同じ問題に出る回数。
+      <span style="color:var(--g3)">●正答側が多い語</span>／<span style="color:var(--g2)">●誤答側が多い語</span>／
+      <span style="color:var(--accent)">●選択中の条件</span>。クリックで条件に追加・解除。</p>
+    ${nWords?`<h4>共起語で絞り込む（${nWords}語・共起の強い順、数字＝共起する問題数）</h4>
+      ${facetList(cand, famCand, "freq")}`:""}
+    ${rows.length?`<h4>選択肢に出る語の正誤傾向</h4>
+      <table><tr><th>語</th><th style="width:300px">正答側 ■ / 誤答側 ■</th><th></th></tr>
+      ${rows.slice(0,18).map(r=>{
+        const lab = r.誤答側>=2&&r.正答側===0 ? "⚠️引っ掛け役" : r.正答側>=2&&r.誤答側===0 ? "✅正答常連" : "";
+        return `<tr><td><span class="word" onclick="addTerm('${r.語}')">${r.語}</span></td>
+          <td><div style="display:flex;gap:2px">
+            <div class="bar c" style="width:${240*r.正答側/mA}px"></div>
+            <div class="bar" style="width:${240*r.誤答側/mA}px"></div></div></td>
+          <td class="num">正${r.正答側}/誤${r.誤答側} <span class="ex">${lab}</span></td></tr>`;}).join("")}</table>`
+      : "<p class=hint>該当なし。条件を外してください。</p>"}
+    <h4>該当問題（${ids.length}問）</h4><div class="qscroll">${qLines(ids, 500)}</div>`;
+  drawConfNet(ids, rows, cand, terms);
+}
+
+/* 絞り込み中の共起ミニネットワーク（語ネットワークとの合併ビュー） */
+let sim2=null;
+function drawConfNet(ids, rows, cand, terms){
+  const svg = d3.select("#confNet");
+  if(svg.empty()) return;
+  svg.selectAll("*").remove();
+  if(sim2) sim2.stop();
+  const W = svg.node().clientWidth, H = +svg.attr("height");
+  const stat = {}; rows.forEach(r=>stat[r.語]=r);
+  const top = Object.entries(cand).sort((a,b)=>b[1]-a[1]).slice(0,26).map(([w])=>w);
+  const wordsSet = new Set([...terms, ...top]);
+  const nodes = [...wordsSet].map(w=>({id:w, n:cand[w]||ids.length, term:terms.includes(w)}));
+  // 絞り込み集合内での共起回数を数える
+  const co = {};
+  ids.forEach(id=>{
+    const cw = cWords[id];
+    const all = new Set(cw.s); cw.c.forEach(a=>a.forEach(x=>all.add(x)));
+    const present = [...wordsSet].filter(w=>all.has(w));
+    for(let i=0;i<present.length;i++) for(let j=i+1;j<present.length;j++){
+      const k = present[i]<present[j] ? present[i]+"|"+present[j] : present[j]+"|"+present[i];
+      (co[k]=co[k]||{a:present[i]<present[j]?present[i]:present[j],
+                     b:present[i]<present[j]?present[j]:present[i], co:0, ids:[]}).co++;
+      if(co[k].ids.length<4) co[k].ids.push(id);
+    }
+  });
+  const minCo = ids.length>6 ? 2 : 1;
+  const links = Object.values(co).filter(e=>e.co>=minCo)
+    .map(e=>({source:e.a, target:e.b, co:e.co, ids:e.ids}));
+  const rS = d3.scaleSqrt().domain([1, d3.max(nodes,d=>d.n)||1]).range([5,16]);
+  const wS = d3.scaleLinear().domain([minCo, d3.max(links,l=>l.co)||minCo+1]).range([1,4]);
+  const colorOf = d=>{
+    if(d.term) return "var(--accent)";
+    const s = stat[d.id];
+    if(s && s.正答側>s.誤答側) return "var(--g3)";
+    if(s && s.誤答側>s.正答側) return "var(--g2)";
+    return "var(--muted)";
+  };
+  const link = svg.append("g").selectAll("path").data(links).join("path")
+    .attr("class","edge").attr("stroke-width", d=>wS(d.co))
+    .on("mousemove",(ev,d)=>showTip(`<b>${d.source.id||d.source} ↔ ${d.target.id||d.target}</b><br>同じ問題に${d.co}回` + qLines(d.ids,3), ev))
+    .on("mouseleave", hideTip);
+  const node = svg.append("g").selectAll("g").data(nodes).join("g")
+    .style("cursor","pointer")
+    .on("click",(ev,d)=>{ hideTip(); d.term ? delTerm(d.id) : addTerm(d.id); })
+    .on("mousemove",(ev,d)=>{
+      const s = stat[d.id];
+      showTip(`<b>${d.id}</b><br>共起 ${d.n}問${s?`<br>正答側${s.正答側}/誤答側${s.誤答側}`:""}`
+        + (d.term?"<br>クリックで条件から外す":"<br>クリックで条件に追加"), ev);})
+    .on("mouseleave", hideTip);
+  node.append("circle").attr("r", d=>d.term?14:rS(d.n))
+    .attr("fill", colorOf).attr("stroke","var(--card)").attr("stroke-width",2);
+  node.append("text").attr("class","nodelabel").attr("dy",d=>-(d.term?14:rS(d.n))-4)
+    .attr("text-anchor","middle").text(d=>d.id);
+  sim2 = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d=>d.id).distance(70).strength(0.4))
+    .force("charge", d3.forceManyBody().strength(-200))
+    .force("center", d3.forceCenter(W/2, H/2))
+    .force("collide", d3.forceCollide().radius(d=>rS(d.n)+16))
+    .on("tick", ()=>{
+      nodes.forEach(d=>{d.x=Math.max(30,Math.min(W-30,d.x));d.y=Math.max(24,Math.min(H-14,d.y));});
+      link.attr("d", d=>`M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
+      node.attr("transform", d=>`translate(${d.x},${d.y})`);
+    });
+}
+
+function pick(w){ addTerm(w); }
+function markedHtml(text, words){
+  const ws = (words||[]).filter(Boolean);
+  if(!ws.length) return esc(text);
+  const pat = new RegExp(ws.map(w=>w.split("")
+      .map(ch=>ch.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("[\\s　]*")).join("|"), "g");
+  const s = String(text);
+  let out = "", last = 0, m;
+  while((m = pat.exec(s))){
+    if(!m[0].length){ pat.lastIndex++; continue; }
+    out += esc(s.slice(last, m.index)) + "<mark>" + esc(m[0]) + "</mark>";
+    last = m.index + m[0].length;
+  }
+  return out + esc(s.slice(last));
+}
+function qCard(id, words, closer){
+  const m = qMeta[id]; if(!m) return "";
+  const imgs = [];
+  (m.画像?.別冊||[]).forEach(p=>imgs.push(p));
+  if(m.画像?.切り抜き) imgs.push(m.画像.切り抜き);
+  return `<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px">
+    <div class="hint">第${m.回}回 ${m.区分} 問${m.番号}${m.採点方式&&m.採点方式!=="通常"?`　<span class="pill">${m.採点方式}</span>`:""}
+      ${closer?`<span class="word" style="float:right" onclick="${closer}">閉じる ✕</span>`:""}</div>
+    <p style="font-size:15px">${markedHtml(m.文, words)}</p>
+    ${imgs.map(p=>`<img class="qimg" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:6px 0" src="${curl(p)}">`).join("")}
+    <ol>${(m.選択肢||[]).map((c,i)=>`<li ${m.正答?.includes(i+1)?'style="font-weight:700;color:var(--g3)"':""}>${markedHtml(c, words)} ${m.正答?.includes(i+1)?"✅":""}</li>`).join("")}</ol>
+  </div>`;
+}
+function showQ(id){
+  let det = document.getElementById("qDetail");
+  if(!det){ det = document.createElement("div"); det.id = "qDetail";
+            document.getElementById("confBody").after(det); }
+  const terms = document.getElementById("confWord").value.split(/[\s　]+/)
+    .filter(Boolean).map(t=>t.replace(/\*$/,""));
+  det.innerHTML = qCard(id, terms, "document.getElementById('qDetail').innerHTML=''");
+  det.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+/* ---------- エントロピー分析 ---------- */
+let WG = null;
+async function ensureWG(){
+  if(!WG) WG = await cfetch("analysis/word_graph.json");
+  return WG;
+}
+document.getElementById("secEntropy").addEventListener("toggle", e=>{
+  if(e.target.open) renderEntropy();
+});
+async function renderEntropy(){
+  const body = document.getElementById("entropyBody");
+  const order = document.getElementById("entOrder")?.value || "low";
+  const minF = +(document.getElementById("entMin")?.value || 5);
+  await ensureWG();
+  const rows = WG.nodes.filter(n=>n.entropy!=null && n.freq>=minF)
+    .sort((a,b)=> order==="low" ? a.entropy-b.entropy || b.freq-a.freq
+                                : b.entropy-a.entropy || b.freq-a.freq)
+    .slice(0, 80);
+  body.innerHTML = `
+    <p class="hint">エントロピー＝語が出る問題の科目分布の偏り（0＝1科目に集中、1＝全科目に分散）。
+      低い語はその科目の専用語、高い語は科目横断の一般語です。語クリックで検索条件に追加。</p>
+    <div class="filters" style="border-bottom:none;margin-bottom:0">
+      <label>並び <select id="entOrder">
+        <option value="low" ${order==="low"?"selected":""}>低い順（科目特異的）</option>
+        <option value="high" ${order==="high"?"selected":""}>高い順（科目横断）</option>
+      </select></label>
+      <label>最小出現数 <input type="number" id="entMin" value="${minF}" min="2" max="100" style="width:70px;min-width:70px"></label>
+    </div>
+    <div class="qscroll" style="max-height:420px">
+    <table><tr><th>語</th><th>出現</th><th>主科目</th><th style="width:300px">エントロピー</th><th></th></tr>
+    ${rows.map(n=>`<tr>
+      <td><span class="word" onclick="addTerm('${n.word}')">${n.word}</span></td>
+      <td class="num">${n.freq}問</td>
+      <td><i style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${groupColor(n.主科目)};margin-right:5px"></i>${n.主科目||"—"}</td>
+      <td><div class="bar" style="background:var(--g1);width:${Math.max(3,250*n.entropy)}px"></div></td>
+      <td class="num">${n.entropy.toFixed(2)}${n.generic?' <span class="pill">一般語</span>':""}</td>
+    </tr>`).join("")}</table></div>`;
+  document.getElementById("entOrder").addEventListener("change", renderEntropy);
+  document.getElementById("entMin").addEventListener("change", renderEntropy);
+}
+
+load().catch(e=>{
+  document.querySelector("main").innerHTML =
+    `<div class="panel">データ読込に失敗しました。start.bat から起動してください。<br><small>${e}</small></div>`;
+});
+</script>
+</body>
+</html>

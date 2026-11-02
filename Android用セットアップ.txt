@@ -1,0 +1,32 @@
+OT国試トレーナーを Android スマホで使う（Termux。PC不要・電波なしでも動く）
+==========================================================
+
+■ 初回（10分ほど）
+1. Termux を入れる
+   F-Droid の Termux（https://f-droid.org/packages/com.termux/）を入れる。
+   （F-Droid アプリを入れて「Termux」を検索、または上のページの「APKをダウンロード」）
+2. 同じドライブのフォルダにある「OT国試トレーナー.zip」をスマホにダウンロードする
+   （ドライブアプリで ZIP の︙ → ダウンロード）
+3. Termux を開いて、次の1行をコピーして貼り付け、Enter
+   termux-setup-storage
+   → 「ファイルへのアクセスを許可」と出たら許可する
+4. 次の1行をコピーして貼り付け、Enter（途中で質問が出たら Enter で進める）
+   pkg update -y && pkg install -y python && python -m zipfile -e "$(ls -t ~/storage/downloads/OT*.zip | head -n 1)" ~/.ot_boot && bash ~/.ot_boot/*/tools/android/setup.sh; rm -rf ~/.ot_boot
+   → 終わると Chrome でアプリが開きます
+
+■ 2回目から
+  Termux を開くだけでアプリが開きます（Termux の画面は閉じずに、裏に置いたままにする）。
+  開いたアプリの画面で Chrome の︙ →「ホーム画面に追加」もしておくと、次から一発で開けます
+  （そのときも Termux は裏で動いている必要があります。止まっていたら Termux を一度開く）。
+
+■ 更新するとき
+  新しい「OT国試トレーナー.zip」をダウンロードして、Termux で  ot-update  と入力して Enter。
+  学習記録はそのまま残ります。
+
+■ PC と学習記録をそろえたいとき
+  PC のアプリの「学習記録の書き出し」で出たファイルをドライブ経由でスマホへ移し、
+  スマホのアプリの「取り込み」で読み込みます（逆も同じ）。記録はスマホとPCで別々に増えます。
+
+■ うまく動かないとき
+  ・Termux で  ot  と入力すると、もう一度起動します
+  ・止まりやすいときは、Android の設定 → アプリ → Termux → 電池 を「制限なし」にする

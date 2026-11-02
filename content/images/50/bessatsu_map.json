@@ -1,0 +1,63 @@
+{
+  "am": [
+    {
+      "no": 1,
+      "part": "",
+      "questions": [
+        12
+      ],
+      "image": "am_bessatsu_p005.png"
+    },
+    {
+      "no": 2,
+      "part": "",
+      "questions": [
+        23
+      ],
+      "image": "am_bessatsu_p007.png"
+    },
+    {
+      "no": 3,
+      "part": "",
+      "questions": [
+        53
+      ],
+      "image": "am_bessatsu_p009.png"
+    }
+  ],
+  "pm": [
+    {
+      "no": 1,
+      "part": "",
+      "questions": [
+        4
+      ],
+      "image": "pm_bessatsu_p005.png"
+    },
+    {
+      "no": 2,
+      "part": "",
+      "questions": [
+        6,
+        7
+      ],
+      "image": "pm_bessatsu_p007.png"
+    },
+    {
+      "no": 3,
+      "part": "",
+      "questions": [
+        11
+      ],
+      "image": "pm_bessatsu_p009.png"
+    },
+    {
+      "no": 4,
+      "part": "",
+      "questions": [
+        77
+      ],
+      "image": "pm_bessatsu_p011.png"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# 学習記録（個人のデータ）は公開しない
+user/
+# 教科書の文章（OCRの根拠）を含む辞書データ。アプリは使っていないので公開しない
+content/dictionary/
+# Windows 用の起動ファイル
+*.exe
+start.bat

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="icon.png">
+<title>教科書 総合索引</title>
+<style>
+  :root{ --bg:#f6f7fb; --card:#fff; --ink:#1d2433; --sub:#5b6577; --accent:#2f6fed; --accent2:#e8f0fe; --line:#e3e7ef; --warn:#b7791f; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --bg:#141822; --card:#1d2433; --ink:#e8ecf4; --sub:#9aa5b8; --accent:#6b9bff; --accent2:#243352; --line:#2c3547; --warn:#e2b45a; } }
+  :root[data-theme="dark"]{ --bg:#141822; --card:#1d2433; --ink:#e8ecf4; --sub:#9aa5b8; --accent:#6b9bff; --accent2:#243352; --line:#2c3547; --warn:#e2b45a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;line-height:1.6;padding:0 16px 48px}
+  header,main{max-width:880px;margin:0 auto}
+  header{padding:18px 0 8px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0} .sub{color:var(--sub);font-size:13px}
+  a{color:var(--accent)}
+  .bar{position:sticky;top:0;background:var(--bg);padding:10px 0;display:flex;gap:8px;flex-wrap:wrap;z-index:2}
+  input[type=search]{flex:1 1 260px;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+  select{font-size:14px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);max-width:100%}
+  label.ck{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:4px}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}
+  .w{font-weight:700;font-size:16px} .r{color:var(--sub);font-size:12px;margin-left:6px}
+  .n{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:0 7px;margin-left:6px}
+  .e{font-size:14px;margin-top:4px} .e b{font-weight:600} .q{color:var(--sub);font-size:12px}
+  .count{color:var(--sub);font-size:13px;margin:4px 0}
+  .e.body{color:var(--sub)}
+/* 発注53：総合索引のカード、見出し、検索欄。 */
+body{line-height:1.8}header:not(.appbar),main{max-width:1000px}
+header:not(.appbar){padding:25px 0 14px;gap:8px 16px}
+header h1{font-size:21px;letter-spacing:.02em;border-left:4px solid var(--accent);padding-left:12px}
+.bar{top:var(--appbar-height);gap:10px;padding:14px;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow)}
+input[type=search]{min-height:44px;min-width:0;background:var(--card2);border-radius:8px}
+select{min-height:42px;min-width:0;background:var(--card2);border-radius:8px}
+label.ck{gap:7px;min-height:34px}label.ck input{width:17px;height:17px;accent-color:var(--accent)}
+.count{padding:12px 2px 5px;font-size:12px;font-variant-numeric:tabular-nums}
+.item{position:relative;padding:18px 20px;margin:12px 0;border-radius:11px;border-left:3px solid color-mix(in srgb,var(--accent) 50%,var(--line));outline:1px solid color-mix(in srgb,var(--line) 65%,transparent);outline-offset:-6px;box-shadow:var(--shadow);overflow-wrap:anywhere}
+.w{font-size:18px;letter-spacing:.015em}.r{font-size:12px}.e{line-height:1.9;margin-top:8px;font-size:14px}
+.e b{color:var(--ink)}.e.body b{color:var(--sub)}.n{padding:2px 8px;border-radius:5px;font-size:11px;white-space:nowrap}
+@media(max-width:560px){
+  header:not(.appbar){padding-top:20px}header h1{font-size:19px}.bar{padding:12px;gap:8px}
+  input[type=search],select{font-size:16px;width:100%;flex-basis:100%}
+  .item{padding:16px;margin:10px 0}.w{font-size:17px}.r{display:inline-block;margin-left:0;margin-right:6px}.e{font-size:13px}
+}
+
+/* 発注53 ユーザー追記：用語を探し、巻末索引と本文の参照を読み分ける。 */
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px 14px}
+#q{grid-column:1/-1;grid-row:1;width:100%;min-height:49px;padding:11px 14px;border:2px solid var(--accent3);background:var(--card);font-size:17px;line-height:1.5}
+#q::placeholder{color:var(--sub);opacity:1}
+#q:focus{outline:3px solid color-mix(in srgb,var(--accent) 22%,transparent);outline-offset:2px;border-color:var(--accent)}
+#book{grid-column:1;grid-row:2;width:100%;max-width:100%}
+.bar>label.ck{grid-column:2;grid-row:2;white-space:nowrap}
+.bar>.sub{grid-column:1/-1;grid-row:3;font-size:12px;line-height:1.7}
+#count{font-size:13px;line-height:1.8;padding:14px 2px 4px}
+#count::before{content:"検索結果";display:inline-block;color:var(--ink);font-weight:700;margin-right:10px;padding-left:9px;border-left:3px solid var(--accent)}
+.item .w{font-size:20px;line-height:1.65;color:var(--ink)}
+.item .r{display:inline-block;margin:3px 9px 5px 7px;line-height:1.7}
+.item .n{display:inline-block;margin:3px 0 5px;padding:1px 7px;line-height:1.7}
+.item .e{padding:10px 12px;border-left:2px solid var(--accent3);border-radius:4px;background:var(--card2);font-size:14px;line-height:1.85}
+.item .e.body{background:transparent;border-left:2px dashed var(--line);font-size:13px;line-height:1.85;padding-block:7px}
+.item .e.body b{font-weight:500}
+#count:not(:empty)+#list:empty::after{content:"一致する語がありません。短い語や読みを試すか、本・国試の絞り込みを見直してください。";display:block;margin:12px 0;padding:22px;border:1px dashed var(--line);border-radius:10px;background:var(--card);color:var(--sub);line-height:1.9}
+@media(max-width:560px){
+  .bar{gap:9px 8px;padding:12px}#q{font-size:16px;min-height:48px;padding:10px 11px}
+  #book{font-size:14px;min-height:42px}.bar>label.ck{font-size:12px;gap:5px}.bar>.sub{font-size:11.5px}
+  .item .w{font-size:18px}.item .r{margin-left:0;margin-right:9px;font-size:12px}.item .e{padding:9px 10px;font-size:13.5px}.item .e.body{font-size:12.5px}
+}
+</style>
+<link rel="stylesheet" href="appbar.css">
+</head>
+<body>
+<header class="appbar"><div class="wrap">
+  <a class="brand" href="index.html"><span class="logo">OT</span><span><b>国試トレーナー</b><small>第50〜61回・2,400問（公式正答準拠）</small></span></a>
+  <nav class="tabs"><a href="index.html">ホーム</a><a href="graph.html">語マップ</a><a href="sakuin.html" class="on">総合索引</a></nav>
+</div></header>
+<header>
+  <h1>教科書 総合索引</h1>
+  <span class="sub" id="info">読み込み中…</span>
+</header>
+<main>
+  <div class="bar">
+    <input type="search" id="q" placeholder="語を入力（例: 上腕二頭筋、褥瘡、FIM）" autofocus>
+    <span class="sub" style="flex-basis:100%">巻末索引のページを先に、本文に出てくるページは（本文）として薄く表示します</span>
+    <select id="book"><option value="">すべての本</option></select>
+    <label class="ck"><input type="checkbox" id="exam"> 国試に出た語だけ</label>
+  </div>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+</main>
+<script src="content.js"></script>
+<script>
+"use strict";
+// 総合索引 data/refs/総合索引.json（tools/build_master_index.py が作る）: 語 → [本, 補足, ページ]
+let D = {books:{}, terms:{}}, KEYS = [];
+const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kata = s => s.replace(/[ぁ-ゖ]/g, c=>String.fromCharCode(c.charCodeAt(0)+0x60)); // ひらがな→カタカナ（読みで引く）
+const fold = s => kata(s.normalize("NFKC").toLowerCase().replace(/\s/g,""));
+function render(){
+  const q = fold(document.getElementById("q").value), bk = document.getElementById("book").value,
+        exam = document.getElementById("exam").checked;
+  let hit = KEYS.filter(k=>{
+    const t = D.terms[k];
+    if(exam && !t.n) return false;
+    if(bk && !t.e.some(e=>e[0]===bk)) return false;
+    return !q || fold(k).includes(q) || (t.r && fold(t.r).includes(q)) || (t.al||[]).some(a=>fold(a).includes(q));
+  });
+  // 完全一致 → 前方一致 → 国試での出題数 → 短い順
+  hit.sort((a,b)=>{ const fa=fold(a), fb=fold(b);
+    return (fb===q)-(fa===q) || fb.startsWith(q)-fa.startsWith(q) || D.terms[b].n-D.terms[a].n || a.length-b.length || a.localeCompare(b,"ja"); });
+  document.getElementById("count").textContent = `${hit.length}語${hit.length>200?"（先頭200語を表示）":""}`;
+  document.getElementById("list").innerHTML = hit.slice(0,200).map(k=>{
+    const t = D.terms[k];
+    // 巻末索引（著者が選んだページ）を先に、本文に出てくるページ（e[3]==="b"）は後ろに薄く
+    const ents = t.e.filter(e=>!bk || e[0]===bk).sort((x,y)=>(x[3]==="b")-(y[3]==="b")).map(e=>
+      `<div class="e${e[3]==="b"?" body":""}"><b>${esc(D.books[e[0]]||e[0])}</b> ${e[1]?`<span class="q">［${esc(e[1])}］</span>`:""} p.${e[2].join(", ")}${e[3]==="b"?` <span class="q">（本文）</span>`:""}</div>`).join("");
+    return `<div class="item"><span class="w">${esc(k)}</span>${t.r?`<span class="r">${esc(t.r)}</span>`:""}${t.n?`<span class="n">国試 ${t.n}問</span>`:""}${(t.al||[]).length?`<div class="q">別表記: ${t.al.map(esc).join("、")}</div>`:""}${ents}</div>`;
+  }).join("");
+}
+cfetch("refs/総合索引.json").then(d=>{
+  D = d; KEYS = Object.keys(d.terms);
+  document.getElementById("info").textContent = `${Object.keys(d.books).length}冊・${KEYS.length.toLocaleString()}語`;
+  const sel = document.getElementById("book");
+  Object.entries(d.books).sort((a,b)=>a[1].localeCompare(b[1],"ja")).forEach(([id,name])=>{
+    const o = document.createElement("option"); o.value = id; o.textContent = name; sel.appendChild(o); });
+  const q0 = new URLSearchParams(location.search).get("q"); if(q0) document.getElementById("q").value = q0;
+  ["q","book","exam"].forEach(id=>document.getElementById(id).addEventListener("input", render));
+  render();
+}).catch(e=>{ document.getElementById("list").textContent = "総合索引を読み込めませんでした（start.bat から開いてください）: " + e; });
+</script>
+</body>
+</html>

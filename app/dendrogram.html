@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="icon.png">
+<title>国試 デンドログラム</title>
+<script src="lib/d3.v7.8.5.min.js"></script>  <!-- 同梱（電波なしでも語マップが動くように。11/01） -->
+<style>
+  :root{
+    --surface:#fcfcfb; --ink:#1d2433; --ink2:#5b6577; --muted:#8a93a6;
+    --line:#e3e7ef; --card:#ffffff; --accent:#2a78d6;
+    --g1:#2a78d6; --g2:#eb6834; --g3:#1baf7a; --g4:#eda100; --g5:#e87ba4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --surface:#1a1a19; --ink:#e8ecf4; --ink2:#9aa5b8; --muted:#6d7789;
+      --line:#2c3547; --card:#20242e; --accent:#3987e5;
+      --g1:#3987e5; --g2:#d95926; --g3:#199e70; --g4:#c98500; --g5:#d55181;
+    }
+  }
+  :root[data-theme="dark"]{
+    --surface:#1a1a19; --ink:#e8ecf4; --ink2:#9aa5b8; --muted:#6d7789;
+    --line:#2c3547; --card:#20242e; --accent:#3987e5;
+    --g1:#3987e5; --g2:#d95926; --g3:#199e70; --g4:#c98500; --g5:#d55181;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--ink);
+       font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
+       padding:0 16px 40px}
+  header{max-width:1200px;margin:0 auto;padding:14px 0 6px;
+         display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;
+         position:sticky;top:0;background:var(--surface);z-index:5;
+         border-bottom:1px solid var(--line)}
+  h1{font-size:18px;margin:0}
+  a{color:var(--accent);text-decoration:none}
+  .hint{color:var(--ink2);font-size:13px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2);
+          margin-left:auto}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;
+            margin-right:5px;vertical-align:-1px}
+  main{overflow-x:auto;padding-top:6px}
+  svg{display:block}
+  .lk{fill:none;stroke-opacity:.55}
+  .lk.hl{stroke:var(--accent)!important;stroke-opacity:1;stroke-width:2.2px}
+  .leaf{cursor:pointer}
+  .leaf text{font-size:12.5px;fill:var(--ink);writing-mode:vertical-rl;text-orientation:mixed}
+  .leaf:hover text{fill:var(--accent);font-weight:600}
+  #tip{position:fixed;pointer-events:none;background:var(--card);
+       border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+       font-size:13px;display:none;z-index:9;max-width:300px;
+       box-shadow:0 4px 14px rgba(0,0,0,.18);color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <h1>語のデンドログラム</h1>
+  <span class="hint">共起文脈が似ている語ほど右で早く結合（上位120語・平均連結法）。葉をクリックで語マップ検索へ。</span>
+  <div class="legend" id="legend"></div>
+</header>
+<main><svg id="dendro"></svg></main>
+<div id="tip"></div>
+
+<script src="content.js"></script>
+<script>
+"use strict";
+const GROUPS = [
+  ["基礎医学",   ["解剖学","生理学","運動学"],                             "var(--g1)"],
+  ["臨床医学",   ["病理学・内科学","神経内科学","整形外科学","精神医学",
+                  "小児科学・人間発達学","臨床心理学","リハビリテーション医学"], "var(--g2)"],
+  ["OT基盤",     ["作業療法概論","作業療法評価学"],                         "var(--g3)"],
+  ["治療学",     ["身体障害作業療法","精神障害作業療法","発達障害作業療法",
+                  "老年期作業療法","高次脳機能障害"],                        "var(--g4)"],
+  ["制度・地域", ["地域・社会制度"],                                        "var(--g5)"],
+];
+function groupColor(subj){
+  for(const [,list,color] of GROUPS) if(list.includes(subj)) return color;
+  return "var(--muted)";
+}
+const tip = document.getElementById("tip");
+function showTip(html, ev){ tip.innerHTML=html; tip.style.display="block";
+  tip.style.left=Math.min(ev.clientX+14, innerWidth-320)+"px"; tip.style.top=(ev.clientY+12)+"px"; }
+function hideTip(){ tip.style.display="none"; }
+document.getElementById("legend").innerHTML =
+  GROUPS.map(([n,,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join("")
+  + `<span><i style="background:var(--muted)"></i>その他/混在</span>`;
+
+cfetch("analysis/dendrogram.json").then(DD=>{
+  const root = d3.hierarchy(DD.tree);
+  const leaves = root.leaves();
+  // 縦向きレイアウト: 樹は上→下、葉が下端、ラベルは縦書き
+  const COL = 20;                       // 葉1つあたりの横幅
+  const AX = 46, TOP = 14;              // 左の距離軸幅・上余白
+  const TREE = 400, LBL = 215;          // 樹の高さ・縦書きラベルの高さ
+  const W = AX + leaves.length * COL + 20;
+  const H = TOP + TREE + LBL;
+  d3.cluster().size([leaves.length * COL - COL, 1])(root);
+  root.each(d=>{ d.px = AX + COL / 2 + d.x; });   // 横位置
+  // 目盛りは実際の結合範囲 [最小結合距離, 最大] に圧縮（下の空走を無くす）
+  const maxD = DD.tree.dist || 1;
+  let minD = maxD;
+  root.each(d=>{ if(d.children && d.data.dist < minD) minD = d.data.dist; });
+  const STEM = 22;                      // 最小結合から葉までの足
+  const yOf = d => d.children
+    ? TOP + (maxD - d.data.dist) / (maxD - minD) * (TREE - STEM)
+    : TOP + TREE;
+
+  // 枝の色: 配下の葉が同じ科目グループなら、そのグループ色
+  const gname = subj => { for(const [n,list] of GROUPS.map(g=>[g[0],g[1]])) if(list.includes(subj)) return n; return null; };
+  root.eachAfter(d=>{
+    if(!d.children){ d.grp = gname(d.data.主科目); return; }
+    const gs = new Set(d.children.map(c=>c.grp));
+    d.grp = (gs.size===1 && !gs.has(null)) ? d.children[0].grp : null;
+  });
+  const gcolor = {}; GROUPS.forEach(([n,,c])=>gcolor[n]=c);
+
+  const svg = d3.select("#dendro").attr("width", W).attr("height", H);
+
+  // 距離軸（左・縦）
+  const ys = d3.scaleLinear().domain([maxD, minD]).range([TOP, TOP + TREE - STEM]);
+  const ax = svg.append("g").attr("transform", `translate(${AX-6},0)`)
+    .call(d3.axisLeft(ys).ticks(6).tickSize(3));
+  ax.selectAll("text").attr("fill","var(--muted)").attr("font-size","10.5px");
+  ax.selectAll("line,path").attr("stroke","var(--line)");
+  svg.append("text").attr("x",6).attr("y",TOP-2).attr("fill","var(--ink2)")
+     .attr("font-size","11.5px").text("結合距離（上＝遠い・下＝近い）");
+
+  const linkByTarget = new Map();
+  svg.append("g").selectAll("path").data(root.links()).join("path")
+    .attr("class","lk")
+    .attr("stroke", d=>d.target.grp ? gcolor[d.target.grp] : "var(--muted)")
+    .attr("stroke-width", 1.4)
+    .attr("d", d=>`M${d.source.px},${yOf(d.source)}H${d.target.px}V${yOf(d.target)}`)
+    .each(function(d){ linkByTarget.set(d.target, this); });
+
+  const leaf = svg.append("g").selectAll("g").data(leaves).join("g")
+    .attr("class","leaf")
+    .attr("transform", d=>`translate(${d.px},${yOf(d)})`)
+    .on("click",(ev,d)=>{ hideTip();
+      window.open(`graph.html?q=${encodeURIComponent(d.data.name)}&v=${Date.now()%1e6}`, "otgraph"); })
+    .on("mousemove",(ev,d)=>{
+      showTip(`<b>${d.data.name}</b><br>出現 ${d.data.freq}問<br>主科目: ${d.data.主科目||"—"}<br>クリックで語マップ検索`, ev);
+      for(const a of d.ancestors()){ const el = linkByTarget.get(a); if(el) el.classList.add("hl"); }})
+    .on("mouseleave",(ev,d)=>{ hideTip();
+      for(const a of d.ancestors()){ const el = linkByTarget.get(a); if(el) el.classList.remove("hl"); }});
+  leaf.append("circle").attr("r",4.2)
+    .attr("fill", d=>groupColor(d.data.主科目))
+    .attr("stroke","var(--card)").attr("stroke-width",1.5);
+  leaf.append("text").attr("x",0).attr("y",9).attr("text-anchor","start")
+    .text(d=>`${d.data.name}`)
+    .append("tspan").attr("fill","var(--muted)").attr("font-size","10.5px")
+    .text(d=>` ${d.data.freq}`);
+}).catch(e=>{
+  document.querySelector("main").innerHTML =
+    `<p class="hint">データ読込に失敗しました。start.bat から起動してください。<br><small>${e}</small></p>`;
+});
+</script>
+</body>
+</html>

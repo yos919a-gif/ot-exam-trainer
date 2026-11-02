@@ -1,0 +1,21 @@
+{
+  "am": {
+    "1": "q001_am_clip.png",
+    "7": "q007_am_clip.png",
+    "8": "q008_am_clip.png",
+    "10": "q010_am_clip.png",
+    "11": "q011_am_clip.png",
+    "54": "q054_am_clip.png",
+    "60": "q060_am_clip.png",
+    "69": "q069_am_clip.png"
+  },
+  "pm": {
+    "1": "q001_pm_clip.png",
+    "2": "q002_pm_clip.png",
+    "9": "q009_pm_clip.png",
+    "39": "q039_pm_clip.png",
+    "59": "q059_pm_clip.png",
+    "80": "q080_pm_clip.png",
+    "3": "q103_pm_clip.png"
+  }
+}

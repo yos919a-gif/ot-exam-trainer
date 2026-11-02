@@ -1,0 +1,38 @@
+{
+  "am": [
+    {
+      "no": 1,
+      "part": "",
+      "questions": [
+        2
+      ],
+      "image": "am_bessatsu_p005.png"
+    },
+    {
+      "no": 2,
+      "part": "",
+      "questions": [
+        3
+      ],
+      "image": "am_bessatsu_p007.png"
+    }
+  ],
+  "pm": [
+    {
+      "no": 1,
+      "part": "",
+      "questions": [
+        2
+      ],
+      "image": "pm_bessatsu_p005.png"
+    },
+    {
+      "no": 2,
+      "part": "",
+      "questions": [
+        9
+      ],
+      "image": "pm_bessatsu_p007.png"
+    }
+  ]
+}
