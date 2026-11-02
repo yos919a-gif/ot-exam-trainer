@@ -542,6 +542,7 @@ function markBtn(id){
 
 let EXPL = {};   // 選択肢の誤り理由 {id:{c:{番号:一言}, flag:{番号:指摘}, ex:除外}}
 let DISEASES = [];  // 疾患別模試のグループ [{name, words, ids}]（content/exam/diseases.json、tools/tag_diseases.py が作る）
+let ADL = {categories: [], notes: {}};  // 疾患ごとの ADL（content/exam/adl.json、tools/tag_adl.py が作る）
 let ASSESS = [], ASSESS_IDS = new Set();  // 評価の問題 [{name, ids}]（content/exam/assessments.json、tools/tag_assessments.py が作る）
 function whyHtml(q, num){
   const e = EXPL[q.id]; if(!e || !e.c || !e.c[num]) return "";
@@ -654,6 +655,7 @@ async function loadAll(){
     ASSESS = (await r.json()).terms || [];
     ASSESS.forEach(t=>t.ids.forEach(i=>ASSESS_IDS.add(i)));
   }catch(e){ console.warn("評価タグなし", e); }
+  try{ ADL = await cfetch("exam/adl.json"); }catch(e){ console.warn("ADL のまとめなし", e); }
   try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); }
   catch(e){ console.warn("用語集なし", e); }
   try{
@@ -908,6 +910,44 @@ function startDzAssess(dname, tname){
   renderQuestion();
 }
 // 疾患×評価の対応表（過去問での出題数）。評価名をタップするとその問題だけ解ける
+// 疾患×ADL のまとめ：疾患ごとの ADL の要点と、その疾患の ADL の過去問（項目ごと）。項目をタップするとその問題だけ解ける
+function dzAdlIds(dname, cat){
+  const g = DISEASES.find(x=>x.name===dname), c = ADL.categories.find(x=>x.name===cat);
+  if(!g || !c) return [];
+  const ids = new Set(g.ids);
+  return c.ids.filter(i=>ids.has(i));
+}
+function startDzAdl(dname, cat){
+  const ids = dzAdlIds(dname, cat);
+  if(!ids.length) return;
+  startList(ids, "disease");
+  if(session) session.label = `${dname} × ${cat}`;
+  renderQuestion();
+}
+function renderDzAdl(){
+  session = null;
+  const notes = ADL.notes || {};
+  // 要点のある疾患を先に、そのあと過去問だけある疾患
+  const order = [...DISEASES].sort((a,b)=>(!!notes[b.name]) - (!!notes[a.name]));
+  const blocks = order.map(g=>{
+    const chips = ADL.categories.map(c=>({name:c.name, n:dzAdlIds(g.name, c.name).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n)
+      .map(x=>`<button class="btn small" onclick="startDzAdl('${esc(g.name)}','${esc(x.name)}')">${esc(x.name)} <b>${x.n}</b></button>`).join(" ");
+    const pts = (notes[g.name]||[]).map(t=>`<li>${esc(t)}</li>`).join("");
+    if(!pts && !chips) return "";
+    return `<div class="card" style="margin:12px 0"><h3 style="margin:0 0 6px">${esc(g.name)}</h3>
+      ${pts ? `<ul style="margin:4px 0 8px;padding-left:20px;line-height:1.85">${pts}</ul>` : ""}
+      ${chips ? `<div class="muted" style="margin:6px 0 4px">過去問（ADL の項目・問題数）</div><div style="line-height:2.3">${chips}</div>` : ""}</div>`;
+  }).join("");
+  app.innerHTML = `
+  <div class="card">
+    <h2>疾患×ADL のまとめ</h2>
+    <p class="muted">疾患ごとの ADL の要点と、第50〜61回でその疾患の問題に出てきた ADL の項目です。項目をタップすると、その疾患×ADL の過去問だけを解けます。要点は過去問の正答で確かめられる点を中心にまとめていますが、最後は教科書で確かめてください。</p>
+    <div><button class="btn primary" onclick="home()">ホームへ</button></div>
+  </div>
+  ${blocks}
+  <div style="margin:12px 0"><button class="btn primary" onclick="home()">ホームへ</button></div>`;
+  window.scrollTo(0,0);
+}
 function renderDzTable(){
   const rows = DISEASES.map(g=>{
     const a = dzAssess(g, 10);
@@ -1010,7 +1050,7 @@ function home(){
       <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div>
       <div class="acts" style="margin-top:8px"><span class="muted" style="margin:0 6px 0 0">全範囲：</span><button class="btn primary" onclick="DRILL.start('rom')">ROM 全範囲ドリル</button><button class="btn primary" onclick="DRILL.start('mmtok')">MMT 正しい図（15）</button><button class="btn" onclick="DRILL.start('mmtng')">MMT 間違い探し（30）</button></div></div>
     <div class="tile c5 wide" id="rangeCard"><div class="top"><span class="ic">🏥</span><h3>条件を選んで解く</h3>
-        <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button></span></div>
+        <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button><button class="btn small" onclick="renderDzAdl()">疾患×ADL のまとめ</button></span></div>
       <p>分野・疾患・評価・回・問題の種類を組み合わせて出題。何も選ばなければ全問から。疾患と評価は問題文の語で自動分類しています。</p>
       ${rangeForm()}
       <div class="acts"><button class="btn primary" id="rangeStart" onclick="startRange()">この条件で解く</button><button class="btn" id="rangePrint" onclick="printRange()">🖨 印刷・PDF</button><span class="pill" id="rangeCount"></span></div></div>
