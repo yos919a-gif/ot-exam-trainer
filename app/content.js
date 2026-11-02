@@ -1,5 +1,5 @@
 // アプリが読むデータは content/（tools/publish_content.py が作業場 data/ から出版する）。
-// manifest.json の版を付けて読むので、出版し直せばブラウザのキャッシュに古いデータが残らない。
+// manifest.json の版（またはファイルごとの sha1）を付けて読むので、出版し直せばブラウザのキャッシュに古いデータが残らない。
 "use strict";
 const CONTENT = "../content";
 let MANIFEST = null;
@@ -10,7 +10,11 @@ async function loadManifest(){
   }
   return MANIFEST;
 }
-function curl(path){ return `${CONTENT}/${path}?v=${MANIFEST ? MANIFEST.version : ""}`; }
+// ファイルごとの sha1 があればそれを付ける（版を上げずに1ファイルだけ差し替えても、端末の古い保存を使わない）
+function curl(path){
+  const f = MANIFEST && MANIFEST.files && MANIFEST.files[path];
+  return `${CONTENT}/${path}?v=${f && f.sha1 ? f.sha1 : (MANIFEST ? MANIFEST.version : "")}`;
+}
 async function cfetch(path){
   await loadManifest();
   const r = await fetch(curl(path));

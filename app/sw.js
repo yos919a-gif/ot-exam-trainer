@@ -4,7 +4,7 @@
 //  - 図（content/images/）: 開いた問題のものから順に保存される
 //  - /api/（serve.py の学習記録）と Google など外部は触らない
 "use strict";
-const SHELL_CACHE = "ot-shell-v4";
+const SHELL_CACHE = "ot-shell-v5";
 const DATA_CACHE = "ot-data-v1";
 const SHELL = ["./", "./index.html", "./appbar.css", "./content.js", "./config.js", "./sync.js", "./textbook.js", "./drill.js", "./print.js",
   "./graph.html", "./sakuin.html", "./dendrogram.html", "./lib/d3.v7.8.5.min.js",
@@ -25,11 +25,11 @@ self.addEventListener("message", e => {
 });
 async function precache(urls, version){
   const c = await caches.open(DATA_CACHE);
-  if(version){   // 古い版のデータを消す
-    for(const req of await c.keys()){
-      const v = new URL(req.url).searchParams.get("v");
-      if(v && v !== version) await c.delete(req);
-    }
+  // 古いデータを消す: 一覧にあるファイルは今の ?v= 以外を、図は版の違うものを
+  const want = new Map(urls.map(u => [new URL(u).pathname, u]));
+  for(const req of await c.keys()){
+    const u = new URL(req.url), w = want.get(u.pathname), v = u.searchParams.get("v");
+    if(w ? w !== u.href : (version && v && v !== version && u.pathname.includes("/images/"))) await c.delete(req);
   }
   for(const u of urls){
     try{ if(!(await c.match(u))){ const r = await fetch(u); if(r.ok) await c.put(u, r); } }catch(e){}
