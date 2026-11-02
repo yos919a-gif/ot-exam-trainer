@@ -962,6 +962,7 @@ function home(){
       </div>
     </div>
   </div>
+  ${window.SYNC && SYNC.status().on && SYNC.status().needLogin ? `<div class="card" style="padding:12px 16px;margin:12px 0">☁ 同期のログインが切れています。<button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">もう一度ログインして同期</button></div>` : ""}
   <div class="sec">今日やること <small>${today}</small></div>
   <div class="today">${reviewCard()}${wordTodayCard()}</div>
   <div class="sec">模試・演習 <span style="margin-left:auto"><button class="btn small ${lookupOn()?"primary":""}" onclick="toggleLookup()" title="オンにすると、解答する前から問題文・選択肢の用語に下線が出て、タップで意味を見られます">📖 用語を見ながら解く: ${lookupOn()?"オン":"オフ"}</button></span></div>
@@ -1595,7 +1596,8 @@ function syncUi(){
   if(!st.on) return `<div style="margin-bottom:10px"><button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">☁ Googleでログインして端末間で同期</button>
     <div class="muted">学習記録を自分の Google Drive のアプリ専用領域に置き、スマホ・PCで同じ記録にします。</div></div>`;
   return `<div style="margin-bottom:10px">☁ Google Drive と同期中（最終 ${SYNC.lastSyncText()}）${st.lastErr?` <span style="color:var(--ng)">— ${esc(st.lastErr)}</span>`:""}
-    <button class="btn small" onclick="SYNC.syncNow('manual').then(()=>home())">今すぐ同期</button>
+    ${st.needLogin ? `<button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">もう一度ログインして同期</button>`
+      : `<button class="btn small" onclick="SYNC.syncNow('manual').then(()=>home())">今すぐ同期</button>`}
     <button class="btn small" onclick="SYNC.signOut().then(()=>home())">ログアウト</button></div>`;
 }
 function exportProgress(){

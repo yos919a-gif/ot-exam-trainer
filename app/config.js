@@ -2,5 +2,5 @@
 // googleClientId: Google Drive 同期に使う OAuth クライアントID（Google Cloud Console で作る）。
 //   空のままなら同期の機能は出ず、学習記録はこの端末（ブラウザ）だけに保存される。
 window.OT_CONFIG = {
-  googleClientId: "",
+  googleClientId: "611251920659-orjdc1pqa1jn0m4j5qsji13sn3dfb8km.apps.googleusercontent.com",   // プロジェクト ot-exam-trainer（テスト中。ログインできるのはテストユーザーだけ）
 };

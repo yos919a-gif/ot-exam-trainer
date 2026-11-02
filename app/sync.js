@@ -12,7 +12,7 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
   const API = "https://www.googleapis.com";
   let st = {};
   try{ st = JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){}
-  let io = null, timer = null, busy = false, applying = false, lastErr = "";
+  let io = null, timer = null, busy = false, applying = false, lastErr = "", needLogin = false;
   const persist = () => { try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} };
   const clientId = () => (window.OT_CONFIG || {}).googleClientId || "";
   const available = () => !!clientId() && (location.protocol === "https:" || ["localhost", "127.0.0.1"].includes(location.hostname));
@@ -29,7 +29,8 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
       document.head.appendChild(s);
     });
   }
-  async function getToken(interactive){
+  // ログインの窓は、ボタンを押したとき（signIn・resume）だけ開く。裏で開くとブラウザに止められる
+  async function getToken(firstTime){
     if(hasToken()) return st.token;
     await loadGis();
     return new Promise((ok, ng) => {
@@ -41,13 +42,14 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
         },
         error_callback: e => ng(new Error((e && e.type) || "popup")),
       });
-      tc.requestAccessToken({prompt: interactive ? "consent" : ""});
+      tc.requestAccessToken({prompt: firstTime ? "consent" : ""});
     });
   }
   async function call(url, opts = {}){
-    const token = await getToken(false);
+    if(!hasToken()){ needLogin = true; throw new Error("ログインの期限が切れました（約1時間）"); }
+    const token = st.token;
     const r = await fetch(url, Object.assign({}, opts, {headers: Object.assign({Authorization: "Bearer " + token}, opts.headers || {})}));
-    if(r.status === 401 || r.status === 403){ st.token = null; st.exp = 0; persist(); throw new Error("ログインし直してください（" + r.status + "）"); }
+    if(r.status === 401 || r.status === 403){ st.token = null; st.exp = 0; persist(); needLogin = true; throw new Error("ログインし直してください（" + r.status + "）"); }
     if(!r.ok) throw new Error("Drive " + r.status);
     return r;
   }
@@ -170,8 +172,8 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
   }
   async function signIn(){
     if(!available()) throw new Error("同期の設定（config.js の googleClientId）がありません");
-    await getToken(true);
-    st.on = true; persist();
+    await getToken(!st.on);
+    st.on = true; needLogin = false; persist();
     const ok = await syncNow("login");
     if(!ok && lastErr) throw new Error(lastErr);
     return ok;
@@ -181,7 +183,7 @@ window.SYNC = (() => {   // window に置く（index.html は window.SYNC の有
     st = {}; persist();
   }
   const lastSyncText = () => st.lastSync ? new Date(st.lastSync).toLocaleString("ja-JP", {month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit"}) : "まだ";
-  const status = () => ({busy, lastErr, lastSync: st.lastSync || 0, on: signedIn()});
+  const status = () => ({busy, lastErr, lastSync: st.lastSync || 0, on: signedIn(), needLogin: needLogin || (signedIn() && !hasToken())});
   // 教科書データなど、学習記録以外のファイルを Drive のアプリ専用領域に置く・読む（ログインしていなければ何もしない）
   const files = {
     get: name => signedIn() && navigator.onLine ? download(name) : Promise.resolve(null),
