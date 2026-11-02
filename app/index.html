@@ -836,6 +836,21 @@ function startReview(limit){
   const ids = dueIds();
   startList(limit ? ids.slice(0, limit) : ids, "review");
 }
+/* ---------- ROM・MMT（2026-11-02 特別授業 第1回）。午前・午後の第1問目はほぼ ROM か MMT ---------- */
+const ROM_RE = /関節可動域|ROM|参考可動域|基本軸|移動軸/, MMT_RE = /徒手筋力|MMT|Daniels/;
+function romMmtList(kind){
+  const isRom = q=>ROM_RE.test(q.問題文), isMmt = q=>!isRom(q) && MMT_RE.test(q.問題文);
+  const pick = {rom: isRom, mmt: isMmt, all: q=>isRom(q) || isMmt(q),
+                q1: q=>(isRom(q) || isMmt(q)) && (q.問題番号===1 || q.問題番号===101)}[kind];
+  return Q.filter(pick).sort((a,b)=>a.回-b.回 || a.問題番号-b.問題番号);
+}
+function startRomMmt(kind){
+  const list = romMmtList(kind);
+  if(!list.length) return;
+  session = {list, idx:0, mode:"rommmt", label: {rom:"ROM", mmt:"MMT", all:"すべて", q1:"問1（実地）"}[kind], results:[], t0:Date.now()};
+  renderQuestion();
+}
+
 /* ---------- 条件を選んで解く（分野・疾患・評価） ---------- */
 // 分野 = 科目のまとまり。同じ科目が複数の分野に入ってよい
 const FIELDS = [
@@ -891,7 +906,7 @@ function dzEvalHtml(q){
   return blocks;
 }
 
-const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明"};
+const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明"};
 
 /* ================= 採点 ================= */
 function judge(q, picked){ // picked: 数値の配列
@@ -958,6 +973,9 @@ function home(){
     <div class="tile c2"><div class="top"><span class="ic">🎯</span><h3>弱点集中</h3></div>
       <p>正答率の低い科目と、最近まちがえた問題を優先。</p>
       <div class="acts"><button class="btn primary" onclick="startWeak(20)">20問</button><button class="btn" onclick="startWeak(50)">50問</button></div></div>
+    <div class="tile c4 wide"><div class="top"><span class="ic">💪</span><h3>ROM・MMT</h3></div>
+      <p>午前・午後の第1問目（実地3点）はほぼ ROM か MMT。第50〜61回の該当問題を回の順に。</p>
+      <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div></div>
     <div class="tile c5 wide" id="rangeCard"><div class="top"><span class="ic">🏥</span><h3>条件を選んで解く</h3>
         <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button></span></div>
       <p>分野・疾患・評価・回・問題の種類を組み合わせて出題。何も選ばなければ全問から。疾患と評価は問題文の語で自動分類しています。</p>
@@ -1174,7 +1192,7 @@ function renderResult(){
   res.forEach(r=>{ const k=byId[r.id].科目; (bySub[k]=bySub[k]||{ok:0,n:0});
                    bySub[k].n++; if(r.ok)bySub[k].ok++; });
   const sanka = session.mode === "sanka";  // 三科目模試: 解いた科目すべてで60%以上なら合格ライン（実地の換算なし）
-  const themed = session.mode === "field" || session.mode === "disease" || session.mode === "assess";  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
+  const themed = ["field", "disease", "assess", "rommmt"].includes(session.mode);  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
   const pass = sanka ? (res.length > 0 && Object.values(bySub).every(v=>v.ok/v.n >= 0.6))
              : themed ? (res.length > 0 && okN/res.length >= 0.6)
                      : ptMax ? (pt/ptMax >= 0.6 && jp >= jNeed) : false;
