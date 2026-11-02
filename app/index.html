@@ -606,6 +606,23 @@ document.addEventListener("click", e=>{
   if(t){ e.preventDefault(); e.stopPropagation(); showTerm(t); return; }
   if(!e.target.closest("#termBox")){ const b = document.getElementById("termBox"); if(b) b.style.display = "none"; }
 }, true);
+// マウスのときは、用語にカーソルを置くだけで吹き出しを出す（タッチは今までどおりタップ）。
+// 吹き出しの上にカーソルを移しても消えないので、長い説明もスクロールして読める
+if(matchMedia("(hover: hover) and (pointer: fine)").matches){
+  let hoverTimer = null;
+  const hideBox = ()=>{ const b = document.getElementById("termBox"); if(b) b.style.display = "none"; };
+  document.addEventListener("mouseover", e=>{
+    const t = e.target.closest(".term");
+    if(t){ clearTimeout(hoverTimer); hoverTimer = setTimeout(()=>showTerm(t), 200); return; }
+    if(e.target.closest("#termBox")) clearTimeout(hoverTimer);
+  });
+  document.addEventListener("mouseout", e=>{
+    if(!e.target.closest(".term, #termBox")) return;
+    const to = e.relatedTarget;
+    if(to && to.closest && to.closest(".term, #termBox")) return;
+    clearTimeout(hoverTimer); hoverTimer = setTimeout(hideBox, 300);
+  });
+}
 
 async function loadAll(){
   await initStore();
