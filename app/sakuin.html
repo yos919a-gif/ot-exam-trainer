@@ -189,7 +189,7 @@ function gate(msg){
 (window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
   const d = window.TEXTBOOK && TEXTBOOK.sakuin();
   if(!d){
-    gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データが古い版で、総合索引が入っていません。新しい ot-textbook-data.json を取り込み直してください。"
+    gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データが古い版で、総合索引が入っていません。配られた「辞書データ」の 辞書_○○.txt を取り込み直してください。"
                                           : "📚 総合索引は、教科書データを取り込んだ人だけが使えます。");
     return;
   }

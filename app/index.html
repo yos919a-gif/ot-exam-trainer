@@ -1606,10 +1606,10 @@ function endWords(){
 function textbookUi(){
   if(!window.TEXTBOOK) return "";
   const i = TEXTBOOK.info();
-  const pick = `<input type="file" id="tbFile" accept=".json,application/json" multiple style="display:none" onchange="importTextbook(this)">`;
+  const pick = `<input type="file" id="tbFile" accept=".txt,text/plain,.json,application/json" multiple style="display:none" onchange="importTextbook(this)">`;
   const note = `${window.SYNC && SYNC.signedIn() ? "取り込んだ本は自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。`;
   if(!i) return `${pick}<button class="btn small primary" onclick="document.getElementById('tbFile').click()">📚 教科書データを取り込む</button>
-    <div class="muted">配られた「辞書データ」の中の 辞書_○○.json を選びます（複数まとめて選べます。スマホなら Google Drive の中から選べます）。取り込むと、用語の吹き出しに教科書での説明が出て、総合索引も使えるようになります。${note}</div>`;
+    <div class="muted">配られた「辞書データ」の中の 辞書_○○.txt を選びます（以前の .json も取り込めます。複数まとめて選べます。スマホなら Google Drive の中から選べます）。取り込むと、用語の吹き出しに教科書での説明が出て、総合索引も使えるようになります。${note}</div>`;
   const bs = TEXTBOOK.books(), nOn = bs.filter(b=>b.on).length;
   const list = bs.map(b=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;break-inside:avoid">
       <label style="display:flex;align-items:center;gap:8px;flex:1;min-width:0"><input type="checkbox" ${b.on?"checked":""} data-k="${esc(b.key)}"

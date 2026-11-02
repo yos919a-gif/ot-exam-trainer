@@ -1,6 +1,8 @@
 // 教科書データ（辞書データ。各自が取り込む。公開サイトには入っていない）
-//  - 取り込み: 1冊ずつのファイル（tools/bundle_textbook.py が作る 辞書_<id>_<書名>.json）を、まとめて選んで取り込む。
-//    本を足すときはファイルを足して取り込み、外すときは一覧から削除する。以前の全冊入りのファイルも本ごとに分けて取り込める
+//  - 取り込み: 1冊ずつのファイル（tools/bundle_textbook.py が作る 辞書_<id>_<書名>.txt）を、まとめて選んで取り込む。
+//    .txt は | 区切りの表（1行目 #OT国試トレーナー 教科書データ v1、#キー=値 のメタ行、見出し行、索引の行・説明の行）で、
+//    読むときに下の1冊のデータ（JSON と同じ形）に戻す。以前の 辞書_<id>_<書名>.json も、全冊入りのファイル（本ごとに分ける）も取り込める。
+//    本を足すときはファイルを足して取り込み、外すときは一覧から削除する
 //  - 保存: 端末の IndexedDB に本ごと。Google ログインしていれば Drive のアプリ専用領域にも本ごと（ot-tb-<id>.json）に置き、
 //    ほかの端末はそこから読む
 //  - 使い道: 用語の吹き出しの「教科書では」と、総合索引のページ（sakuin.html）
@@ -49,6 +51,50 @@ window.TEXTBOOK = (() => {
     }));
     return Object.values(out);
   }
+  // | 区切りのテキスト（新しい形式）を1冊のデータに戻す。列は見出し行の列名で探す
+  const TXT_SIG = "#OT国試トレーナー 教科書データ";
+  const isTxt = text => (String(text).replace(/^\uFEFF/, "").split(/\r\n|\r|\n/).find(l => l.trim()) || "").startsWith(TXT_SIG);
+  function parseText(text){
+    const lines = String(text).replace(/^\uFEFF/, "").split(/\r\n|\r|\n/).filter(l => l.trim());
+    if(!lines.length || !lines[0].startsWith(TXT_SIG)) throw new Error("1行目が「#OT国試トレーナー 教科書データ」ではありません");
+    const meta = {};
+    let i = 1;
+    for(; i < lines.length && lines[i].startsWith("#"); i++){
+      const m = lines[i].slice(1).match(/^([^=]*)=(.*)$/); if(m) meta[m[1].trim()] = m[2];
+    }
+    const head = (lines[i] || "").split("|").map(c => c.trim());
+    if(!head.includes("行の種類") || !head.includes("単語名")) throw new Error("教科書データ（.txt）の見出し行がありません");
+    if(!meta.id) throw new Error("教科書データ（.txt）に本の id（#id=）がありません");
+    const col = {}; head.forEach((c, k) => { if(!(c in col)) col[c] = k; });
+    const int = v => parseInt(v, 10) || 0;
+    const page = v => /^\d+$/.test(v) ? Number(v) : v;
+    const split = v => v.split("；").filter(Boolean);
+    const terms = {}, entries = {}, index = {};
+    let prev = null;   // 直前の索引の行 {w, d, b, e}
+    for(const line of lines.slice(i + 1)){
+      const cells = line.split("|"), g = name => col[name] == null ? "" : (cells[col[name]] ?? "");
+      const kind = g("行の種類").trim(), w = g("単語名");
+      if(kind === "索引"){
+        const t = terms[w] || (terms[w] = {r: g("かな"), n: int(g("国試出題数")), al: split(g("別表記")), e: []});
+        const d = g("説明"), b = g("本文") === "本文", p = g("ページ");
+        let e;
+        if(prev && prev.w === w && prev.d === d && prev.b === b) e = prev.e;
+        else{ e = b ? [d, [], "b"] : [d, []]; t.e.push(e); }
+        if(p !== "") e[1].push(page(p));
+        prev = {w, d, b, e};
+        continue;
+      }
+      prev = null;
+      if(kind !== "説明") continue;
+      const eid = g("項目id");
+      if(!eid) continue;
+      const x = entries[eid] || (entries[eid] = {w, n: int(g("出現冊数")), r: []});
+      const p = g("ページ");
+      if(["ページ", "説明", "出現文脈", "関係", "相手"].some(c => g(c) !== "")) x.r.push([p === "" ? null : page(p), g("関係"), g("相手"), g("出現文脈")]);
+      split(g("引く表記")).forEach(k => { const a = index[k] || (index[k] = []); if(!a.includes(eid)) a.push(eid); });
+    }
+    return {kind: "ot-textbook-book", version: meta.version || "", id: meta.id, name: meta.name || meta.id, 説明: meta.説明 || "", terms, entries, index};
+  }
   // 取り込んだ本をまとめ直す（本を足したり消したりするたびに）
   function rebuild(){
     const ids = Object.keys(bookMap);
@@ -95,10 +141,11 @@ window.TEXTBOOK = (() => {
     rebuild();
     return !!data;
   }
-  // 1ファイル分を取り込む（1冊のファイルか、以前の全冊入りのファイル）。取り込んだ本の名前を返す
+  // 1ファイル分を取り込む（1冊の .txt か、以前の 1冊の .json・全冊入りのファイル）。取り込んだ本の名前を返す
   async function importText(text){
     let j;
-    try{ j = JSON.parse(text); }catch(e){ throw new Error("JSON として読めません"); }
+    if(isTxt(text)) j = parseText(text);
+    else try{ j = JSON.parse(String(text).replace(/^\uFEFF/, "")); }catch(e){ throw new Error("教科書データ（.txt）としても JSON としても読めません"); }
     const list = isBook(j) ? [j] : isOldBundle(j) ? splitBundle(j) : null;
     if(!list) throw new Error("OT国試トレーナーの教科書データではありません");
     for(const b of list){
@@ -166,6 +213,6 @@ window.TEXTBOOK = (() => {
     const more = e.r.length > max ? `<div class="st">ほか ${e.r.length - max}件</div>` : "";
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
-  return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+  return {load, importText, importFiles, parseText, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet()};
 })();
