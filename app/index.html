@@ -426,6 +426,7 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 <script src="sync.js"></script>
 <script src="textbook.js"></script>
 <script src="drill.js"></script>
+<script src="print.js"></script>
 <script>
 "use strict";
 /* ================= データ ================= */
@@ -609,7 +610,7 @@ document.addEventListener("click", e=>{
 async function loadAll(){
   await initStore();
   if(window.SYNC) SYNC.init({get: ()=>store(), put: s=>save(normS(s)),
-    onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && typeof home==="function") home(); }});
+    onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && !(window.PRINT && PRINT.active()) && typeof home==="function") home(); }});
   srsMigrate();
   if(window.TEXTBOOK) TEXTBOOK.load().catch(()=>{});
   const qs = await cfetch("exam/questions.json");
@@ -819,15 +820,26 @@ function rangeChanged(init){
   const n = buildRangeSet(p).length;
   document.getElementById("rangeCount").textContent = `該当 ${n}問`;
   document.getElementById("rangeStart").disabled = !n;
+  document.getElementById("rangePrint").disabled = !n;
+}
+function rangeLabel(p){
+  return [p.kai!=="all" ? `第${p.kai}回` : "", p.ku!=="all" ? p.ku : "", p.sub!=="all" ? p.sub : "", p.dis!=="all" ? p.dis : "",
+          p.ev==="1" ? "評価" : p.ev!=="0" ? p.ev : "", p.kind==="jitsu" ? "実地" : p.kind==="ippan" ? "一般" : ""].filter(Boolean).join(" × ");
 }
 function startRange(){
   const p = readRangeForm();
   const list = buildRangeSet(p);
   if(!list.length) return;
   const mode = p.dis!=="all" ? "disease" : p.ev!=="0" ? "assess" : p.sub!=="all" ? "field" : "range";
-  const label = [p.kai!=="all" ? `第${p.kai}回` : "", p.ku!=="all" ? p.ku : "", p.sub!=="all" ? p.sub : "", p.dis!=="all" ? p.dis : "",
-                 p.ev==="1" ? "評価" : p.ev!=="0" ? p.ev : "", p.kind==="jitsu" ? "実地" : p.kind==="ippan" ? "一般" : ""].filter(Boolean).join(" × ");
-  session = {list, idx:0, mode, label, results:[], t0:Date.now()}; renderQuestion();
+  session = {list, idx:0, mode, label: rangeLabel(p), results:[], t0:Date.now()}; renderQuestion();
+}
+function printRange(){   // 今の条件の問題を印刷・PDF に
+  const p = readRangeForm();
+  PRINT.open(buildRangeSet(p), rangeLabel(p) || "全範囲");
+}
+function printWrong(){   // 結果画面から、間違えた問題だけを印刷・PDF に
+  const ids = session.results.filter(r=>!r.ok).map(r=>r.id);
+  PRINT.open(ids.map(i=>byId[i]).filter(Boolean), `${MODE_LABEL[session.mode]||"演習"}${session.label?"（"+session.label+"）":""}の間違えた問題`);
 }
 function startList(ids, mode){
   const list = ids.map(i=>byId[i]).filter(Boolean);
@@ -934,7 +946,7 @@ function ringSvg(pct){ // 正答率の輪
 }
 function barCls(p){ return p===null ? "" : p<50 ? "lo" : p<70 ? "mid" : "hi"; } // 科目の成績バーの色（50%未満・70%未満・それ以上）
 function home(){
-  session = null; wsess = null; if(window.DRILL) DRILL.reset();
+  session = null; wsess = null; if(window.DRILL) DRILL.reset(); if(window.PRINT) PRINT.reset();
   const s = store();
   const answered = Object.keys(s.attempts).length;
   const attempts = Object.values(s.attempts).reduce((a,b)=>a+b.length,0);
@@ -984,7 +996,7 @@ function home(){
         <span style="margin-left:auto"><button class="btn small" onclick="renderDzTable()">疾患×評価の対応表</button></span></div>
       <p>分野・疾患・評価・回・問題の種類を組み合わせて出題。何も選ばなければ全問から。疾患と評価は問題文の語で自動分類しています。</p>
       ${rangeForm()}
-      <div class="acts"><button class="btn primary" id="rangeStart" onclick="startRange()">この条件で解く</button><span class="pill" id="rangeCount"></span></div></div>
+      <div class="acts"><button class="btn primary" id="rangeStart" onclick="startRange()">この条件で解く</button><button class="btn" id="rangePrint" onclick="printRange()">🖨 印刷・PDF</button><span class="pill" id="rangeCount"></span></div></div>
   </div>
   <div class="sec">暗記・復習</div>
   <div class="tiles">
@@ -1240,7 +1252,7 @@ function renderResult(){
     ${wrong?`<h3>間違えた問題</h3><table>${wrong}</table>`:""}
     <div style="margin-top:12px">
       <button class="btn primary" onclick="home()">ホームへ</button>
-      ${wrong?`<button class="btn" onclick="retryWrong()">間違いだけ再挑戦</button>`:""}
+      ${wrong?`<button class="btn" onclick="retryWrong()">間違いだけ再挑戦</button><button class="btn" onclick="printWrong()">🖨 間違えた問題を印刷</button>`:""}
     </div>
   </div>`;
 }
