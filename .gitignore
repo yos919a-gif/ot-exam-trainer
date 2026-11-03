@@ -9,3 +9,5 @@ start.bat
 private/
 # 教科書の総合索引（教科書データに入れて配る。公開しない）
 content/refs/
+# 教科書の文で作った語のつながり（教科書データに入れて配る。公開しない）
+content/knowledge/

@@ -12,6 +12,7 @@ content/refs/総合索引.json には教科書の索引（語→本・ページ�
   terms   総合索引のうちこの本の分 {語: {r 読み, n 国試の出題数, al 別表記, e [[補足, [ページ], 本文なら"b"]]}}
   entries 辞書の説明のうちこの本の分 {項目id: {w 見出し, n 出現冊数, r [[ページ, 関係, 相手, 根拠の文]]}}
   index   entries の項目を引く表記 {表記: [項目id]}
+  kotoba  語のつながり（content/knowledge/<id>_terms.json があれば。kotoba.html が使う）
 
     python3 tools/bundle_textbook.py
 """
@@ -65,6 +66,9 @@ def main():
         out = {"kind": "ot-textbook-book", "version": meta.get("版", ""), "id": bid, "name": name,
                "説明": "OT国試トレーナーの教科書データ（1冊分・個人の学習用。再配布しないでください）",
                "terms": b["terms"], "entries": b["entries"], "index": sub_index}
+        kp = ROOT / "content" / "knowledge" / f"{bid}_terms.json"   # 語のつながり（説明を原本で確かめた本だけ）
+        if kp.exists():
+            out["kotoba"] = json.loads(kp.read_text(encoding="utf-8"))
         safe = re.sub(r'[\\/:*?"<>|]', "_", name)
         path = OUT_DIR / f"辞書_{bid}_{safe}.json"
         path.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

@@ -3,7 +3,7 @@
 //    本を足すときはファイルを足して取り込み、外すときは一覧から削除する。以前の全冊入りのファイルも本ごとに分けて取り込める
 //  - 保存: 端末の IndexedDB に本ごと。Google ログインしていれば Drive のアプリ専用領域にも本ごと（ot-tb-<id>.json）に置き、
 //    ほかの端末はそこから読む
-//  - 使い道: 用語の吹き出しの「教科書では」と、総合索引のページ（sakuin.html）
+//  - 使い道: 用語の吹き出しの「教科書では」と、総合索引のページ（sakuin.html）、語のつながり（kotoba.html。本のファイルの kotoba）
 //  - 本の選択: チェックボックスで一時的に外せる（外した本は S.pref.tbOff。学習記録と一緒に同期される）
 "use strict";
 window.TEXTBOOK = (() => {
@@ -167,5 +167,7 @@ window.TEXTBOOK = (() => {
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
   return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
-          sakuin: () => (data && data.sakuin) || null, offIds: () => offSet()};
+          sakuin: () => (data && data.sakuin) || null, offIds: () => offSet(),
+          // 語のつながり（kotoba.html）: 説明を原本で確かめた本のファイルに入っている（今は生理学）
+          kotoba: () => { const b = Object.values(bookMap).find(b => b.kotoba && b.kotoba.terms); return b ? b.kotoba : null; }};
 })();

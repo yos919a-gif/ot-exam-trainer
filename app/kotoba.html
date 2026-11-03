@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="icon.png">
+<title>語のつながり</title>
+<style>
+  :root{ --bg:#f6f7fb; --card:#fff; --card2:#f9fafc; --ink:#1d2433; --sub:#5b6577; --accent:#2f6fed; --accent2:#e8f0fe; --accent3:#c9d8fb; --line:#e3e7ef; --warm:#b7591f; --warm2:#fbeee4; --shadow:0 1px 2px rgba(20,30,60,.06); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --bg:#141822; --card:#1d2433; --card2:#222a3b; --ink:#e8ecf4; --sub:#9aa5b8; --accent:#6b9bff; --accent2:#243352; --accent3:#33466e; --line:#2c3547; --warm:#f0a070; --warm2:#3a2a20; } }
+  :root[data-theme="dark"]{ --bg:#141822; --card:#1d2433; --card2:#222a3b; --ink:#e8ecf4; --sub:#9aa5b8; --accent:#6b9bff; --accent2:#243352; --accent3:#33466e; --line:#2c3547; --warm:#f0a070; --warm2:#3a2a20; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;line-height:1.8;padding:0 16px 48px}
+  main{max-width:1000px;margin:0 auto}
+  .head{padding:22px 0 10px;display:flex;gap:8px 16px;align-items:baseline;flex-wrap:wrap}
+  .head h1{font-size:21px;margin:0;border-left:4px solid var(--accent);padding-left:12px}
+  .sub{color:var(--sub);font-size:13px}
+  .layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+  @media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}}
+  .side{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;position:sticky;top:calc(var(--appbar-height,56px) + 8px)}
+  @media(max-width:760px){.side{position:static}}
+  #q{width:100%;min-height:46px;font-size:16px;padding:10px 12px;border:2px solid var(--accent3);border-radius:8px;background:var(--card);color:var(--ink)}
+  #q:focus{outline:3px solid color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent)}
+  #list{max-height:60vh;overflow:auto;margin-top:8px}
+  @media(max-width:760px){#list{max-height:36vh}}
+  #list button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;padding:6px 8px;border-radius:6px;cursor:pointer}
+  #list button:hover{background:var(--accent2)} #list button[aria-current="true"]{background:var(--accent);color:#fff}
+  #list .c{color:var(--sub);font-size:12px;font-variant-numeric:tabular-nums} #list button[aria-current="true"] .c{color:inherit}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);min-width:0}
+  .card h2{font-size:22px;margin:0} .pg{color:var(--sub);font-size:13px;margin-left:8px}
+  .ex{margin:12px 0;padding:10px 14px;background:var(--card2);border-left:3px solid var(--accent3);border-radius:4px;font-size:15px;line-height:1.95;overflow-wrap:anywhere}
+  .ex .h{font-weight:700;display:block} .ex .p{color:var(--sub);font-size:12px;margin-left:4px}
+  .ex mark{background:var(--accent2);color:inherit;border-radius:3px;padding:0 2px;cursor:pointer}
+  h3{font-size:15px;margin:18px 0 6px;display:flex;gap:8px;align-items:baseline} h3 small{color:var(--sub);font-weight:400;font-size:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--accent3);background:var(--card);color:var(--accent);border-radius:999px;padding:3px 12px;font:inherit;font-size:14px;cursor:pointer}
+  .chip.use{border-color:color-mix(in srgb,var(--warm) 45%,var(--line));color:var(--warm);background:var(--warm2)}
+  .chip:hover{filter:brightness(.95)} .chip:focus-visible,#list button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .none{color:var(--sub);font-size:13px}
+  .crumb{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:13px;color:var(--sub);margin-bottom:8px}
+  .crumb button{border:0;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:0}
+  .ob{margin-top:4px} .obt{font-size:13px;font-weight:700;color:var(--sub);margin-top:12px}
+  .ex.ex2{border-left-color:color-mix(in srgb,var(--warm) 55%,var(--line))}
+  .chip .ob1{font-size:11px;margin-left:4px;opacity:.75}
+  .note{font-size:12px;color:var(--sub);margin-top:14px;border-top:1px dashed var(--line);padding-top:8px}
+</style>
+<link rel="stylesheet" href="appbar.css">
+</head>
+<body>
+<header class="appbar"><div class="wrap">
+  <a class="brand" href="index.html"><span class="logo">OT</span><span><b>国試トレーナー</b><small>第50〜61回・2,400問（公式正答準拠）</small></span></a>
+  <nav class="tabs"><a href="index.html">ホーム</a><a href="graph.html">語マップ</a><a href="sakuin.html">総合索引</a><a href="kotoba.html" class="on">語のつながり</a></nav>
+</div></header>
+<main>
+  <div class="head"><h1>語のつながり</h1><span class="sub" id="info">読み込み中…</span></div>
+  <div class="layout">
+    <div class="side">
+      <input type="search" id="q" placeholder="語を入力（例: ホルモン、筋紡錘）" autocomplete="off">
+      <div class="sub" style="margin-top:6px">数字＝この語を使って説明される語の数</div>
+      <div id="list"></div>
+    </div>
+    <div class="card" id="card"><p class="none">左の一覧から語を選んでください。</p></div>
+  </div>
+</main>
+<script src="content.js"></script>
+<script src="textbook.js"></script>
+<script>
+"use strict";
+// 教科書の索引の語ごとに、原本で字まで確かめた説明の文と、語どうしのつながり（説明に出てくる語）。tools/build_term_links.py が作る
+let T = {}, META = {}, KEYS = [], trail = [];
+const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kata = s => s.replace(/[ぁ-ゖ]/g, c=>String.fromCharCode(c.charCodeAt(0)+0x60));
+const fold = s => kata(s.normalize("NFKC").toLowerCase().replace(/\s/g,""));
+const tidy = s => s.replace(/[ 　\t]+/g," ").replace(/(?<![A-Za-z0-9]) | (?![A-Za-z0-9])/g,"").trim();
+const spec = w => (T[w] ? T[w]["使われる"].length : 0);  // 少ないほど専門的な語
+
+function renderList(){
+  const q = fold(document.getElementById("q").value);
+  let hit = KEYS.filter(k=>!q || fold(k).includes(q));
+  hit.sort((a,b)=>(fold(b)===q)-(fold(a)===q) || fold(b).startsWith(q)-fold(a).startsWith(q) || spec(b)-spec(a) || a.localeCompare(b,"ja"));
+  const cur = trail[trail.length-1];
+  document.getElementById("list").innerHTML = hit.slice(0,300).map(k=>
+    `<button type="button" data-w="${esc(k)}" aria-current="${k===cur}"><span>${esc(k)}</span><span class="c">${spec(k)||""}</span></button>`).join("");
+}
+function chips(ws, cls){
+  if(!ws.length) return `<span class="none">見つけられない（この本の説明の文の中では）</span>`;
+  return `<div class="chips">${[...ws].sort((a,b)=>spec(a)-spec(b)).map(w=>`<button type="button" class="chip ${cls}" data-w="${esc(w)}">${esc(w)}${T[w]&&T[w]["他の本"]?`<span class="ob1">＋${T[w]["他の本"].length}冊</span>`:""}</button>`).join("")}</div>`;
+}
+function show(w, push=true){
+  const t = T[w]; if(!t) return;
+  if(push){ if(trail[trail.length-1]!==w) trail.push(w); if(trail.length>8) trail.shift(); }
+  const linked = new Set(t["出てくる"]);
+  // 長い語から先に、一度だけ当てる（色を付けた所にもう一度当てない）
+  const marks = [...linked].sort((a,b)=>b.length-a.length);
+  const rx = marks.length ? new RegExp("(" + marks.map(m=>m.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")", "g") : null;
+  const markUp = s => { const t = tidy(s); if(!rx) return esc(t);
+    return t.split(rx).map((part,i)=> i%2 ? `<mark data-w="${esc(part)}">${esc(part)}</mark>` : esc(part)).join(""); };
+  const ex = t["説明"].map(o=> o["見出し"] ? `<span class="h">${esc(tidy(o["文"]))}</span>` : `${markUp(o["文"])}<span class="p">（p.${esc(o.p)}）</span>`).join(" ");
+  document.getElementById("card").innerHTML =
+    `${trail.length>1?`<div class="crumb">たどった語: ${trail.map((x,i)=>i<trail.length-1?`<button type="button" data-w="${esc(x)}" data-back="${i}">${esc(x)}</button> ›`:`<b>${esc(x)}</b>`).join(" ")}</div>`:""}
+     <h2>${esc(w)}<span class="pg">${esc(META["本"]||"")} 索引 p.${t.p.join(", ")}</span></h2>
+     ${(t["他の本"]||[]).length?`<div class="obt">${esc(META["本"]||"")}</div>`:""}
+     <div class="ex">${ex}</div>
+     ${(t["他の本"]||[]).map(o=>`<div class="ob"><div class="obt">${esc(o["本"])}${o["語"]!==w?`（${esc(o["語"])}）`:""}</div><div class="ex ex2">${o["説明"].map(x=> x["見出し"] ? `<span class="h">${esc(tidy(x["文"]))}</span>` : `${markUp(x["文"])}<span class="p">（p.${esc(x.p)}）</span>`).join(" ")}</div></div>`).join("")}
+     <h3>説明に出てくる語 <small>この語を理解するのに使われている語</small></h3>${chips(t["出てくる"],"")}
+     <h3>この語を使って説明される語 <small>この語が土台になっている語（${t["使われる"].length}語）</small></h3>${chips(t["使われる"],"use")}
+     <div class="note">説明の文は、教科書の原本の画像から書き写し、字まで確かめた文です。つながりは、その文の中に索引の語が出てくることを表します。「＋1冊」はほかの教科書の説明（同じく原本で確かめた文）もある語です。<a href="sakuin.html?q=${encodeURIComponent(w)}">総合索引でほかの本を見る</a></div>`;
+  renderList();
+  const u = new URL(location); u.searchParams.set("w", w); history.replaceState(null,"",u);
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-w]"); if(!b) return;
+  if(b.dataset.back!==undefined){ trail = trail.slice(0, +b.dataset.back+1); show(b.dataset.w,false); return; }
+  show(b.dataset.w);
+  if(window.innerWidth<=760) document.getElementById("card").scrollIntoView({behavior:"smooth",block:"start"});
+});
+document.getElementById("q").addEventListener("input", renderList);
+function gate(msg){
+  document.querySelector(".side").style.display = "none"; document.querySelector(".layout").style.gridTemplateColumns = "minmax(0,1fr)";
+  document.getElementById("info").textContent = "";
+  document.getElementById("card").innerHTML = `<p>${msg}</p><p class="none"><a href="index.html">ホームへ</a>
+    （ホームの一番下「教科書データ」から取り込めます。Google でログインしていれば、ほかの端末で取り込んだデータも使えます）</p>`;
+}
+// 語のつながりは教科書の文でできているので公開サイトには置かず、教科書データ（生理学のファイル）に入れて配る
+(window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
+  const d = window.TEXTBOOK && TEXTBOOK.kotoba && TEXTBOOK.kotoba();
+  if(!d){
+    gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データに語のつながりが入っていません。新しい生理学のファイル（辞書_physiology_…json）を取り込み直してください。"
+                                          : "📚 語のつながりは、教科書データを取り込んだ人だけが使えます。");
+    return;
+  }
+  T = d.terms; META = d.meta; KEYS = Object.keys(T);
+  document.getElementById("info").textContent = `${META["本"]}・${KEYS.length.toLocaleString()}語・つながり ${META["つながり数"].toLocaleString()}本`;
+  renderList();
+  const w0 = new URLSearchParams(location.search).get("w"); if(w0 && T[w0]) show(w0);
+}).catch(e=>{ document.getElementById("card").textContent = "読み込めませんでした: " + e; });
+</script>
+</body>
+</html>
