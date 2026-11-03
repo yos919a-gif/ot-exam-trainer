@@ -96,13 +96,13 @@ function show(w, push=true){
   const rx = marks.length ? new RegExp("(" + marks.map(m=>m.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")", "g") : null;
   const markUp = s => { const t = tidy(s); if(!rx) return esc(t);
     return t.split(rx).map((part,i)=> i%2 ? `<mark data-w="${esc(part)}">${esc(part)}</mark>` : esc(part)).join(""); };
-  const ex = t["説明"].map(o=> o["見出し"] ? `<span class="h">${esc(tidy(o["文"]))}</span>` : `${markUp(o["文"])}<span class="p">（p.${esc(o.p)}）</span>`).join(" ");
+  const ex = !t["説明"] ? `<span class="none">説明の文は基本辞書を取り込むと出ます（ホームの「教科書データ」）。索引 p.${t.p.join(", ")}</span>` : t["説明"].map(o=> o["見出し"] ? `<span class="h">${esc(tidy(o["文"]))}</span>` : `${markUp(o["文"])}<span class="p">（p.${esc(o.p)}）</span>`).join(" ");
   document.getElementById("card").innerHTML =
     `${trail.length>1?`<div class="crumb">たどった語: ${trail.map((x,i)=>i<trail.length-1?`<button type="button" data-w="${esc(x)}" data-back="${i}">${esc(x)}</button> ›`:`<b>${esc(x)}</b>`).join(" ")}</div>`:""}
      <h2>${esc(w)}<span class="pg">${esc(META["本"]||"")} 索引 p.${t.p.join(", ")}</span></h2>
      ${(t["他の本"]||[]).length?`<div class="obt">${esc(META["本"]||"")}</div>`:""}
      <div class="ex">${ex}</div>
-     ${(t["他の本"]||[]).map(o=>`<div class="ob"><div class="obt">${esc(o["本"])}${o["語"]!==w?`（${esc(o["語"])}）`:""}</div><div class="ex ex2">${o["説明"].map(x=> x["見出し"] ? `<span class="h">${esc(tidy(x["文"]))}</span>` : `${markUp(x["文"])}<span class="p">（p.${esc(x.p)}）</span>`).join(" ")}</div></div>`).join("")}
+     ${(t["他の本"]||[]).map(o=>`<div class="ob"><div class="obt">${esc(o["本"])}${o["語"]!==w?`（${esc(o["語"])}）`:""}</div><div class="ex ex2">${!o["説明"] ? `<span class="none">p.${(o.p||[]).join(", ")}（文は基本辞書を取り込むと出ます）</span>` : o["説明"].map(x=> x["見出し"] ? `<span class="h">${esc(tidy(x["文"]))}</span>` : `${markUp(x["文"])}<span class="p">（p.${esc(x.p)}）</span>`).join(" ")}</div></div>`).join("")}
      <h3>説明に出てくる語 <small>この語を理解するのに使われている語</small></h3>${chips(t["出てくる"],"")}
      <h3>この語を使って説明される語 <small>この語が土台になっている語（${t["使われる"].length}語）</small></h3>${chips(t["使われる"],"use")}
      <div class="note">説明の文は、教科書の原本の画像から書き写し、字まで確かめた文です。つながりは、その文の中に索引の語が出てくることを表します。「＋1冊」はほかの教科書の説明（同じく原本で確かめた文）もある語です。<a href="sakuin.html?q=${encodeURIComponent(w)}">総合索引でほかの本を見る</a></div>`;
@@ -116,22 +116,21 @@ document.addEventListener("click", e=>{
   if(window.innerWidth<=760) document.getElementById("card").scrollIntoView({behavior:"smooth",block:"start"});
 });
 document.getElementById("q").addEventListener("input", renderList);
-function gate(msg){
-  document.querySelector(".side").style.display = "none"; document.querySelector(".layout").style.gridTemplateColumns = "minmax(0,1fr)";
-  document.getElementById("info").textContent = "";
-  document.getElementById("card").innerHTML = `<p>${msg}</p><p class="none"><a href="index.html">ホームへ</a>
-    （ホームの一番下「教科書データ」から取り込めます。Google でログインしていれば、ほかの端末で取り込んだデータも使えます）</p>`;
-}
-// 語のつながりは教科書の文でできているので公開サイトには置かず、教科書データ（生理学のファイル）に入れて配る
-(window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
-  const d = window.TEXTBOOK && TEXTBOOK.kotoba && TEXTBOOK.kotoba();
-  if(!d){
-    gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データに語のつながりが入っていません。新しい生理学のファイル（辞書_physiology_…json）を取り込み直してください。"
-                                          : "📚 語のつながりは、教科書データを取り込んだ人だけが使えます。");
-    return;
-  }
+// 公開版には語のつながりと索引ページだけ（content/knowledge/physiology_links.json）。説明の文は基本辞書（教科書データの
+// 辞書_kotoba_…json。tools/bundle_textbook.py が作る）を取り込んだ人にだけ重ねて出す（パッチ）
+let FULL = false;
+cfetch("knowledge/physiology_links.json").then(async d=>{
   T = d.terms; META = d.meta; KEYS = Object.keys(T);
-  document.getElementById("info").textContent = `${META["本"]}・${KEYS.length.toLocaleString()}語・つながり ${META["つながり数"].toLocaleString()}本`;
+  try{
+    if(window.TEXTBOOK){ await TEXTBOOK.load(); }
+    const full = window.TEXTBOOK && TEXTBOOK.kotoba && TEXTBOOK.kotoba(META.id || "physiology");
+    if(full && full.terms){
+      FULL = true;
+      KEYS.forEach(w=>{ const f = full.terms[w]; if(!f) return; T[w]["説明"] = f["説明"]; if(f["他の本"]) T[w]["他の本"] = f["他の本"]; });
+    }
+  }catch(e){ console.warn("基本辞書", e); }
+  document.getElementById("info").textContent = `${META["本"]}・${KEYS.length.toLocaleString()}語・つながり ${META["つながり数"].toLocaleString()}本` +
+    (FULL ? "" : "（説明の文は基本辞書を取り込むと出ます）");
   renderList();
   const w0 = new URLSearchParams(location.search).get("w"); if(w0 && T[w0]) show(w0);
 }).catch(e=>{ document.getElementById("card").textContent = "読み込めませんでした: " + e; });

@@ -1683,7 +1683,8 @@ function textbookUi(){
   const pick = `<input type="file" id="tbFile" accept=".json,application/json" multiple style="display:none" onchange="importTextbook(this)">`;
   const note = `${window.SYNC && SYNC.signedIn() ? "取り込んだ本は自分の Google Drive にも保存し、ほかの端末でも使えます。" : "Google でログインしていれば、ほかの端末でも使えます。"}再配布はしないでください。`;
   if(!i) return `${pick}<button class="btn small primary" onclick="document.getElementById('tbFile').click()">📚 教科書データを取り込む</button>
-    <div class="muted">配られた「辞書データ」の中の 辞書_○○.json を選びます（複数まとめて選べます。スマホなら Google Drive の中から選べます）。取り込むと、用語の吹き出しに教科書での説明が出て、総合索引も使えるようになります。${note}</div>`;
+    ${TEXTBOOK.hasKotoba() ? `<div style="margin-top:6px">📖 基本辞書：取り込み済み <button class="btn small ghost" onclick="TEXTBOOK.removeBook('kotoba').then(home)">削除</button></div>` : ""}
+    <div class="muted">配られた「辞書データ」の中の 辞書_○○.json を選びます（複数まとめて選べます。スマホなら Google Drive の中から選べます）。取り込むと、用語の吹き出しに教科書での説明が出て、総合索引も使えるようになります。基本辞書（辞書_kotoba_…）を取り込むと、「語のつながり」に説明の文も出ます。${note}</div>`;
   const bs = TEXTBOOK.books(), nOn = bs.filter(b=>b.on).length;
   const list = bs.map(b=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;break-inside:avoid">
       <label style="display:flex;align-items:center;gap:8px;flex:1;min-width:0"><input type="checkbox" ${b.on?"checked":""} data-k="${esc(b.key)}"
@@ -1691,7 +1692,10 @@ function textbookUi(){
         <span>${esc(b.name)} <span class="muted" style="margin:0">${[b.words ? `索引${b.words}` : "", b.rels ? `説明${b.rels}` : ""].filter(Boolean).join("・")}</span></span></label>
       <button class="btn small ghost" title="この本を削除" data-k="${esc(b.key)}" data-n="${esc(b.name)}"
         onclick="if(confirm('「'+this.dataset.n+'」をこの端末と Google Drive から削除します。よろしいですか？')) TEXTBOOK.removeBook(this.dataset.k).then(home)">削除</button></div>`).join("");
-  return `${pick}📚 取り込み済み：${i.books}冊（版 ${esc(i.version)}）
+  const kot = TEXTBOOK.hasKotoba() ? `<div style="margin-top:6px">📖 基本辞書（語のつながりの説明の文）：取り込み済み
+      <button class="btn small ghost" onclick="if(confirm('基本辞書をこの端末と Google Drive から削除します。よろしいですか？')) TEXTBOOK.removeBook('kotoba').then(home)">削除</button></div>`
+    : `<div class="muted" style="margin-top:6px">📖 基本辞書（辞書_kotoba_基本辞書（語の説明）.json）を取り込むと、「語のつながり」に教科書の説明の文も出ます。</div>`;
+  return `${pick}📚 取り込み済み：${i.books}冊（版 ${esc(i.version)}）${kot}
     <button class="btn small" onclick="document.getElementById('tbFile').click()">本を追加する</button>
     <button class="btn small" onclick="if(confirm('取り込んだ教科書データをすべて、この端末と Google Drive から削除します。よろしいですか？')) TEXTBOOK.remove().then(home)">すべて削除</button>
     <div class="muted">${note}</div>

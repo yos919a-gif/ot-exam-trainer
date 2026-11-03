@@ -12,7 +12,10 @@ content/refs/総合索引.json には教科書の索引（語→本・ページ�
   terms   総合索引のうちこの本の分 {語: {r 読み, n 国試の出題数, al 別表記, e [[補足, [ページ], 本文なら"b"]]}}
   entries 辞書の説明のうちこの本の分 {項目id: {w 見出し, n 出現冊数, r [[ページ, 関係, 相手, 根拠の文]]}}
   index   entries の項目を引く表記 {表記: [項目id]}
-  kotoba  語のつながり（content/knowledge/<id>_terms.json があれば。kotoba.html が使う）
+
+基本辞書（辞書_kotoba_基本辞書（語の説明）.json）: 語のつながり（kotoba.html）の説明の文。公開版には語のつながりと
+索引ページ（content/knowledge/<id>_links.json）だけを載せ、文はこのファイルを取り込んだ人にだけ出す（パッチ）。
+本ではないので terms/entries/index は空、kotoba に content/knowledge/<id>_terms.json の中身を入れる
 
     python3 tools/bundle_textbook.py
 """
@@ -66,15 +69,22 @@ def main():
         out = {"kind": "ot-textbook-book", "version": meta.get("版", ""), "id": bid, "name": name,
                "説明": "OT国試トレーナーの教科書データ（1冊分・個人の学習用。再配布しないでください）",
                "terms": b["terms"], "entries": b["entries"], "index": sub_index}
-        kp = ROOT / "content" / "knowledge" / f"{bid}_terms.json"   # 語のつながり（説明を原本で確かめた本だけ）
-        if kp.exists():
-            out["kotoba"] = json.loads(kp.read_text(encoding="utf-8"))
         safe = re.sub(r'[\\/:*?"<>|]', "_", name)
         path = OUT_DIR / f"辞書_{bid}_{safe}.json"
         path.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         total += path.stat().st_size
         n_rel = sum(len(x["r"]) for x in b["entries"].values())
         print(f"{bid:10s} 索引 {len(b['terms']):5d} 語・説明 {n_rel:5d} 件  {path.name}（{path.stat().st_size // 1024} KB）")
+    kot = {}
+    for kp in sorted((ROOT / "content" / "knowledge").glob("*_terms.json")):
+        kot[kp.name[:-len("_terms.json")]] = json.loads(kp.read_text(encoding="utf-8"))
+    if kot:
+        out = {"kind": "ot-textbook-book", "version": meta.get("版", ""), "id": "kotoba", "name": "基本辞書（語の説明）",
+               "説明": "OT国試トレーナーの基本辞書（語のつながりの説明の文。個人の学習用。再配布しないでください）",
+               "terms": {}, "entries": {}, "index": {}, "kotoba": kot}
+        path = OUT_DIR / "辞書_kotoba_基本辞書（語の説明）.json"
+        path.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        print(f"基本辞書 {', '.join(kot)} → {path.name}（{path.stat().st_size // 1024} KB）")
     print(f"{len(books)} 冊 → {OUT_DIR}（計 {total // 1024} KB）")
     if missing:
         print("要確認: 総合索引の本に結び付いていない出どころ:", sorted(missing))
