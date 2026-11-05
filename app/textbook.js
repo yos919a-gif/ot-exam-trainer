@@ -171,5 +171,9 @@ window.TEXTBOOK = (() => {
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet(),
           // 基本辞書（語のつながり kotoba.html の説明の文。本ごとの {meta, terms}）
           hasKotoba: () => !!(bookMap.kotoba && bookMap.kotoba.kotoba),
-          kotoba: id => { const b = bookMap.kotoba; return b && b.kotoba ? (b.kotoba[id] || null) : null; }};
+          kotoba: id => { const b = bookMap.kotoba; return b && b.kotoba ? (b.kotoba[id] || null) : null; },
+          // つながりと索引ページ（kotoba.html の土台。公開サイトには置かない）
+          kotobaLinks: id => { const b = bookMap.kotoba; return b && b.links ? (b.links[id] || null) : null; },
+          // 用語集の教科書ページ（公開サイトには置かない）を、取り込んだ人の用語集にだけ重ねる
+          applyGlossSrc: g => { const b = bookMap.kotoba; if(b && b.glossSrc) Object.entries(b.glossSrc).forEach(([w, s]) => { if(g[w]) g[w].出典 = s; }); }};
 })();

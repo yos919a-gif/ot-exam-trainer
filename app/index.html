@@ -631,7 +631,7 @@ async function loadAll(){
   if(window.SYNC) SYNC.init({get: ()=>store(), put: s=>save(normS(s)),
     onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && !(window.PRINT && PRINT.active()) && typeof home==="function") home(); }});
   srsMigrate();
-  if(window.TEXTBOOK) TEXTBOOK.load().catch(()=>{});
+  const tbReady = window.TEXTBOOK ? TEXTBOOK.load().catch(()=>{}) : Promise.resolve();
   const qs = await cfetch("exam/questions.json");
   Q = qs.filter(q => !q.採点除外);           // 採点除外(全員正解)は出題対象外
   qs.forEach(q => byId[q.id] = q);
@@ -658,7 +658,7 @@ async function loadAll(){
   }catch(e){ console.warn("評価タグなし", e); }
   try{ ADL = await cfetch("exam/adl.json"); }catch(e){ console.warn("ADL のまとめなし", e); }
   try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
-  try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); }
+  try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); }); }
   catch(e){ console.warn("用語集なし", e); }
   try{
     const an =await cfetch("analysis/anomalies.json");
@@ -1708,7 +1708,7 @@ function importTextbook(inp){
   const files = [...inp.files]; if(!files.length) return;
   TEXTBOOK.importFiles(files).then(r=>{
     alert(`${r.names.length}冊を取り込みました。${r.errors.length ? "\n\n取り込めなかったファイル:\n" + r.errors.join("\n") : ""}`);
-    inp.value = ""; home();
+    inp.value = ""; TEXTBOOK.applyGlossSrc(GLOSS); home();
   });
 }
 function syncUi(){

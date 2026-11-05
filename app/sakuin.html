@@ -175,7 +175,7 @@ if(matchMedia("(hover: hover) and (pointer: fine)").matches){
 }
 // 用語集と教科書データは、一覧を出したあとで読み、読めたら印を付け直す
 Promise.all([
-  cfetch("glossary/glossary.json").then(g=>{ GLOSS = g;
+  cfetch("glossary/glossary.json").then(g=>{ GLOSS = g; if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(g);
     Object.entries(g).forEach(([k, v])=>{ [].concat(v.別名 || []).forEach(a=>{ if(a) GALIAS[a] = k; }); }); }).catch(e=>console.warn("用語集なし", e)),
 ]).then(()=>{ if(KEYS.length) render(); });
 
@@ -187,6 +187,7 @@ function gate(msg){
     （ホームの一番下「教科書データ」から取り込めます。Google でログインしていれば、ほかの端末で取り込んだデータも使えます）</div></div>`;
 }
 (window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
+  if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS);
   const d = window.TEXTBOOK && TEXTBOOK.sakuin();
   if(!d){
     gate(window.TEXTBOOK && TEXTBOOK.has() ? "📚 取り込んである教科書データが古い版で、総合索引が入っていません。新しい ot-textbook-data.json を取り込み直してください。"

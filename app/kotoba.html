@@ -116,13 +116,18 @@ document.addEventListener("click", e=>{
   if(window.innerWidth<=760) document.getElementById("card").scrollIntoView({behavior:"smooth",block:"start"});
 });
 document.getElementById("q").addEventListener("input", renderList);
-// 公開版には語のつながりと索引ページだけ（content/knowledge/physiology_links.json）。説明の文は基本辞書（教科書データの
-// 辞書_kotoba_…json。tools/bundle_textbook.py が作る）を取り込んだ人にだけ重ねて出す（パッチ）
+// つながり・索引ページ・説明の文はどれも基本辞書（教科書データの辞書_kotoba_…json。tools/bundle_textbook.py が作る）に入っていて、
+// 取り込んだ人にだけ出す。公開サイトには置かない
 let FULL = false;
-cfetch("knowledge/physiology_links.json").then(async d=>{
+(window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(async ()=>{
+  const d = window.TEXTBOOK && TEXTBOOK.kotobaLinks("physiology");
+  if(!d){
+    document.getElementById("info").textContent = "";
+    document.getElementById("card").textContent = "語のつながりは、基本辞書を取り込んだ人だけが使えます（ホームの「教科書データ」から）。";
+    return;
+  }
   T = d.terms; META = d.meta; KEYS = Object.keys(T);
   try{
-    if(window.TEXTBOOK){ await TEXTBOOK.load(); }
     const full = window.TEXTBOOK && TEXTBOOK.kotoba && TEXTBOOK.kotoba(META.id || "physiology");
     if(full && full.terms){
       FULL = true;

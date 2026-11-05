@@ -82,6 +82,12 @@ def main():
         out = {"kind": "ot-textbook-book", "version": meta.get("版", ""), "id": "kotoba", "name": "基本辞書（語の説明）",
                "説明": "OT国試トレーナーの基本辞書（語のつながりの説明の文。個人の学習用。再配布しないでください）",
                "terms": {}, "entries": {}, "index": {}, "kotoba": kot}
+        know = ROOT / "content" / "knowledge"
+        out["links"] = {p.name[:-len("_links.json")]: json.loads(p.read_text(encoding="utf-8")) for p in sorted(know.glob("*_links.json"))}
+        src_p = know / "glossary_src.json"   # 用語集の教科書ページ（公開版の用語集からは外してある）
+        out["glossSrc"] = json.loads(src_p.read_text(encoding="utf-8")) if src_p.exists() else {}
+        if not out["links"] or not out["glossSrc"]:
+            print("要確認: content/knowledge の *_links.json か glossary_src.json が無く、基本辞書に入っていません")
         path = OUT_DIR / "辞書_kotoba_基本辞書（語の説明）.json"
         path.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         print(f"基本辞書 {', '.join(kot)} → {path.name}（{path.stat().st_size // 1024} KB）")
