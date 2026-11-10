@@ -44,6 +44,21 @@
   .ex.ex2{border-left-color:color-mix(in srgb,var(--warm) 55%,var(--line))}
   .chip .ob1{font-size:11px;margin-left:4px;opacity:.75}
   .note{font-size:12px;color:var(--sub);margin-top:14px;border-top:1px dashed var(--line);padding-top:8px}
+  /* スマホでは一覧・関連語を44px以上にし、長い語と見出しを折り返す。 */
+  @media(max-width:640px){
+    .layout,.side,.card{min-width:0}.head{padding-top:16px}.head h1{font-size:19px}
+    #list{max-height:32vh;max-height:32dvh;overscroll-behavior:contain}
+    #list button{min-height:44px;font-size:16px;line-height:1.65;padding:9px 8px;margin-block:4px}
+    #list button>span:first-child{min-width:0;overflow-wrap:anywhere}
+    #list .c{flex-shrink:0;padding-top:3px}
+    .card{padding:16px 14px;scroll-margin-top:calc(var(--appbar-height) + 12px);overflow-wrap:anywhere}
+    .card h2{font-size:21px;line-height:1.7}.pg{display:block;margin:4px 0 0;font-size:13px;font-weight:400}
+    .ex{font-size:16px;line-height:1.9;padding:12px}
+    h3{flex-wrap:wrap;gap:2px 8px;font-size:16px;line-height:1.8}h3 small{flex-basis:100%;font-size:13px}
+    .chips{gap:8px}.chip{min-height:44px;max-width:100%;padding:8px 12px;font-size:16px;line-height:1.6;overflow-wrap:anywhere}
+    .crumb{gap:4px 8px;line-height:1.8}.crumb button{min-width:44px;min-height:44px;padding:7px 6px;font-size:14px;max-width:100%;overflow-wrap:anywhere}
+    .note{font-size:13px;line-height:1.85}.note a{display:inline-block;min-height:44px;padding-block:8px}
+  }
 </style>
 <link rel="stylesheet" href="appbar.css">
 </head>

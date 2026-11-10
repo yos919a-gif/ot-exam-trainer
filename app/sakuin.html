@@ -75,6 +75,24 @@ label.ck{gap:7px;min-height:34px}label.ck input{width:17px;height:17px;accent-co
 #wordTip .tb{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
 #wordTip .tb ul{margin:6px 0 0;padding-left:18px}#wordTip .tb li{margin:0 0 8px;font-size:13.5px}
 #wordTip .tbq{font-size:13px}#wordTip .tbs{color:var(--sub);font-size:11.5px}
+.tip-close{display:none}
+
+/* スマホでは検索条件をスクロールで退避し、参照本文の幅を確保する。 */
+@media(max-width:640px){
+  .bar{position:static;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px}
+  #q{grid-column:1;grid-row:1;font-size:16px;min-height:48px}
+  #book{grid-column:1;grid-row:2;font-size:16px;min-height:44px;width:100%}
+  .bar>label.ck{grid-column:1;grid-row:3;min-height:44px;font-size:14px;white-space:normal;gap:10px}
+  .bar>label.ck input{width:20px;height:20px;flex-shrink:0}
+  .bar>.sub{grid-column:1;grid-row:4;font-size:13px;line-height:1.8}
+  .item{padding:14px;min-width:0}
+  .item .w.tip{display:inline-block;min-width:44px;min-height:44px;padding-block:6px}
+  .item .e,.item .e.body{font-size:16px;line-height:1.85;padding:10px}
+  .item .q{font-size:13px}.item a{display:inline-block;min-height:44px;padding-block:7px}
+  #wordTip{position:fixed;left:12px!important;right:12px;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom));width:auto;max-height:70vh;max-height:70dvh;font-size:16px;line-height:1.85;overscroll-behavior:contain}
+  #wordTip .mn,#wordTip .tb li,#wordTip .tbq{font-size:16px;line-height:1.85}
+  .tip-close{display:block;position:sticky;top:0;min-height:44px;min-width:72px;margin:0 0 8px auto;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:7px 12px;cursor:pointer}
+}
 </style>
 <link rel="stylesheet" href="appbar.css">
 </head>
@@ -145,7 +163,8 @@ function showTip(el){
   const html = tipHtml(el.dataset.w); if(!html) return;
   let box = document.getElementById("wordTip");
   if(!box){ box = document.createElement("div"); box.id = "wordTip"; document.body.appendChild(box); }
-  box.innerHTML = html;
+  box.innerHTML = `<button type="button" class="tip-close" aria-label="用語の説明を閉じる">閉じる ×</button>` + html;
+  box.querySelector(".tip-close").addEventListener("click", hideTip);
   const r = el.getBoundingClientRect();
   box.style.display = "block";
   box.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - box.offsetWidth - 8)) + "px";

@@ -5,7 +5,7 @@
 //  - /api/（serve.py の学習記録）と Google など外部は触らない
 //  - private/辞書データ/ は触らない（textbook.js が端末の IndexedDB に入れるので、二重に保存しない）
 "use strict";
-const SHELL_CACHE = "ot-shell-v8";
+const SHELL_CACHE = "ot-shell-v9";
 const DATA_CACHE = "ot-data-v1";
 const SHELL = ["./", "./index.html", "./appbar.css", "./content.js", "./config.js", "./sync.js", "./textbook.js", "./drill.js", "./print.js",
   "./graph.html", "./sakuin.html", "./kotoba.html", "./dendrogram.html", "./lib/d3.v7.8.5.min.js",

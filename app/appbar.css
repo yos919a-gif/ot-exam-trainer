@@ -102,3 +102,13 @@ button,input,select,textarea{font-family:inherit}
 /* 発注53：既存の暗色指定にも共有色の別名を適用する。 */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--surface:var(--bg);--ink2:var(--sub);--muted:var(--faint);--g1:var(--subject-anatomy);--g2:var(--subject-internal);--g3:var(--subject-ot);--g4:var(--subject-mental);--g5:var(--subject-community);}}
 :root[data-theme="dark"]{--surface:var(--bg);--ink2:var(--sub);--muted:var(--faint);--g1:var(--subject-anatomy);--g2:var(--subject-internal);--g3:var(--subject-ot);--g4:var(--subject-mental);--g5:var(--subject-community);}
+
+/* 発注01：スマホではホームと4つの行き先を1段に収める。 */
+@media(max-width:640px){
+  :root{--appbar-height:65px}
+  .appbar .wrap{padding:6px 10px;gap:6px;flex-wrap:nowrap}
+  .appbar .brand{flex:none;min-width:44px;min-height:44px;justify-content:center}
+  .appbar .brand>span:not(.logo){display:none}.appbar .brand .logo{width:32px;height:32px}
+  .appbar .tabs{flex:1 1 0;min-width:0;gap:0}
+  .appbar .tabs a,.appbar .tabs a.on{min-height:44px;padding:4px;font-size:12px;flex:1}
+}

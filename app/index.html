@@ -407,11 +407,54 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 #termBox .tb{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
 #termBox .tb ul{margin:6px 0 0;padding-left:18px}#termBox .tb li{margin:0 0 8px;font-size:13.5px;line-height:1.7}
 #termBox .tbq{color:var(--ink);font-size:13px}#termBox .tbs{color:var(--sub);font-size:11.5px}
+
+/* 発注01：図の拡大と、スマホの操作・読み幅。採点処理とは独立した表示指定。 */
+.image-button{display:block;max-width:100%;padding:0;border:0;background:none;color:var(--sub);font:inherit;cursor:zoom-in;text-align:left}
+.image-button .qimg{display:block;margin-bottom:2px}.image-button small{display:block;margin-bottom:12px}
+#imageViewer{width:min(1100px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+#imageViewer::backdrop{background:#0009}.image-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}.image-tools .btn{min-height:44px;margin:0}
+.image-scroll{overflow:auto;max-height:calc(100dvh - 155px);text-align:center;background:#fff;overscroll-behavior:contain}
+.image-scroll img{display:block;max-width:100%;max-height:calc(100dvh - 155px);height:auto;margin:auto;object-fit:contain}
+.image-scroll.original img{max-width:none;max-height:none}.term-close{float:right;margin:0 0 8px 8px!important;min-height:44px!important}
+.table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}.table-scroll:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(max-width:640px){
+  :root{--appbar-height:65px}
+  .appbar .wrap{padding:6px 10px;gap:6px;flex-wrap:nowrap}
+  .appbar .brand{flex:none;min-width:44px;min-height:44px;justify-content:center}
+  .appbar .brand>span:not(.logo){display:none}.appbar .brand .logo{width:32px;height:32px}
+  .appbar .tabs{flex:1 1 0;min-width:0;gap:0}
+  .appbar .tabs a,.appbar .tabs a.on{min-height:44px;padding:4px;font-size:12px;flex:1}
+  main{padding:0 12px}.card{min-width:0}.btn,.btn.small,.mark,select,summary{min-height:44px}
+  .btn,.btn.small{margin:4px 4px 4px 0;font-size:14px}.mark{padding:5px 10px}select{width:100%;font-size:16px}
+  summary{align-content:center}details.opts>summary{min-height:44px}
+  .fields{grid-template-columns:minmax(0,1fr);gap:12px}.fields label{font-size:14px;min-width:0}
+  .tile .top{flex-wrap:wrap}#rangeCard .top>span:last-child{flex:1 0 100%;margin-left:0!important;display:flex;flex-wrap:wrap;gap:4px}
+  #rangeCard .top h3{flex:1}#rangeCard .acts{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .card.hero{grid-template-columns:76px minmax(0,1fr);gap:12px;padding:16px;justify-items:stretch;text-align:left}
+  .hero .ring{width:76px;height:76px;padding:3px}.hero .ring .val b{font-size:22px}.hero .ring .val span{font-size:10px}
+  .hero h2{font-size:20px}.hero .grid{grid-column:1/-1}.hero .stat{font-size:11px}.hero .stat b{font-size:20px}
+  .hero>div:last-child{min-width:0}.hero .muted{font-size:12px}
+  .question-card{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+  .question-card .actions.sticky{position:fixed;z-index:45;inset:auto 0 0;margin:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));border-radius:0;border-top:1px solid var(--line);background:var(--card);box-shadow:0 -3px 12px #0001;display:flex;flex-wrap:wrap;gap:8px}
+  .question-card .actions.sticky .btn{flex:1 1 0;min-width:0;min-height:44px;margin:0;font-size:14px;padding:9px 6px}
+  .question-card .actions.sticky .btn.primary{order:2;flex:1 0 100%;min-height:48px;font-size:16px}
+  .question-card .actions.sticky .spacer{display:none}
+  .why{font-size:16px;line-height:1.85}.question-card .qtext{font-size:17px}.choice .tx{font-size:16px}
+  #termBox{position:fixed;z-index:60;inset:auto 12px calc(12px + env(safe-area-inset-bottom))!important;width:auto;max-width:none;max-height:65dvh;overscroll-behavior:contain;padding:14px;font-size:16px}
+  #termBox .mn,#termBox .tb li,#termBox .tbq{font-size:16px}.term-close{position:sticky;top:0;background:var(--card)}
+  .table-scroll table{min-width:580px;table-layout:auto}
+  .notes-table,.notes-table tbody{display:block;width:100%}.notes-table tr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+  .notes-table td{min-width:0;padding:0;border:0}.notes-table td:nth-child(2){white-space:normal!important;font-size:13px}.notes-table td:nth-child(3){grid-column:1/-1;grid-row:2;font-size:16px;overflow-wrap:anywhere}
+  .notes-table td:last-child{grid-column:3;grid-row:1}.notes-table .btn{margin:0}.notes-table .why{font-size:16px}
+  #tbUi{overflow-wrap:anywhere}#tbUi label{display:inline-flex;align-items:center;gap:8px;min-height:44px}#tbUi input[type=checkbox]{flex:none;width:20px;height:20px}
+  .flash-card{padding-bottom:calc(150px + env(safe-area-inset-bottom))}.flash-controls{position:fixed;inset:auto 0 0;z-index:45;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -3px 12px #0001}
+  .flash-controls>.btn{width:100%;margin:0}.flash-controls .grade{gap:8px}.flash-controls .grade .btn{min-height:54px;padding:8px 4px;font-size:14px;margin:0}.flash-controls>div:last-child .btn{margin:0}
+}
 </style>
 </head>
 <body>
 <header class="appbar"><div class="wrap">
-  <a class="brand" href="index.html" onclick="if(typeof home==='function'){home();return false}"><span class="logo">OT</span>
+  <a class="brand" href="index.html" aria-label="OT国試トレーナー ホーム" onclick="if(typeof home==='function'){home();return false}"><span class="logo">OT</span>
     <span><b>国試トレーナー</b><small>第50〜61回・2,400問（公式正答準拠）</small></span></a>
   <nav class="tabs"><a href="index.html" class="on">ホーム</a><a href="graph.html">語マップ</a><a href="sakuin.html">総合索引</a><a href="kotoba.html">語のつながり</a></nav>
   <span class="loadstate" id="loadState">データ読込中…</span>
@@ -421,6 +464,10 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
   出典: 厚生労働省 理学療法士・作業療法士国家試験 問題および正答（第50回〜第61回）。
   学習記録はこの端末に保存されます（serve.py で動かしている場合は user/progress.json）。Googleでログインすると端末間で同期できます。<br><span id="contentVer"></span>
 </footer>
+<dialog id="imageViewer" aria-label="問題図の拡大">
+  <div class="image-tools"><button class="btn" autofocus onclick="document.getElementById('imageViewer').close()">閉じる</button><button class="btn" id="imageSize" aria-pressed="false" onclick="toggleImageSize(this)">原寸サイズ</button><a class="btn" id="imageOriginal" target="_blank" rel="noopener">別画面で開く</a></div>
+  <div class="image-scroll" id="imageScroll" tabindex="0" role="region" aria-label="拡大した問題図"><img id="imageLarge" alt=""></div>
+</dialog>
 <script src="content.js"></script>
 <script src="config.js"></script>
 <script src="sync.js"></script>
@@ -591,7 +638,7 @@ function showTerm(el){
   let box = document.getElementById("termBox");
   if(!box){ box = document.createElement("div"); box.id = "termBox"; document.body.appendChild(box); }
   const subs = (g.科目||[]).map(s=>s[0]).join("・");
-  box.innerHTML = `<b>${esc(el.textContent)}</b> <span class="rd">${esc(g.読み||"")}</span>
+  box.innerHTML = `<button class="btn small term-close" type="button" onclick="closeTerm()" aria-label="用語の説明を閉じる">閉じる</button><b>${esc(el.textContent)}</b> <span class="rd">${esc(g.読み||"")}</span>
     ${g.flag?`<span class="chk" title="${esc(g.flag)}">要確認</span>`:""}
     ${g.別名?`<div class="st">＝ ${esc(g.別名)}</div>`:""}
     <div class="mn">${esc(g.意味||"（意味は準備中）")}</div>
@@ -603,6 +650,11 @@ function showTerm(el){
   box.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - box.offsetWidth - 8)) + "px";
   box.style.top = (r.bottom + scrollY + 6) + "px";
 }
+function closeTerm(){
+  const box = document.getElementById("termBox");
+  if(box) box.style.display = "none";
+}
+document.addEventListener("keydown", e=>{ if(e.key === "Escape") closeTerm(); });
 document.addEventListener("click", e=>{
   const t = e.target.closest(".term");
   if(t){ e.preventDefault(); e.stopPropagation(); showTerm(t); return; }
@@ -1164,7 +1216,7 @@ function renderNotes(){
   app.innerHTML = `<div class="card">
     <h2>しおり・メモの一覧</h2>
     <p style="color:var(--sub);font-size:13px">この一覧ではメモも表示します（問題を解く画面では解答後に出ます）。★を押すとしおりを外せます。</p>
-    <table>${rows || "<tr><td>まだありません</td></tr>"}</table>
+    <table class="notes-table">${rows || "<tr><td>まだありません</td></tr>"}</table>
     <div style="margin-top:12px"><button class="btn primary" onclick="home()">ホームへ</button></div>
   </div>`;
 }
@@ -1175,10 +1227,34 @@ function startWeak(n){ session = {list: buildWeakSet(n), idx:0, mode:"weak", res
 
 function imgHtml(q){
   let h = "";
-  (q.画像?.別冊 || []).forEach(p=> h += `<img class="qimg" src="${curl(p)}" alt="別冊図">`);
-  if(q.画像?.切り抜き) h += `<img class="qimg" src="${curl(q.画像.切り抜き)}" alt="問題図">`;
+  const image = (p, alt) => `<button type="button" class="image-button" onclick="openQuestionImage(this)" aria-label="${alt}を拡大"><img class="qimg" src="${curl(p)}" alt="${alt}"><small>図をタップして拡大</small></button>`;
+  (q.画像?.別冊 || []).forEach(p=> h += image(p, "別冊図"));
+  if(q.画像?.切り抜き) h += image(q.画像.切り抜き, "問題図");
   return h;
 }
+let imageOpener = null;
+function openQuestionImage(button){
+  const source = button.querySelector("img"), viewer = document.getElementById("imageViewer");
+  imageOpener = button;
+  document.getElementById("imageLarge").src = source.currentSrc || source.src;
+  document.getElementById("imageLarge").alt = source.alt;
+  document.getElementById("imageOriginal").href = source.currentSrc || source.src;
+  document.getElementById("imageScroll").classList.remove("original");
+  document.getElementById("imageSize").setAttribute("aria-pressed", "false");
+  document.getElementById("imageSize").textContent = "原寸サイズ";
+  viewer.showModal();
+}
+function toggleImageSize(button){
+  const original = document.getElementById("imageScroll").classList.toggle("original");
+  button.setAttribute("aria-pressed", String(original));
+  button.textContent = original ? "画面に合わせる" : "原寸サイズ";
+}
+document.getElementById("imageViewer").addEventListener("click", e=>{
+  if(e.target === e.currentTarget) e.currentTarget.close();
+});
+document.getElementById("imageViewer").addEventListener("close", ()=>{
+  if(imageOpener && imageOpener.isConnected) imageOpener.focus({preventScroll:true});
+});
 
 /* 用語を見ながら解く: オンなら解答前から問題文・選択肢の用語に下線を出し、タップで意味を見られる（設定は pref.lookup に保存） */
 function lookupOn(){ return !!(S.pref && S.pref.lookup); }
@@ -1249,6 +1325,8 @@ function renderQuestion(showAnswer=false, picked=[]){
     </div>
   </div>`;
   if(!showAnswer){
+    // 固定バーから次へ進んだときも、新しい問題文を先頭から読めるようにする。
+    window.scrollTo(0, 0);
     document.querySelectorAll(".choice input").forEach(el=>{
       el.addEventListener("change", ()=>{
         if(multi){
@@ -1419,7 +1497,7 @@ function renderTrend(){
     ${mp.length ? lineChart(mp, {v:60, label:"合格 60%"}) +
       `<p style="color:var(--sub);font-size:12px">点にカーソルを合わせると（スマホはタップ）得点・実地・判定が出ます。合格は総得点60%以上かつ実地の足切り以上（第61回基準を出題数に比例）。</p>
        <details><summary style="cursor:pointer;font-size:14px">表で見る（${mocks.length}回）</summary>
-       <table><tr><th>日時</th><th>出題</th><th>得点</th><th>実地</th><th>判定</th></tr>${mockRows}</table></details>`
+       <div class="table-scroll" tabindex="0" role="region" aria-label="模試成績の表（横スクロール）"><table><tr><th>日時</th><th>出題</th><th>得点</th><th>実地</th><th>判定</th></tr>${mockRows}</table></div></details>`
       : `<p style="color:var(--sub)">まだ記録がありません。模試を最後まで（または「中断して結果」まで）解くと、ここに1回分の点が増えます。</p>`}
   </div>
   <div class="card">
@@ -1429,7 +1507,8 @@ function renderTrend(){
   <div class="card">
     <h3>科目別の正答率の変化</h3>
     <p style="color:var(--sub);font-size:13px">直近7日（今日を含む）と、それより前の回答を比べます。変化は両方に${TREND_MIN}回答以上ある科目だけ出します。</p>
-    <table><tr><th>科目</th><th>それより前</th><th>直近7日</th><th>変化</th></tr>${subRows}</table>
+    <p class="muted">表は左右にスクロールできます。</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="科目別成績の表（横スクロール）"><table><tr><th>科目</th><th>それより前</th><th>直近7日</th><th>変化</th></tr>${subRows}</table></div>
     <div style="margin-top:12px"><button class="btn primary" onclick="home()">ホームへ</button></div>
   </div>`;
   bindTips();
@@ -1621,7 +1700,7 @@ function renderWord(back){
   const full = s.dir==="w2m" ? wordHtml + `<hr style="width:60%;border:0;border-top:1px solid var(--line);margin:14px 0">` + meanHtml
                              : meanHtml + `<hr style="width:60%;border:0;border-top:1px solid var(--line);margin:14px 0">` + wordHtml;
   const r = S.wsrs[w];
-  app.innerHTML = `<div class="card">
+  app.innerHTML = `<div class="card flash-card">
     <div class="qprog"><i style="width:${Math.round(100*(s.idx+(back?1:0))/s.list.length)}%"></i></div>
     <div class="qmeta"><span class="count">🃏 暗記カード ${s.idx+1} / ${s.list.length}</span><span class="tag">${esc(wordSub(w))}</span>
       ${r?`<span>復習 段階${r.b}</span>`:`<span>はじめて</span>`}</div>
@@ -1630,13 +1709,14 @@ function renderWord(back){
                        ${g.出典?`<span class="src">📖 ${esc(g.出典)}</span>`:""}`
              : front + `<div class="fs">タップ（またはスペース）で裏返す</div>`}
     </div>
-    ${back ? `<div class="grade">
+    <div class="flash-controls">${back ? `<div class="grade">
         <button class="btn ngb" onclick="gradeWord(0)">覚えていない [1]</button>
         <button class="btn" onclick="gradeWord(1)">あいまい [2]</button>
         <button class="btn okb" onclick="gradeWord(2)">覚えていた [3]</button></div>`
            : `<button class="btn primary" onclick="renderWord(true)">裏を見る</button>`}
-    <div style="margin-top:10px"><button class="btn small" onclick="endWords()">ここでやめる</button></div>
+    <div style="margin-top:10px"><button class="btn small" onclick="endWords()">ここでやめる</button></div></div>
   </div>`;
+  if(!back) window.scrollTo(0, 0);
 }
 function gradeWord(k, now=Date.now()){
   const s = wsess, w = s.list[s.idx], r = S.wsrs[w], tomorrow = dayStart(now) + DAY;
