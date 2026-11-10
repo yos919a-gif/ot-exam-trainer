@@ -132,13 +132,13 @@ document.addEventListener("click", e=>{
 });
 document.getElementById("q").addEventListener("input", renderList);
 // つながり・索引ページ・説明の文はどれも基本辞書（教科書データの辞書_kotoba_…json。tools/bundle_textbook.py が作る）に入っていて、
-// 最初から読み込む（取り込まなくても使える。ホームで削除した人には案内を出す）
+// 取り込んだ人にだけ出す。公開サイトには置かない
 let FULL = false;
 (window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(async ()=>{
   const d = window.TEXTBOOK && TEXTBOOK.kotobaLinks("physiology");
   if(!d){
     document.getElementById("info").textContent = "";
-    document.getElementById("card").textContent = "語のつながりには基本辞書が必要です。ネットにつながった状態で開き直すと読み込みます（ホームの「教科書データ」で削除した場合は、そこの「削除した最初の本を戻す」で戻せます）。";
+    document.getElementById("card").textContent = "語のつながりは、基本辞書を取り込んだ人だけが使えます（ホームの「教科書データ」から）。";
     return;
   }
   T = d.terms; META = d.meta; KEYS = Object.keys(T);

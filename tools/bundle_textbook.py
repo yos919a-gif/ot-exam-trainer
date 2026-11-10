@@ -3,10 +3,10 @@
 
 content/dictionary/（entries.json・index.json・meta.json）には教科書の文（OCRの根拠）が、
 content/refs/総合索引.json には教科書の索引（語→本・ページ）が入っているので、どちらも公開サイトには載せない
-（.gitignore で除外）。代わりに本ごとのファイルを private/辞書データ/ に作る。2026-11-10 から、このフォルダは
-公開サイトに置き、アプリが最初から読み込む（一覧 files.json の sha1 が変わった本だけ取り直す）。ほかの本は
-アプリの「本を追加する」で取り込む（複数まとめて選べる）。外すときはアプリの一覧から削除する。アプリは端末
-（IndexedDB）に本ごとに保存し、自分で取り込んだ本はログインしていれば Drive のアプリ専用領域にも置く。
+（.gitignore で除外）。代わりに本ごとのファイルを Google Drive の「国家試験トレーナー/辞書データ」に置き、
+アプリの「教科書データを取り込む」で読み込む（複数まとめて選べる）。本を足すときはファイルを足して取り込み、
+外すときはアプリの一覧から削除する。アプリは端末（IndexedDB）と、ログインしていれば Drive のアプリ専用領域に
+本ごとに保存する。
 
 1冊のファイルの中身:
   terms   総合索引のうちこの本の分 {語: {r 読み, n 国試の出題数, al 別表記, e [[補足, [ページ], 本文なら"b"]]}}
@@ -17,13 +17,10 @@ content/refs/総合索引.json には教科書の索引（語→本・ページ�
 索引ページ（content/knowledge/<id>_links.json）だけを載せ、文はこのファイルを取り込んだ人にだけ出す（パッチ）。
 本ではないので terms/entries/index は空、kotoba に content/knowledge/<id>_terms.json の中身を入れる
 
-    python3 tools/bundle_textbook.py          # 本ごとのファイルと一覧 files.json を作り直す
-    python3 tools/bundle_textbook.py --list   # 一覧 files.json だけ作り直す（ファイルを手で差し替えたとき）
+    python3 tools/bundle_textbook.py
 """
-import hashlib
 import json
 import re
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -62,8 +59,7 @@ def main():
             ent["r"] += [[r.get("p"), r.get("rel", ""), r.get("相手", ""), r.get("根拠", "")] for r in src.get("関係", [])]
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     for old in OUT_DIR.glob("辞書_*.json"):
-        if not old.name.startswith("辞書_kotoba_"):   # 基本辞書は content/knowledge があるときだけ下で作り直す（無い端末で消さない）
-            old.unlink()
+        old.unlink()
     total = 0
     for bid, b in books.items():
         ids = set(b["entries"])
@@ -101,20 +97,7 @@ def main():
     old = ROOT / "private" / "ot-textbook-data.json"   # 以前の1ファイル版
     if old.exists():
         old.unlink()
-    write_list()
-
-
-def write_list():
-    """アプリが最初から読み込む本の一覧（private/辞書データ/files.json）。sha1 が変わった本だけ端末が取り直す"""
-    files = []
-    for p in sorted(OUT_DIR.glob("辞書_*.json")):
-        raw = p.read_bytes()
-        j = json.loads(raw)
-        files.append({"id": j["id"], "file": p.name, "bytes": len(raw), "sha1": hashlib.sha1(raw).hexdigest()})
-    out = {"kind": "ot-textbook-builtin", "files": files}
-    (OUT_DIR / "files.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"一覧 files.json: {len(files)} ファイル（計 {sum(f['bytes'] for f in files) // 1024} KB）")
 
 
 if __name__ == "__main__":
-    write_list() if "--list" in sys.argv else main()
+    main()
