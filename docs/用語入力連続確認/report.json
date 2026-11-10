@@ -1,0 +1,1033 @@
+{
+  "base": "http://ot-trainer.test/app/",
+  "startedAt": "2026-11-10T22:50:41.856Z",
+  "checks": [
+    {
+      "name": "360 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "360 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "360 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "360 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 291
+        }
+      ]
+    },
+    {
+      "name": "360 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "360 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "360 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "360 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "390 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "390 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "390 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "390 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 321
+        }
+      ]
+    },
+    {
+      "name": "390 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "390 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "390 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "390 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "表記正規化 ガイジツ",
+      "pass": true
+    },
+    {
+      "name": "表記正規化 ｶﾞｲｼﾞﾂ",
+      "pass": true
+    },
+    {
+      "name": "表記正規化  がい じつ ",
+      "pass": true
+    },
+    {
+      "name": "全角英字の正規化",
+      "pass": true
+    },
+    {
+      "name": "クリアで候補・選択を解除",
+      "pass": true
+    },
+    {
+      "name": "IME変換中Enterで候補未選択",
+      "pass": true
+    },
+    {
+      "name": "Enter長押しで候補未選択",
+      "pass": true
+    },
+    {
+      "name": "Enter1回で選択のみ",
+      "pass": true
+    },
+    {
+      "name": "選択後のEnter長押しで未採点",
+      "pass": true
+    },
+    {
+      "name": "選択後の編集で即座に採点不可",
+      "pass": true
+    },
+    {
+      "name": "Enter2回目で正解",
+      "pass": true
+    },
+    {
+      "name": "下キーで先頭候補",
+      "pass": true
+    },
+    {
+      "name": "下キーで次候補",
+      "pass": true
+    },
+    {
+      "name": "上キーで前候補",
+      "pass": true
+    },
+    {
+      "name": "Escapeで候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "候補なし表示",
+      "pass": true
+    },
+    {
+      "name": "誤答表示と正答提示",
+      "pass": true
+    },
+    {
+      "name": "リトライ初期化",
+      "pass": true
+    },
+    {
+      "name": "答えを見るは採点しない",
+      "pass": true
+    },
+    {
+      "name": "明示別名も正解",
+      "pass": true
+    },
+    {
+      "name": "候補表示中の答えを見るタップが有効",
+      "pass": true
+    },
+    {
+      "name": "412 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "412 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "412 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "412 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 343
+        }
+      ]
+    },
+    {
+      "name": "412 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "412 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "412 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "412 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "1280 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "1280 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "1280 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "1280 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 666
+        }
+      ]
+    },
+    {
+      "name": "1280 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "1280 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "1280 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "1280 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "暗色の背景色",
+      "pass": true,
+      "detail": {
+        "bg": "rgb(18, 27, 36)",
+        "ink": "rgb(237, 242, 244)"
+      }
+    },
+    {
+      "name": "読込失敗で全解答操作不可",
+      "pass": true
+    },
+    {
+      "name": "生理学20問・正答キー・問題IDの一意性",
+      "pass": true
+    },
+    {
+      "name": "全問題に解説と根拠HTTPSリンク",
+      "pass": true
+    },
+    {
+      "name": "360 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "360 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "5問\n10問\n20問",
+          "height": 48,
+          "width": 296
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 296
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "360 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "360 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "390 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "390 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "5問\n10問\n20問",
+          "height": 48,
+          "width": 326
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 326
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "390 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "390 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "412 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "412 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "5問\n10問\n20問",
+          "height": 48,
+          "width": 166
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 166
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "412 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "412 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "1280 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "1280 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "5問\n10問\n20問",
+          "height": 48,
+          "width": 335
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 335
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "1280 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "1280 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "採点後1件だけ保存",
+      "pass": true
+    },
+    {
+      "name": "二重採点で回答重複なし",
+      "pass": true
+    },
+    {
+      "name": "次問で入力と選択・採点状態を初期化",
+      "pass": true
+    },
+    {
+      "name": "誤答は正答と区別され保存",
+      "pass": true
+    },
+    {
+      "name": "リロード後に採点済み状態を再開",
+      "pass": true
+    },
+    {
+      "name": "答えを見るはrevealで正解扱いしない",
+      "pass": true
+    },
+    {
+      "name": "中断前に候補表示",
+      "pass": true
+    },
+    {
+      "name": "中断して保存済み回答数を案内",
+      "pass": true
+    },
+    {
+      "name": "未採点の問から再開・未確定入力は空",
+      "pass": true
+    },
+    {
+      "name": "5問の混在結果集計",
+      "pass": true
+    },
+    {
+      "name": "全問の回答一覧を保持",
+      "pass": true
+    },
+    {
+      "name": "終了後はactiveを消してhistoryへ1件保存",
+      "pass": true
+    },
+    {
+      "name": "別の過去問成績保存キーを不変",
+      "pass": true
+    },
+    {
+      "name": "誤答と答えを見た2問だけ再出題",
+      "pass": true
+    },
+    {
+      "name": "解き直し全問正解で再出題無効",
+      "pass": true
+    },
+    {
+      "name": "完了履歴をメニューに表示",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-circadian-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 概日リズム",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-homeostasis-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 ホメオスターシス",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-insulin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 インスリン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-glucagon-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 グルカゴン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-adh-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 抗利尿ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-oxytocin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 オキシトシン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-growth-hormone-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 成長ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-pth-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 副甲状腺ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-aldosterone-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 アルドステロン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-cortisol-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 コルチゾール",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-melatonin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 メラトニン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-calcitonin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 カルシトニン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-erythropoietin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 エリスロポエチン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-action-potential-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 活動電位",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-acetylcholine-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 アセチルコリン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-sinoatrial-node-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 洞房結節",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-cardiac-output-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 心拍出量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-tidal-volume-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 1回換気量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-vital-capacity-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 肺活量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-residual-volume-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 残気量",
+      "pass": true
+    },
+    {
+      "name": "20問すべて正解の集計",
+      "pass": true
+    },
+    {
+      "name": "ランダム10問の重複・欠落なし",
+      "pass": true
+    },
+    {
+      "name": "ランダム20問の重複・欠落なし",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 サーカディアンリズム",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ホメオスタシス",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 恒常性",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ADH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 バソプレシン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 GH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ソマトトロピン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 PTH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 パラトルモン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 EPO",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ACh",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 洞結節",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 SA結節",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 CO",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 一回換気量",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 TV",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 VC",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 RV",
+      "pass": true
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 0",
+      "pass": true,
+      "detail": "1 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 1",
+      "pass": true,
+      "detail": "2 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 2",
+      "pass": true,
+      "detail": "3 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 3",
+      "pass": true,
+      "detail": "4 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 4",
+      "pass": true,
+      "detail": "5 / 5"
+    },
+    {
+      "name": "暗色でも答えを見た5問の結果",
+      "pass": true
+    },
+    {
+      "name": "メニューから前回の間違いへ入口",
+      "pass": true
+    },
+    {
+      "name": "前回の間違いをメニューから再開",
+      "pass": true
+    },
+    {
+      "name": "保存拒否を案内して練習継続",
+      "pass": true
+    },
+    {
+      "name": "保存拒否でも採点・次問に進める",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {broken",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {broken",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":99,\"history\":[]}",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":99,\"history\":[]}",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "例題モードは独立記録を保存しない",
+      "pass": true
+    },
+    {
+      "name": "既存過去問の採点と誤り理由",
+      "pass": true,
+      "detail": {
+        "verdict": "✖ 不正解\n正答は 2",
+        "why": 4
+      }
+    },
+    {
+      "name": "本体から用語入力への導線",
+      "pass": true
+    },
+    {
+      "name": "予期しないJS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    "360-candidates.png",
+    "360-correct.png",
+    "390-candidates.png",
+    "390-correct.png",
+    "1280-candidates.png",
+    "1280-correct.png",
+    "390-dark-candidates.png",
+    "390-dark-correct.png",
+    "390-setup.png",
+    "390-practice-candidates.png",
+    "1280-setup.png",
+    "390-mixed-result.png",
+    "1280-all-correct-result.png",
+    "390-dark-setup.png",
+    "390-dark-practice.png",
+    "390-dark-result.png"
+  ],
+  "apiWrites": 2,
+  "expectedLoadErrors": [
+    {
+      "url": "http://ot-trainer.test/app/term-drill.html",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    }
+  ],
+  "finishedAt": "2026-11-10T22:51:12.293Z"
+}

@@ -18,12 +18,33 @@
   </header>
   <main class="term-main">
     <div class="term-intro">
-      <span class="eyebrow">用語入力 / 試作</span>
+      <span class="eyebrow">用語入力 / 生理学</span>
       <h1>思い出して、入力する。</h1>
       <p>答えの読みを入力して、候補から用語を選びます。</p>
     </div>
-    <section class="card term-question" aria-labelledby="question-title">
-      <div class="qmeta"><span class="subject" id="question-subject">生理学</span><span>例題 1 / 1</span></div>
+    <p id="load-status" class="helper" role="status">問題と用語を読み込んでいます…</p>
+    <button id="reload-data" class="btn" type="button" hidden>再読み込み</button>
+    <p id="storage-notice" class="error-message" role="status" hidden></p>
+    <section id="start-screen" class="card" aria-labelledby="start-title">
+      <h2 id="start-title">生理学の用語を練習</h2>
+      <p>短い問いから答えを思い出します。候補は入力してから表示されます。</p>
+      <form id="start-form">
+        <div class="practice-settings">
+          <label for="practice-count">問題数<select id="practice-count"><option value="5">5問</option><option value="10" selected>10問</option><option value="20">20問</option></select></label>
+          <label for="practice-order">順番<select id="practice-order"><option value="random">ランダム</option><option value="fixed">問題順</option></select></label>
+        </div>
+        <div class="term-actions"><button id="start-practice" class="btn primary" type="submit" disabled>練習を始める</button>
+          <a id="demo-start" class="btn" href="?demo=1">例題を1問試す</a></div>
+      </form>
+      <p id="deck-description" class="helper"></p>
+      <div id="resume-section" class="resume-section" hidden><p id="resume-description"></p><button id="resume-practice" class="btn primary" type="button">前回の続きから</button></div>
+      <p id="recent-summary" class="helper"></p>
+      <button id="review-previous" class="btn" type="button" hidden>前回の間違いを解き直す</button>
+      <p class="helper">回答と中断位置はこのブラウザーに保存します。過去問の成績とは別の記録です。</p>
+    </section>
+    <section id="question-screen" class="card term-question" aria-labelledby="question-title" hidden>
+      <div class="qmeta"><span class="subject" id="question-subject">生理学</span><span id="question-count"></span></div>
+      <progress id="session-progress" value="0" max="1" aria-label="回答の進み具合"></progress>
       <h2 id="question-title"></h2>
       <p class="muted">選択肢を見ずに、まず答えを思い出してみましょう。</p>
       <form id="answer-form">
@@ -44,13 +65,22 @@
         <div class="term-actions">
           <button id="submit-answer" class="btn primary" type="submit" disabled>解答する</button>
           <button id="give-up" class="btn" type="button" disabled>答えを見る</button>
+          <button id="pause-practice" class="btn" type="button">中断する</button>
         </div>
       </form>
     </section>
     <section id="feedback" class="card feedback" aria-labelledby="verdict" hidden></section>
+    <section id="result-screen" class="card" aria-labelledby="result-title" hidden>
+      <h2 id="result-title" tabindex="-1">おつかれさまでした</h2>
+      <p id="result-score" class="result-score"></p>
+      <p id="result-detail"></p>
+      <div class="term-actions"><button id="review-mistakes" class="btn primary" type="button">間違いを解き直す</button><button id="result-back" class="btn" type="button">練習メニューへ</button></div>
+      <details><summary>今回の回答を見る</summary><ol id="session-results" class="session-results"></ol></details>
+    </section>
     <noscript><p>このドリルを使うには JavaScript を有効にしてください。</p></noscript>
   </main>
   <script src="content.js"></script>
+  <script src="term-questions.js"></script>
   <script src="term-drill.js"></script>
 </body>
 </html>
