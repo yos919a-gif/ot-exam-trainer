@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#285f8b">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="appbar.css">
+  <link rel="stylesheet" href="term-drill.css">
+  <title>用語入力ドリル | OT国試トレーナー</title>
+</head>
+<body class="term-drill-page">
+  <header class="appbar">
+    <div class="wrap">
+      <a class="brand" href="./"><span class="logo">OT</span><b>OT国試トレーナー</b></a>
+      <a class="home-link" href="./">ホームへ</a>
+    </div>
+  </header>
+  <main class="term-main">
+    <div class="term-intro">
+      <span class="eyebrow">用語入力 / 試作</span>
+      <h1>思い出して、入力する。</h1>
+      <p>答えの読みを入力して、候補から用語を選びます。</p>
+    </div>
+    <section class="card term-question" aria-labelledby="question-title">
+      <div class="qmeta"><span class="subject" id="question-subject">生理学</span><span>例題 1 / 1</span></div>
+      <h2 id="question-title"></h2>
+      <p class="muted">選択肢を見ずに、まず答えを思い出してみましょう。</p>
+      <form id="answer-form">
+        <div class="picker">
+          <label for="answer-input">答えを入力</label>
+          <div class="input-row">
+            <input id="answer-input" type="text" role="combobox" aria-autocomplete="list"
+              aria-expanded="false" aria-controls="answer-options" aria-describedby="input-help picker-status"
+              placeholder="ひらがな・漢字で入力" autocomplete="off" autocapitalize="off"
+              spellcheck="false" enterkeyhint="done" disabled>
+            <button id="clear-answer" class="clear-input" type="button" disabled>消す</button>
+          </div>
+          <p id="input-help" class="helper">数文字で候補が出ます。タップ、または ↑↓ と Enter で選べます。</p>
+          <ul id="answer-options" class="options" role="listbox" aria-label="答えの候補" hidden></ul>
+          <p id="picker-status" class="helper" role="status" aria-live="polite">用語を読み込んでいます…</p>
+          <div id="selected-answer" class="selected-answer" hidden>選択中：<span class="selected-label"></span></div>
+        </div>
+        <div class="term-actions">
+          <button id="submit-answer" class="btn primary" type="submit" disabled>解答する</button>
+          <button id="give-up" class="btn" type="button" disabled>答えを見る</button>
+        </div>
+      </form>
+    </section>
+    <section id="feedback" class="card feedback" aria-labelledby="verdict" hidden></section>
+    <noscript><p>このドリルを使うには JavaScript を有効にしてください。</p></noscript>
+  </main>
+  <script src="content.js"></script>
+  <script src="term-drill.js"></script>
+</body>
+</html>

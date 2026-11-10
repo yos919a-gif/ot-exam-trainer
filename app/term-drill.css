@@ -1,0 +1,261 @@
+/* 用語入力の試作。配色は appbar.css の共有トークンを使う。 */
+.term-drill-page {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.term-drill-page *,
+.term-drill-page *::before,
+.term-drill-page *::after { box-sizing: border-box; }
+.term-drill-page [hidden],
+.term-drill-page .hidden { display: none !important; }
+.term-drill-page a { color: var(--accent); }
+.term-drill-page header.appbar { margin: 0; }
+.term-drill-page .appbar .wrap {
+  max-width: 840px;
+  min-height: 68px;
+  padding: 10px 24px;
+  flex-wrap: nowrap;
+}
+.term-drill-page .brand { min-height: 44px; }
+.term-drill-page .brand b { overflow-wrap: anywhere; }
+.term-drill-page .home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 7px 12px;
+  margin-left: auto;
+  border-radius: 8px;
+  color: var(--sub);
+  font-size: 16px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.term-drill-page .home-link:hover { background: var(--card2); }
+.term-main {
+  width: 100%;
+  max-width: 792px;
+  margin: 0 auto;
+  padding: 38px 24px max(40px, env(safe-area-inset-bottom));
+}
+.term-intro { margin: 0 0 24px; }
+.term-intro .eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--subject-physiology);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.term-intro h1 {
+  margin: 0 0 10px;
+  font-size: clamp(25px, 4.5vw, 32px);
+  line-height: 1.5;
+  letter-spacing: .02em;
+}
+.term-intro p { max-width: 42em; margin: 0; color: var(--sub); }
+.term-drill-page .card {
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.term-drill-page .term-question {
+  border-left: 4px solid var(--subject-physiology);
+}
+.term-drill-page .qmeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 0 18px;
+  color: var(--sub);
+  font-size: 14px;
+}
+.term-drill-page .subject {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border: 1px solid var(--subject-physiology);
+  border-radius: 6px;
+  color: var(--subject-physiology);
+  font-weight: 700;
+}
+.term-drill-page #question-title {
+  margin: 0 0 14px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.term-drill-page .muted,
+.term-drill-page .helper { color: var(--sub); }
+.term-drill-page .muted { margin: 0 0 24px; }
+.term-drill-page .picker { min-width: 0; }
+.term-drill-page .picker > label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.term-drill-page .input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.term-drill-page #answer-input {
+  display: block;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.5;
+}
+.term-drill-page #answer-input::placeholder { color: var(--faint); opacity: 1; }
+.term-drill-page #answer-input:focus { border-color: var(--accent); }
+.term-drill-page #answer-input:disabled { background: var(--card2); color: var(--sub); }
+.term-drill-page .clear-input {
+  flex: 0 0 auto;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card2);
+  color: var(--sub);
+  font: inherit;
+  cursor: pointer;
+}
+.term-drill-page .clear-input:disabled { opacity: .5; cursor: default; }
+.term-drill-page .helper { margin: 8px 0 0; font-size: 14px; line-height: 1.7; }
+.term-drill-page #picker-status { min-height: 24px; }
+.term-drill-page .options {
+  list-style: none;
+  max-height: 320px;
+  max-height: min(320px, 44dvh);
+  margin: 12px 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  background: var(--card);
+}
+.term-drill-page .option {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 62px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.term-drill-page .option:last-child { border-bottom: 0; }
+.term-drill-page .option:hover,
+.term-drill-page .option.active { background: var(--accent2); }
+.term-drill-page .option.active { box-shadow: inset 3px 0 var(--accent); }
+.term-drill-page .option-label { font-size: 17px; line-height: 1.6; font-weight: 600; }
+.term-drill-page .option-reading { color: var(--sub); font-size: 14px; line-height: 1.6; }
+.term-drill-page .selected-answer {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent3);
+  border-radius: 9px;
+  background: var(--accent2);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.term-drill-page .selected-label { font-weight: 700; }
+.term-drill-page .term-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.term-drill-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.6;
+  text-decoration: none;
+  cursor: pointer;
+}
+.term-drill-page .btn:hover { background: var(--card2); }
+.term-drill-page .btn.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.term-drill-page .btn.primary:hover { filter: brightness(.95); }
+.term-drill-page .btn:disabled { opacity: .45; cursor: default; filter: none; }
+.term-drill-page .feedback { margin-top: 20px; }
+.term-drill-page .verdict { margin: 0 0 14px; font-size: 22px; }
+.term-drill-page .verdict.correct { color: var(--ok); }
+.term-drill-page .verdict.incorrect { color: var(--ng); }
+.term-drill-page .answer-word {
+  margin: 12px 0 0;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.term-drill-page .answer-reading { margin: 2px 0 16px; color: var(--sub); }
+.term-drill-page .answer-meaning { margin: 0 0 16px; overflow-wrap: anywhere; }
+.term-drill-page .feedback details { margin: 0 0 20px; color: var(--sub); }
+.term-drill-page .feedback summary { min-height: 44px; padding: 8px 0; cursor: pointer; }
+.term-drill-page .feedback details a { overflow-wrap: anywhere; }
+.term-drill-page .error-message {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--ng);
+  background: var(--ng2);
+  color: var(--ng);
+  overflow-wrap: anywhere;
+}
+.term-drill-page :where(button, a, input, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .term-drill-page .appbar .wrap { min-height: 62px; padding: 6px 12px; gap: 8px; }
+  .term-drill-page .brand b { font-size: 14px; }
+  .term-drill-page .home-link { padding: 7px 8px; font-size: 14px; }
+  .term-main { padding: 24px 14px max(28px, env(safe-area-inset-bottom)); }
+  .term-intro { margin-bottom: 20px; }
+  .term-intro p { font-size: 16px; }
+  .term-drill-page .card { padding: 20px 17px; }
+  .term-drill-page .qmeta { margin-bottom: 14px; }
+  .term-drill-page #question-title { font-size: 19px; line-height: 1.8; }
+  .term-drill-page .muted { margin-bottom: 20px; }
+  .term-drill-page #answer-input { padding: 12px 10px; font-size: 16px; }
+  .term-drill-page .clear-input { padding: 6px 8px; }
+  .term-drill-page .option { padding: 10px 12px; }
+  .term-drill-page .term-actions { gap: 10px; margin-top: 20px; }
+  .term-drill-page #submit-answer { flex: 1 1 100%; }
+  .term-drill-page #give-up { width: 100%; }
+  .term-drill-page .answer-word { font-size: 23px; }
+}
