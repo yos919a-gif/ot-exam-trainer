@@ -1,4 +1,7 @@
-// 教科書データ（辞書データ。各自が取り込む。公開サイトには入っていない）
+// 教科書データ（辞書データ）
+//  - 最初から入っている分: private/辞書データ/（教科書45冊＋基本辞書。tools/bundle_textbook.py が作る）を、一覧 files.json を見て
+//    端末に無い本・新しくなった本（sha1 が違う本）だけ取りに行く。削除した本は取りに行かない（IndexedDB の builtinSkip）。
+//    どの端末も公開サイトから読めるので、Drive には置かない
 //  - 取り込み: 1冊ずつのファイル（tools/bundle_textbook.py が作る 辞書_<id>_<書名>.json）を、まとめて選んで取り込む。
 //    本を足すときはファイルを足して取り込み、外すときは一覧から削除する。以前の全冊入りのファイルも本ごとに分けて取り込める
 //  - 保存: 端末の IndexedDB に本ごと。Google ログインしていれば Drive のアプリ専用領域にも本ごと（ot-tb-<id>.json）に置き、
@@ -9,6 +12,9 @@
 "use strict";
 window.TEXTBOOK = (() => {
   const DB = "ot-textbook", STORE = "kv", PREFIX = "book:", DRIVE_PREFIX = "ot-tb-";
+  const BUILTIN = "../private/辞書データ/", SKIP = "builtinSkip";
+  let builtinState = "none";   // none 未着手 / loading 読み込み中 / done 済み / offline 一覧を読めなかった（圏外など）
+  let builtinCount = 0, skipped = new Set();
   let bookMap = {};   // {本id: 1冊のデータ {kind, version, id, name, terms, entries, index}}
   let data = null;    // 全冊をまとめたもの {version, entries:{項目id:{w, n, r:[[本id, p, rel, 相手, 根拠]]}}, index:{表記:[項目id]}, sakuin:{books, terms}}
 
@@ -72,6 +78,44 @@ window.TEXTBOOK = (() => {
     data = {version, entries, index, sakuin: {books, terms}};
   }
 
+  const getSkip = async () => { try{ skipped = new Set((await idb("readonly", st => st.get(SKIP))) || []); }catch(e){} return skipped; };
+  const putSkip = s => { skipped = s; return idbPut(SKIP, [...s]).catch(() => {}); };
+  // 最初から入っている本を読む（端末に無い本と、sha1 が変わった本だけ）。取ってきた冊数を返す
+  async function loadBuiltin(){
+    builtinState = "loading";
+    let list;
+    try{
+      const r = await fetch(BUILTIN + "files.json", {cache: "no-cache"});
+      if(!r.ok) throw new Error(r.status);
+      list = (await r.json()).files || [];
+    }catch(e){ builtinState = "offline"; console.warn("最初から入っている辞書データの一覧", e); return 0; }
+    builtinCount = list.length;
+    const skip = await getSkip();
+    const todo = list.filter(f => !skip.has(f.id) && !(bookMap[f.id] && bookMap[f.id].sha1 === f.sha1));
+    let n = 0;
+    for(let i = 0; i < todo.length; i += 6){
+      await Promise.all(todo.slice(i, i + 6).map(async f => {
+        try{
+          const r = await fetch(BUILTIN + encodeURIComponent(f.file) + "?v=" + f.sha1);
+          if(!r.ok) throw new Error(r.status);
+          const b = await r.json();
+          if(!isBook(b)) return;
+          b.sha1 = f.sha1;
+          bookMap[b.id] = b; await idbPut(PREFIX + b.id, b); n++;
+        }catch(e){ console.warn("最初から入っている辞書データ", f.file, e); }
+      }));
+    }
+    builtinState = "done";
+    return n;
+  }
+  // 削除した「最初から入っている本」を戻す
+  async function restoreBuiltin(){
+    await putSkip(new Set());
+    const n = await loadBuiltin();
+    rebuild();
+    return n;
+  }
+
   async function load(){
     try{ ((await idbBooks()) || []).forEach(b => { if(isBook(b)) bookMap[b.id] = b; }); }catch(e){ console.warn("教科書データ（端末）", e); }
     // 以前の全冊入りのデータが端末に残っていれば、本ごとに分けて入れ直す
@@ -82,7 +126,8 @@ window.TEXTBOOK = (() => {
         await idbDel("bundle");
       }
     }catch(e){ console.warn("教科書データ（以前の版）", e); }
-    // ログインしていれば、ほかの端末で取り込んだ本を Drive から
+    await loadBuiltin();
+    // ログインしていれば、ほかの端末で取り込んだ本を Drive から（最初から入っている本は上で読んであるので取りに行かない）
     try{
       if(window.SYNC && SYNC.signedIn()){
         for(const name of await SYNC.files.list(DRIVE_PREFIX)){
@@ -101,7 +146,10 @@ window.TEXTBOOK = (() => {
     let j;
     try{ j = JSON.parse(text); }catch(e){ throw new Error("JSON として読めません"); }
     const list = isBook(j) ? [j] : isOldBundle(j) ? splitBundle(j) : null;
-    if(!list) throw new Error("OT国試トレーナーの教科書データではありません");
+    if(!list) throw new Error("OT国試トレーナーの教科書データではありません（取り込めるのは 辞書_○○.json です。最初から入っている辞書データは取り込まなくても使えます）");
+    const skip = await getSkip();
+    list.forEach(b => skip.delete(b.id));
+    await putSkip(skip);
     for(const b of list){
       bookMap[b.id] = b;
       await idbPut(PREFIX + b.id, b);
@@ -118,6 +166,7 @@ window.TEXTBOOK = (() => {
     return {names, errors};
   }
   async function removeBook(id){
+    const skip = await getSkip(); skip.add(id); await putSkip(skip);   // 最初から入っている本なら、次に開いたときにまた取りに行かない
     delete bookMap[id];
     await idbDel(PREFIX + id);
     try{ if(window.SYNC) await SYNC.files.remove(DRIVE_PREFIX + id + ".json"); }catch(e){}
@@ -167,7 +216,8 @@ window.TEXTBOOK = (() => {
     const more = e.r.length > max ? `<div class="st">ほか ${e.r.length - max}件</div>` : "";
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
-  return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+  return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data, restoreBuiltin,
+          builtin: () => ({state: builtinState, count: builtinCount, skipped: skipped.size}),
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet(),
           // 基本辞書（語のつながり kotoba.html の説明の文。本ごとの {meta, terms}）
           hasKotoba: () => !!(bookMap.kotoba && bookMap.kotoba.kotoba),
