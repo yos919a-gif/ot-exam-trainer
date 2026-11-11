@@ -84,6 +84,11 @@ def main():
                "terms": {}, "entries": {}, "index": {}, "kotoba": kot}
         know = ROOT / "content" / "knowledge"
         out["links"] = {p.name[:-len("_links.json")]: json.loads(p.read_text(encoding="utf-8")) for p in sorted(know.glob("*_links.json"))}
+        ami_p = know / "ami.json"   # 語の網（ami.html。親・流れ・つながり。2026-11-11）
+        if ami_p.exists():
+            out["ami"] = json.loads(ami_p.read_text(encoding="utf-8"))
+        else:
+            print("要確認: content/knowledge/ami.json が無く、語の網が基本辞書に入っていません")
         src_p = know / "glossary_src.json"   # 用語集の教科書ページ（公開版の用語集からは外してある）
         out["glossSrc"] = json.loads(src_p.read_text(encoding="utf-8")) if src_p.exists() else {}
         if not out["links"] or not out["glossSrc"]:

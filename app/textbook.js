@@ -174,6 +174,8 @@ window.TEXTBOOK = (() => {
           kotoba: id => { const b = bookMap.kotoba; return b && b.kotoba ? (b.kotoba[id] || null) : null; },
           // つながりと索引ページ（kotoba.html の土台。公開サイトには置かない）
           kotobaLinks: id => { const b = bookMap.kotoba; return b && b.links ? (b.links[id] || null) : null; },
+          // 語の網（ami.html。親・流れ・つながり。基本辞書の ami キー。公開サイトには置かない）
+          ami: () => { const b = bookMap.kotoba; return b && b.ami ? b.ami : null; },
           // 用語集の教科書ページ（公開サイトには置かない）を、取り込んだ人の用語集にだけ重ねる
           applyGlossSrc: g => { const b = bookMap.kotoba; if(b && b.glossSrc) Object.entries(b.glossSrc).forEach(([w, s]) => { if(g[w]) g[w].出典 = s; }); }};
 })();
