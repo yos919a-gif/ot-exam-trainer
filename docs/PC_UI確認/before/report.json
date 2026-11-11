@@ -1,0 +1,378 @@
+{
+  "phase": "before",
+  "startedAt": "2026-11-11T10:24:11.412Z",
+  "checks": [
+    {
+      "name": "1280 過去問の誤答採点と誤り理由",
+      "pass": true
+    },
+    {
+      "name": "1280 過去問の結果画面",
+      "pass": true
+    },
+    {
+      "name": "1280 用語入力採点",
+      "pass": true
+    },
+    {
+      "name": "1440 過去問の誤答採点と誤り理由",
+      "pass": true
+    },
+    {
+      "name": "1440 過去問の結果画面",
+      "pass": true
+    },
+    {
+      "name": "1440 用語入力採点",
+      "pass": true
+    },
+    {
+      "name": "JS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screens": [
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    },
+    {
+      "label": "quiz",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "button[onclick=\"submitQ()\"]",
+          "text": "解答する",
+          "x": 167,
+          "y": 661,
+          "width": 104,
+          "height": 50,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "quiz-feedback",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "button[onclick=\"nextQ()\"]",
+          "text": "結果を見る",
+          "x": 167,
+          "y": 1186,
+          "width": 119,
+          "height": 50,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-setup",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#start-practice",
+          "text": "練習を始める",
+          "x": 297,
+          "y": 510,
+          "width": 128,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-candidates",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 300,
+          "y": 724,
+          "width": 100,
+          "height": 48,
+          "disabled": true,
+          "inViewport": false,
+          "uncovered": false
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 410,
+          "y": 724,
+          "width": 112,
+          "height": 48,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-feedback",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 300,
+          "y": 707,
+          "width": 100,
+          "height": 48,
+          "disabled": true,
+          "inViewport": false,
+          "uncovered": false
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 410,
+          "y": 707,
+          "width": 112,
+          "height": 48,
+          "disabled": true,
+          "inViewport": false,
+          "uncovered": false
+        },
+        {
+          "selector": "#next-question",
+          "text": "次の問題 →",
+          "x": 297,
+          "y": 1107,
+          "width": 124,
+          "height": 48,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    },
+    {
+      "label": "quiz",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "button[onclick=\"submitQ()\"]",
+          "text": "解答する",
+          "x": 247,
+          "y": 661,
+          "width": 104,
+          "height": 50,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "quiz-feedback",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "button[onclick=\"nextQ()\"]",
+          "text": "結果を見る",
+          "x": 247,
+          "y": 1186,
+          "width": 119,
+          "height": 50,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-setup",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#start-practice",
+          "text": "練習を始める",
+          "x": 377,
+          "y": 510,
+          "width": 128,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-candidates",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 380,
+          "y": 724,
+          "width": 100,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 490,
+          "y": 724,
+          "width": 112,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-feedback",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 380,
+          "y": 707,
+          "width": 100,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 490,
+          "y": 707,
+          "width": 112,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#next-question",
+          "text": "次の問題 →",
+          "x": 377,
+          "y": 1107,
+          "width": 124,
+          "height": 48,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    }
+  ],
+  "screenshots": [
+    "1280x720-light-home.png",
+    "1280x720-light-home-full.png",
+    "1280x720-light-quiz.png",
+    "1280x720-light-quiz-full.png",
+    "1280x720-light-quiz-feedback.png",
+    "1280x720-light-quiz-feedback-full.png",
+    "1280x720-light-term-setup.png",
+    "1280x720-light-term-setup-full.png",
+    "1280x720-light-term-candidates.png",
+    "1280x720-light-term-candidates-full.png",
+    "1280x720-light-term-feedback.png",
+    "1280x720-light-term-feedback-full.png",
+    "1440x900-light-home.png",
+    "1440x900-light-home-full.png",
+    "1440x900-light-quiz.png",
+    "1440x900-light-quiz-full.png",
+    "1440x900-light-quiz-feedback.png",
+    "1440x900-light-quiz-feedback-full.png",
+    "1440x900-light-term-setup.png",
+    "1440x900-light-term-setup-full.png",
+    "1440x900-light-term-candidates.png",
+    "1440x900-light-term-candidates-full.png",
+    "1440x900-light-term-feedback.png",
+    "1440x900-light-term-feedback-full.png"
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "apiWrites": 4,
+  "finishedAt": "2026-11-11T10:24:41.064Z"
+}

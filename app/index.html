@@ -453,6 +453,70 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 /* タブが5つ（語の網を足した、11/11）になり狭い画面で収まらないので、帯の中だけ横にスクロールさせる */
 .appbar .tabs{min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.appbar .tabs::-webkit-scrollbar{display:none}
 @media(max-width:640px){.appbar .tabs a{flex:0 0 auto;padding-inline:10px}}
+/* PCでは学習開始を上段へまとめ、問題と選択肢の読み幅を保つ。 */
+.home-shortcuts{display:none}
+@media(min-width:1024px){
+  main,footer{max-width:1320px;padding-inline:28px}
+  .appbar .wrap{max-width:1320px;min-height:62px;padding:8px 28px;gap:16px;flex-wrap:nowrap}
+  .appbar .brand .logo{width:34px;height:34px}.appbar .brand b{font-size:15px}.appbar .brand small{font-size:10px}
+  .appbar .tabs a,.appbar .tabs a.on{min-height:38px;padding:5px 13px;font-size:13px}
+  .appbar .loadstate{font-size:11px;white-space:nowrap}
+  .home-dashboard{padding-top:20px}
+  .home-overview{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:stretch}
+  .home-overview .card.hero{margin:0;grid-template-columns:96px minmax(0,1fr);gap:18px;padding:20px}
+  .home-overview .hero .ring{width:96px;height:96px;padding:3px}.home-overview .hero .ring .val b{font-size:25px}
+  .home-overview .hero h2{font-size:23px}.home-overview .hero .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+  .home-overview .hero .stat{padding:8px;font-size:11px}.home-overview .hero .stat b{font-size:22px}
+  .home-overview .hero .muted{font-size:12px}.home-overview .hero .meter{margin:10px 0}
+  .home-daily{display:flex;flex-direction:column;min-width:0}.home-daily>.sec{margin:0 0 10px;font-size:16px}
+  .home-daily .today{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;flex:1}
+  .home-daily .todo{padding:14px 16px;min-width:0}.home-daily .todo .head{font-size:14px;gap:7px}
+  .home-daily .todo .num{font-size:26px;line-height:1.4;margin:5px 0}.home-daily .todo .sub{font-size:12px;line-height:1.65}
+  .home-daily .todo .ic{width:28px;height:28px;font-size:16px}.home-daily .todo .act{margin-top:8px}
+  .home-daily .todo .btn{min-height:38px;font-size:12px;padding:8px 10px;margin:0 4px 0 0}
+  .home-shortcuts{display:flex;align-items:center;gap:14px;margin:18px 0 0;padding:13px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+  .home-shortcuts>div{margin-right:auto;min-width:0}.home-shortcuts strong{font-size:15px;display:block}.home-shortcuts small{display:block;font-size:12px;color:var(--sub)}
+  .home-shortcuts .btn{margin:0;min-height:44px;font-size:14px;white-space:nowrap}
+  .home-exams>.sec,.home-memory>.sec,.home-dashboard>.sec{margin-top:24px;margin-bottom:12px}
+  .home-exams>.tiles{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:16px}
+  .home-exams .tile{padding:18px;min-width:0}.home-exams .tile p{font-size:13px;line-height:1.75}
+  .home-exams .tile>.acts{padding-top:4px}.home-exams .tile .btn{margin:3px 5px 0 0;font-size:13px;min-height:40px;padding:8px 11px}
+  .home-exams .rom-tile.wide{grid-column:auto}.home-exams #rangeCard.wide{grid-column:span 2}
+  .home-exams .rom-tile .acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.home-exams .rom-tile .acts>.muted{flex-basis:100%}
+  #rangeCard .top{flex-wrap:wrap}#rangeCard .top>span:last-child{margin-left:0!important;flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px}
+  #rangeCard .top>span:last-child .btn{margin:0;min-height:34px;font-size:12px;padding:6px 10px}
+  #rangeCard .fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px;margin:8px 0 12px}
+  #rangeCard .fields label{min-width:0;font-size:12px}#rangeCard .fields select{width:100%;min-width:0;min-height:38px;font-size:13px}
+  .home-memory>.tiles{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+  .home-memory .tile{padding:18px;min-width:0}.home-memory .tile p{font-size:13px;line-height:1.75}
+  .home-memory .tile .grid{gap:6px}.home-memory .tile .stat{font-size:11px;padding:7px}.home-memory .tile .stat b{font-size:22px}
+  .home-memory .tile .btn{font-size:13px;padding:8px 11px;min-height:40px}.home-memory .tile .acts{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+  .home-dashboard>.card{margin-top:12px}
+  .question-card{max-width:960px;margin:20px auto;padding:24px}
+  .question-card .qmeta{margin-bottom:14px}.question-card .qtext{max-width:46em;font-size:18px;line-height:1.9;margin:8px 0 18px}
+  .question-card .choice{min-height:56px;padding:11px 14px;margin:8px 0;font-size:16px;line-height:1.8}
+  .question-card .choice.sel{padding:10.5px 13.5px}.question-card .why{font-size:14px;line-height:1.75}
+  .question-card .image-button{max-width:100%}.question-card .qimg{max-height:440px;object-fit:contain;object-position:left center}
+  .question-card .actions.sticky,.flash-card .flash-controls,.result-card .result-actions{position:sticky;bottom:12px;z-index:35;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-lg);padding:12px 14px;margin-top:20px}
+  .question-card .actions.sticky{gap:8px}.question-card .actions.sticky .btn{margin:0;min-height:44px}
+  .question-card .actions.sticky .btn.primary{min-width:160px}.question-card .actions.sticky .spacer{min-width:8px}
+  .result-card{max-width:1120px;margin:20px auto}.result-card .score{grid-template-columns:112px minmax(0,1fr);gap:24px}
+  .result-card .score .ring{width:112px;height:112px}.result-card>.grid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+  .result-card .result-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.result-card .result-actions .btn{margin:0;min-height:44px}
+  .result-card>h3{margin-top:26px}.result-card>table td:first-child{width:25%}.result-card>table:has(td:nth-child(4)) td:first-child{width:16%}
+  .flash-card{display:flex;flex-direction:column;max-width:960px;min-height:calc(100dvh - 190px);margin:20px auto;padding:24px}
+  .flash-card .flash{flex:1;min-height:clamp(220px,40vh,360px);margin:8px 0 0;padding:26px}
+  .flash-card .flash .fm{max-width:36em}.flash-card .flash-controls{flex:none;text-align:center}
+  .flash-card .flash-controls>.btn{min-width:180px;margin:0}.flash-card .flash-controls .grade{max-width:720px;margin:0 auto}
+  .flash-card .flash-controls>div:last-child .btn{margin:0}.flash-card .flash-controls .grade .btn{min-height:48px}
+}
+@media(min-width:1280px){
+  .home-memory>.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .question-card{max-width:none}.question-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start}
+  .question-stem,.question-response{min-width:0}.question-stem{padding-right:26px;border-right:1px solid var(--line)}
+  .question-response #choices>.choice:first-child{margin-top:0}.question-response .verdict{margin-top:0}
+  .question-card .qmeta{padding-bottom:14px;border-bottom:1px solid var(--line)}
+}
 </style>
 </head>
 <body>
@@ -1107,6 +1171,8 @@ function home(){
   }).join("");
   const today = new Date().toLocaleDateString("ja-JP", {month:"long", day:"numeric", weekday:"short"});
   app.innerHTML = `
+  <div class="home-dashboard">
+  <div class="home-overview">
   <div class="card hero">
     <div class="ring">${ringSvg(rate||0)}<div class="val"><div><b>${rate===null?"—":rate+"%"}</b><span>正答率</span></div></div></div>
     <div>
@@ -1120,9 +1186,19 @@ function home(){
       </div>
     </div>
   </div>
-  ${window.SYNC && SYNC.status().on && SYNC.status().needLogin ? `<div class="card" style="padding:12px 16px;margin:12px 0">☁ 同期のログインが切れています。<button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">もう一度ログインして同期</button></div>` : ""}
+  <section class="home-daily">
   <div class="sec">今日やること <small>${today}</small></div>
   <div class="today">${reviewCard()}${wordTodayCard()}</div>
+  </section>
+  </div>
+  ${window.SYNC && SYNC.status().on && SYNC.status().needLogin ? `<div class="card" style="padding:12px 16px;margin:12px 0">☁ 同期のログインが切れています。<button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">もう一度ログインして同期</button></div>` : ""}
+  <nav class="home-shortcuts" aria-label="すぐに学習を始める">
+    <div><strong>今日の学習を始める</strong><small>取り組みたい方法を選びましょう</small></div>
+    <a class="btn primary" href="term-drill.html">⌨ 用語を入力して解く</a>
+    <button class="btn" onclick="startMock(50)">📝 過去問50問</button>
+    <button class="btn" onclick="startWordsQuick()">🃏 今日の暗記カード</button>
+  </nav>
+  <section class="home-exams">
   <div class="sec">模試・演習 <span style="margin-left:auto"><button class="btn small ${lookupOn()?"primary":""}" onclick="toggleLookup()" title="オンにすると、解答する前から問題文・選択肢の用語に下線が出て、タップで意味を見られます">📖 用語を見ながら解く: ${lookupOn()?"オン":"オフ"}</button></span></div>
   <div class="tiles">
     <div class="tile c1"><div class="top"><span class="ic">📝</span><h3>オリジナル模試</h3></div>
@@ -1134,7 +1210,7 @@ function home(){
     <div class="tile c2"><div class="top"><span class="ic">🎯</span><h3>弱点集中</h3></div>
       <p>正答率の低い科目と、最近まちがえた問題を優先。</p>
       <div class="acts"><button class="btn primary" onclick="startWeak(20)">20問</button><button class="btn" onclick="startWeak(50)">50問</button></div></div>
-    <div class="tile c4 wide"><div class="top"><span class="ic">💪</span><h3>ROM・MMT</h3></div>
+    <div class="tile c4 wide rom-tile"><div class="top"><span class="ic">💪</span><h3>ROM・MMT</h3></div>
       <p>午前・午後の第1問目（実地3点）はほぼ ROM か MMT。上の段は第50〜61回の過去問、下の段は入力して答えるドリル（ROMは2022年改訂の表の全範囲、MMTは過去問の図を正しい図と誤りの図に分けて）。</p>
       <div class="acts"><button class="btn primary" onclick="startRomMmt('rom')">ROM（${romMmtList("rom").length}問）</button><button class="btn primary" onclick="startRomMmt('mmt')">MMT（${romMmtList("mmt").length}問）</button><button class="btn" onclick="startRomMmt('all')">両方（${romMmtList("all").length}問）</button><button class="btn" onclick="startRomMmt('q1')">問1だけ（${romMmtList("q1").length}問）</button></div>
       <div class="acts" style="margin-top:8px"><span class="muted" style="margin:0 6px 0 0">全範囲：</span><button class="btn primary" onclick="DRILL.start('rom')">ROM 全範囲ドリル</button><button class="btn primary" onclick="DRILL.start('mmtok')">MMT 正しい図（15）</button><button class="btn" onclick="DRILL.start('mmtng')">MMT 間違い探し（30）</button></div></div>
@@ -1144,6 +1220,8 @@ function home(){
       ${rangeForm()}
       <div class="acts"><button class="btn primary" id="rangeStart" onclick="startRange()">この条件で解く</button><button class="btn" id="rangePrint" onclick="printRange()">🖨 印刷・PDF</button><span class="pill" id="rangeCount"></span></div></div>
   </div>
+  </section>
+  <section class="home-memory">
   <div class="sec">暗記・復習</div>
   <div class="tiles">
     <div class="tile c4"><div class="top"><span class="ic">⌨</span><h3>用語入力ドリル</h3></div>
@@ -1155,6 +1233,7 @@ function home(){
       <p>正答の理由を声で説明し、キーワードのカバー率を判定（Chrome推奨）。</p>
       <div class="acts"><button class="btn primary" onclick="startExplain()">はじめる</button></div></div>
   </div>
+  </section>
   <div class="sec">科目別の成績 <span style="margin-left:auto"><button class="btn small" onclick="renderTrend()">📈 成績の推移</button></span></div>
   <div class="card">
     <details class="opts" style="border-top:0;margin:0;padding:0"><summary>18科目の正答率を見る</summary><div class="subj" style="margin-top:10px">${rows}</div></details>
@@ -1166,6 +1245,7 @@ function home(){
         <button class="btn small" onclick="resetProgress()">リセット</button>
         <input type="file" id="impFile" accept=".json" style="display:none">
       </div></details>
+  </div>
   </div>`;
   rangeChanged(true);
   if(document.getElementById("wordCard")) wordChanged(true);
@@ -1311,14 +1391,17 @@ function renderQuestion(showAnswer=false, picked=[]){
       ${!showAnswer && S.notes[q.id]?'<span class="pill">📝 メモあり（解答後に表示）</span>':""}
       <span style="margin-left:auto">${lookupBtn()} ${markBtn(q.id)} <span class="pill">⏱ ${elapsed}分</span></span>
     </div>
+    <div class="question-layout"><div class="question-stem">
     <p class="qtext">${look?termHtml(q.問題文):esc(q.問題文)}</p>
     ${!showAnswer && lookupOn() ? `<div class="muted" style="margin:-8px 0 8px">📖 下線の語をタップすると意味が出ます（用語を見ながら解くモード）</div>` : ""}
     ${imgHtml(q)}
+    </div><div class="question-response">
     ${verdict}
     <div id="choices">${choices}</div>
     ${showAnswer?dzEvalHtml(q):""}
     ${showAnswer?`<div style="margin-top:14px"><label style="font-size:13px;color:var(--sub)">📝 メモ（自動保存）
       <textarea class="memo" oninput="setNote('${q.id}',this.value)" placeholder="覚え方・間違えた理由など">${esc(S.notes[q.id]?.text||"")}</textarea></label></div>`:""}
+    </div></div>
     <div class="actions sticky">
       ${showAnswer
         ? `<button class="btn primary big" onclick="nextQ()">${session.idx+1<n?"次の問題 →":"結果を見る"}</button>
@@ -1402,7 +1485,7 @@ function renderResult(){
       <td>正答${q.正答.join(",")}</td><td>${q.科目}</td></tr>`;}).join("");
   const mins = Math.floor((Date.now()-session.t0)/60000);
   app.innerHTML = `
-  <div class="card">
+  <div class="card result-card">
     <div class="score">
       <div class="ring">${ringSvg(res.length?Math.round(100*okN/res.length):0)}<div class="val"><div><b>${res.length?Math.round(100*okN/res.length):0}%</b><span>正答率</span></div></div></div>
       <div><h2>${MODE_LABEL[session.mode]||""}${session.label?"（"+esc(session.label)+"）":""}の結果</h2>
@@ -1425,7 +1508,7 @@ function renderResult(){
     <p style="color:var(--sub);font-size:12px">※配点は一般問題1点・実地問題（午前・午後の問1〜20）3点。合格基準は第61回の「総得点167点以上／278点かつ実地問題43点以上／120点」を出題数に比例させた目安です。</p>`}
     <h3>科目別（弱い順）</h3><table>${rows}</table>
     ${wrong?`<h3>間違えた問題</h3><table>${wrong}</table>`:""}
-    <div style="margin-top:12px">
+    <div class="result-actions" style="margin-top:12px">
       <button class="btn primary" onclick="home()">ホームへ</button>
       ${wrong?`<button class="btn" onclick="retryWrong()">間違いだけ再挑戦</button><button class="btn" onclick="printWrong()">🖨 間違えた問題を印刷</button>`:""}
     </div>
@@ -1713,7 +1796,7 @@ function renderWord(back){
     <div class="flash" data-subject="${esc(wordSub(w))}" ${back?"":`onclick="renderWord(true)" style="cursor:pointer"`}>
       ${back ? full + `<div class="fs">${g.出題数}問に出題（第${g.初出}〜${g.最終}回）・${esc(subs)}</div>
                        ${g.出典?`<span class="src">📖 ${esc(g.出典)}</span>`:""}`
-             : front + `<div class="fs">タップ（またはスペース）で裏返す</div>`}
+             : front + `<div class="fs">クリック・タップ（またはスペース）で裏返す</div>`}
     </div>
     <div class="flash-controls">${back ? `<div class="grade">
         <button class="btn ngb" onclick="gradeWord(0)">覚えていない [1]</button>

@@ -115,3 +115,11 @@ button,input,select,textarea{font-family:inherit}
 /* タブが5つ（語の網を足した、11/11）になり狭い画面で収まらないので、帯の中だけ横にスクロールさせる */
 .appbar .tabs{min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.appbar .tabs::-webkit-scrollbar{display:none}
 @media(max-width:640px){.appbar .tabs a{flex:0 0 auto;padding-inline:10px}}
+
+/* PCの作業幅に合わせ、上部の行き先は1段でコンパクトに保つ。 */
+@media(min-width:1024px){
+  .appbar .wrap{max-width:1320px;min-height:62px;padding:8px 28px;gap:16px;flex-wrap:nowrap}
+  .appbar .brand .logo{width:34px;height:34px}
+  .appbar .brand b{font-size:15px}.appbar .brand small{font-size:10px}
+  .appbar .tabs a,.appbar .tabs a.on{min-height:38px;padding:5px 13px;font-size:13px}
+}

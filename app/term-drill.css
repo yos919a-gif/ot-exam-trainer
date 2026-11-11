@@ -58,6 +58,9 @@
   letter-spacing: .02em;
 }
 .term-intro p { max-width: 42em; margin: 0; color: var(--sub); }
+.term-drill-page .desktop-hint { display:none; }
+.term-drill-page .practice-history { margin-top:20px; padding-top:16px; border-top:1px solid var(--line); }
+.term-drill-page .practice-history h3 { margin:0 0 12px; font-size:17px; }
 .term-drill-page .card {
   min-width: 0;
   padding: 28px;
@@ -254,6 +257,58 @@
 .term-drill-page :where(button, a, input, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
+}
+@media (min-width: 1024px) {
+  .term-drill-page .appbar .wrap { max-width:1320px; min-height:60px; padding:6px 24px; }
+  .term-main { max-width:1320px; padding:20px 24px 32px; }
+  .term-intro { display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:24px; margin-bottom:18px; }
+  .term-intro .eyebrow { grid-column:1/-1; margin-bottom:2px; font-size:12px; }
+  .term-intro h1 { grid-column:1; margin-bottom:2px; font-size:26px; line-height:1.4; }
+  .term-intro > p:not(.desktop-hint) { grid-column:1; font-size:14px; }
+  .term-drill-page .desktop-hint { display:block; grid-column:2; grid-row:2/4; align-self:center; max-width:340px; font-size:12px; line-height:1.9; }
+  .term-drill-page kbd { display:inline-block; min-width:22px; padding:0 5px; margin:0 2px; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; background:var(--card); color:var(--ink); font:inherit; text-align:center; }
+  .term-drill-page .card { padding:22px 24px; }
+  .term-drill-page #start-screen { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:32px; align-items:start; }
+  .term-drill-page #start-title { margin:0 0 10px; font-size:23px; }
+  .term-drill-page .setup-main > p { margin:0 0 20px; }
+  .term-drill-page .practice-history { margin:0; padding:0 0 0 24px; border-top:0; border-left:1px solid var(--line); }
+  .term-drill-page .practice-settings { gap:12px; }
+  .term-drill-page .practice-settings label { flex-basis:130px; }
+  .term-drill-page .resume-section { margin:0 0 16px; padding:0; border:0; }
+  .term-drill-page .practice-workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; }
+  .term-drill-page .practice-workspace:not(.has-feedback) .term-question { grid-column:1/-1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:36px; align-items:start; }
+  .term-drill-page .practice-workspace:not(.has-feedback) .qmeta,
+  .term-drill-page .practice-workspace:not(.has-feedback) #session-progress { grid-column:1/-1; }
+  .term-drill-page .practice-workspace:not(.has-feedback) #question-title { grid-column:1; grid-row:3; }
+  .term-drill-page .practice-workspace:not(.has-feedback) .muted { grid-column:1; grid-row:4; }
+  .term-drill-page .practice-workspace:not(.has-feedback) #answer-form { grid-column:2; grid-row:3/5; }
+  .term-drill-page .qmeta { margin-bottom:12px; }
+  .term-drill-page #session-progress { margin-bottom:18px; }
+  .term-drill-page #question-title { font-size:22px; line-height:1.8; }
+  .term-drill-page .muted { margin-bottom:12px; font-size:14px; }
+  .term-drill-page .term-actions { margin-top:16px; gap:8px; }
+  .term-drill-page .term-actions .btn { padding:9px 16px; }
+  .term-drill-page .options { max-height:clamp(100px, calc(100dvh - 580px), 280px); }
+  .term-drill-page .feedback { margin-top:0; }
+  .term-drill-page .has-feedback #input-help,
+  .term-drill-page .has-feedback #picker-status,
+  .term-drill-page .has-feedback #selected-answer,
+  .term-drill-page .has-feedback #submit-answer,
+  .term-drill-page .has-feedback #give-up,
+  .term-drill-page .has-feedback #clear-answer,
+  .term-drill-page .has-feedback .term-question .muted { display:none; }
+  .term-drill-page .has-feedback #answer-input { font-size:17px; min-height:48px; }
+  .term-drill-page .has-feedback #question-title { margin-bottom:22px; }
+  .term-drill-page .feedback .verdict { margin-bottom:8px; }
+  .term-drill-page .feedback .answer-word { margin-top:8px; font-size:24px; }
+  .term-drill-page .feedback .answer-reading { margin-bottom:12px; font-size:14px; }
+  .term-drill-page .feedback .answer-meaning { margin-bottom:10px; font-size:16px; line-height:1.75; }
+  .term-drill-page .feedback details { margin-bottom:14px; }
+  .term-drill-page .feedback > .btn { margin-right:8px; }
+  .term-drill-page #result-screen { display:grid; grid-template-columns:310px minmax(0,1fr); gap:36px; }
+  .term-drill-page .result-overview { position:sticky; top:80px; align-self:start; }
+  .term-drill-page #result-screen summary { margin-top:0; }
+  .term-drill-page #session-results { max-height:calc(100dvh - 270px); min-height:200px; overflow:auto; padding-right:12px; scrollbar-gutter:stable; }
 }
 @media (max-width: 560px) {
   .term-drill-page .appbar .wrap { min-height: 62px; padding: 6px 12px; gap: 8px; }

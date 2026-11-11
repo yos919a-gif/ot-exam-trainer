@@ -6,6 +6,7 @@
   const clear = $("clear-answer"), submit = $("submit-answer"), giveUp = $("give-up");
   const demo = new URLSearchParams(location.search).get("demo") === "1";
   const STORAGE_KEY = "ot-term-drill-v1";
+  const desktopInput = () => matchMedia("(min-width: 1024px) and (pointer: fine)").matches;
   const SUBJECT_ORDER = ["解剖学", "生理学", "運動学"];
   let questions = [], byId = new Map(), glossary, entries = [], entryByLabel = new Map();
   let dataReady = false;
@@ -105,6 +106,7 @@
   function screen(name){
     for(const id of ["start-screen", "question-screen", "result-screen"]) $(id).hidden = id !== name;
     $("feedback").hidden = true;
+    $("practice-workspace").classList.remove("has-feedback");
   }
   function closeList(){
     shown = []; active = -1;
@@ -159,6 +161,7 @@
     $("resume-section").hidden = !state.active;
     if(state.active) $("resume-description").textContent = `${scopeSummary(state.active.ids)}：${state.active.ids.length}問中${state.active.results.length}問の回答を保存しています。`;
     const recent = state.history.at(-1);
+    $("empty-history").hidden = !!state.active || !!recent;
     $("recent-summary").textContent = recent ? `前回：${recent.ids.length}問中 ${recent.results.filter(result => result.ok).length}問正解（${scopeSummary(recent.ids)}）` : "";
     $("review-previous").hidden = !recent?.results.some(result => !result.ok);
     if(moveFocus){ $("start-title").tabIndex = -1; $("start-title").focus(); }
@@ -179,6 +182,7 @@
     setSelection(null); draw();
     const result = current.results[current.index];
     if(result) showFeedback(result);
+    else if(desktopInput()) input.focus();
     else { $("question-title").tabIndex = -1; $("question-title").focus(); }
   }
   function addText(parent, tag, text, className){
@@ -216,7 +220,8 @@
       }else { persist(); renderQuestion(); }
     }, {once: true});
     if(demo){ const back = addText(panel, "a", "練習メニューへ", "btn"); back.href = "term-drill.html"; }
-    panel.hidden = false; status.textContent = "解答を確認しました。"; verdict.focus();
+    panel.hidden = false; $("practice-workspace").classList.add("has-feedback");
+    status.textContent = "解答を確認しました。"; verdict.focus();
   }
   function answer(revealOnly = false){
     if(answered || composing || !current || (!revealOnly && !selected)) return;
@@ -227,6 +232,7 @@
   }
   function showResults(){
     screen("result-screen");
+    $("result-answers").open = desktopInput();
     const results = current.results, correct = results.filter(result => result.ok).length;
     const revealed = results.filter(result => result.kind === "reveal").length;
     $("result-scope").textContent = scopeSummary(current.ids);
@@ -263,6 +269,14 @@
       if(!list.hidden && shown.length) pick(shown[active < 0 ? 0 : active]); else if(selected) answer();
     }else if(event.key === "Escape"){ event.preventDefault(); closeList(); }
     else if(event.key === "Tab") closeList();
+  });
+  document.addEventListener("keydown", event => {
+    if(event.key !== "Enter" || event.defaultPrevented || event.repeat || event.isComposing || event.keyCode === 229 || composing ||
+      event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || !desktopInput() || !current || !answered || $("feedback").hidden) return;
+    // リンク・出典・ボタンなどの通常のキーボード操作は横取りしない。
+    if(event.target.closest?.("input,textarea,select,button,a,summary,[contenteditable]")) return;
+    const next = $("feedback").querySelector("#next-question,#try-again");
+    if(next){ event.preventDefault(); next.click(); }
   });
   list.addEventListener("mousedown", event => event.preventDefault());
   list.addEventListener("click", event => { const option = event.target.closest("[data-index]"); if(option) pick(shown[Number(option.dataset.index)]); });
