@@ -1,0 +1,206 @@
+{
+  "phase": "after",
+  "scope": "home",
+  "baselineCommit": "f44f310",
+  "startedAt": "2026-11-11T10:33:59.857Z",
+  "checks": [
+    {
+      "name": "1024 最終ホームの3statが同じ行",
+      "pass": true,
+      "detail": [
+        {
+          "x": 163,
+          "y": 210.9375,
+          "width": 100.65625
+        },
+        {
+          "x": 271.65625,
+          "y": 210.9375,
+          "width": 100.671875
+        },
+        {
+          "x": 380.328125,
+          "y": 210.9375,
+          "width": 100.65625
+        }
+      ]
+    },
+    {
+      "name": "1024x768-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1024,
+        "height": 768,
+        "documentWidth": 1024,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280 最終ホームの3statが同じ行",
+      "pass": true,
+      "detail": [
+        {
+          "x": 163,
+          "y": 215.6875,
+          "width": 143.328125
+        },
+        {
+          "x": 314.328125,
+          "y": 215.6875,
+          "width": 143.328125
+        },
+        {
+          "x": 465.65625,
+          "y": 215.6875,
+          "width": 143.328125
+        }
+      ]
+    },
+    {
+      "name": "1280x720-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1440 最終ホームの3statが同じ行",
+      "pass": true,
+      "detail": [
+        {
+          "x": 223,
+          "y": 215.6875,
+          "width": 150
+        },
+        {
+          "x": 381,
+          "y": 215.6875,
+          "width": 150
+        },
+        {
+          "x": 539,
+          "y": 215.6875,
+          "width": 150
+        }
+      ]
+    },
+    {
+      "name": "1440x900-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "height": 900,
+        "documentWidth": 1440,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1920 最終ホームの3statが同じ行",
+      "pass": true,
+      "detail": [
+        {
+          "x": 463,
+          "y": 215.6875,
+          "width": 150
+        },
+        {
+          "x": 621,
+          "y": 215.6875,
+          "width": 150
+        },
+        {
+          "x": 779,
+          "y": 215.6875,
+          "width": 150
+        }
+      ]
+    },
+    {
+      "name": "1920x1080-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1920,
+        "height": 1080,
+        "documentWidth": 1920,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "JS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screens": [
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1024,
+      "height": 768,
+      "documentWidth": 1024,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1920,
+      "height": 1080,
+      "documentWidth": 1920,
+      "overflow": false,
+      "actions": [],
+      "outside": []
+    }
+  ],
+  "screenshots": [
+    "1024x768-light-home.png",
+    "1024x768-light-home-full.png",
+    "1280x720-light-home.png",
+    "1280x720-light-home-full.png",
+    "1440x900-light-home.png",
+    "1440x900-light-home-full.png",
+    "1920x1080-light-home.png",
+    "1920x1080-light-home-full.png"
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "apiWrites": 4,
+  "finishedAt": "2026-11-11T10:34:07.844Z"
+}

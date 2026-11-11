@@ -1,0 +1,1180 @@
+{
+  "phase": "after",
+  "scope": "integration",
+  "baselineCommit": "f44f310",
+  "startedAt": "2026-11-11T16:16:30.197Z",
+  "checks": [
+    {
+      "name": "1024 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "1024 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1024,
+        "height": 768,
+        "documentWidth": 1024,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 508,
+            "y": 366,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 47,
+            "y": 1548,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1024 語の網へ遷移・5タブ維持",
+      "pass": true
+    },
+    {
+      "name": "1024 語の網のページ全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1024,
+        "height": 768,
+        "documentWidth": 1024,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1024 語の網からホームへ戻る",
+      "pass": true
+    },
+    {
+      "name": "1280 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "1280 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 764,
+            "y": 357,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 47,
+            "y": 1492,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280x720-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 764,
+            "y": 357,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 47,
+            "y": 1492,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280 語の網へ遷移・5タブ維持",
+      "pass": true
+    },
+    {
+      "name": "1280 語の網のページ全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280 語の網からホームへ戻る",
+      "pass": true
+    },
+    {
+      "name": "1440 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "1440 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "height": 900,
+        "documentWidth": 1440,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 864,
+            "y": 357,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 107,
+            "y": 1492,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1440x900-light-home 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "height": 900,
+        "documentWidth": 1440,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 864,
+            "y": 357,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 107,
+            "y": 1492,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1440 語の網へ遷移・5タブ維持",
+      "pass": true
+    },
+    {
+      "name": "1440 語の網のページ全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "height": 900,
+        "documentWidth": 1440,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1440 語の網からホームへ戻る",
+      "pass": true
+    },
+    {
+      "name": "1920 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "1920 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1920,
+        "height": 1080,
+        "documentWidth": 1920,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "⌨ 用語を入力して解く",
+            "x": 1104,
+            "y": 357,
+            "width": 162,
+            "height": 44,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 347,
+            "y": 1492,
+            "width": 125,
+            "height": 40,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1920 語の網へ遷移・5タブ維持",
+      "pass": true
+    },
+    {
+      "name": "1920 語の網のページ全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1920,
+        "height": 1080,
+        "documentWidth": 1920,
+        "overflow": false,
+        "actions": [],
+        "outside": []
+      }
+    },
+    {
+      "name": "1920 語の網からホームへ戻る",
+      "pass": true
+    },
+    {
+      "name": "360 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "360 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "height": 844,
+        "documentWidth": 360,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3451,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "360 末尾の語の網までnav内で表示",
+      "pass": true,
+      "detail": {
+        "clientWidth": 288,
+        "scrollWidth": 305,
+        "scrollLeft": 17,
+        "navLeft": 60,
+        "navRight": 350,
+        "lastLeft": 292.453125,
+        "lastRight": 346.484375
+      }
+    },
+    {
+      "name": "360 navスクロール後もページ全体の横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "height": 844,
+        "documentWidth": 360,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3451,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "390 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "390 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3395,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "390 末尾の語の網までnav内で表示",
+      "pass": true,
+      "detail": {
+        "clientWidth": 318,
+        "scrollWidth": 318,
+        "scrollLeft": 0,
+        "navLeft": 60,
+        "navRight": 380,
+        "lastLeft": 321.96875,
+        "lastRight": 376
+      }
+    },
+    {
+      "name": "390 navスクロール後もページ全体の横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3395,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "390x844-light-integration-nav-last 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3395,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "412 統合後の5タブを維持",
+      "pass": true,
+      "detail": [
+        "index.html",
+        "graph.html",
+        "sakuin.html",
+        "kotoba.html",
+        "ami.html"
+      ]
+    },
+    {
+      "name": "412 統合後ホームの全体横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "height": 844,
+        "documentWidth": 412,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3318,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "412 末尾の語の網までnav内で表示",
+      "pass": true,
+      "detail": {
+        "clientWidth": 340,
+        "scrollWidth": 340,
+        "scrollLeft": 0,
+        "navLeft": 60,
+        "navRight": 402,
+        "lastLeft": 343.96875,
+        "lastRight": 398
+      }
+    },
+    {
+      "name": "412 navスクロール後もページ全体の横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "height": 844,
+        "documentWidth": 412,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "a[href=\"term-drill.html\"]",
+            "text": "3科目を入力で解く",
+            "x": 33,
+            "y": 3318,
+            "width": 141,
+            "height": 44,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "統合後の過去問採点とwhy",
+      "pass": true
+    },
+    {
+      "name": "統合後Enterで用語入力を採点",
+      "pass": true
+    },
+    {
+      "name": "1280x720-light-term-feedback 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "#next-question",
+            "text": "次の問題 →",
+            "x": 675,
+            "y": 455,
+            "width": 124,
+            "height": 48,
+            "disabled": false,
+            "inViewport": true,
+            "uncovered": true
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "統合後Enterで次問へ進む",
+      "pass": true
+    },
+    {
+      "name": "統合後SHELL_CACHEはv15",
+      "pass": true,
+      "detail": "ot-shell-v15"
+    },
+    {
+      "name": "SHELLに語の網を保持",
+      "pass": true
+    },
+    {
+      "name": "SHELL全URLにローカルファイルが存在",
+      "pass": true,
+      "detail": [
+        {
+          "url": "./",
+          "path": "app\\index.html",
+          "exists": true
+        },
+        {
+          "url": "./index.html",
+          "path": "app\\index.html",
+          "exists": true
+        },
+        {
+          "url": "./appbar.css",
+          "path": "app\\appbar.css",
+          "exists": true
+        },
+        {
+          "url": "./content.js",
+          "path": "app\\content.js",
+          "exists": true
+        },
+        {
+          "url": "./config.js",
+          "path": "app\\config.js",
+          "exists": true
+        },
+        {
+          "url": "./sync.js",
+          "path": "app\\sync.js",
+          "exists": true
+        },
+        {
+          "url": "./textbook.js",
+          "path": "app\\textbook.js",
+          "exists": true
+        },
+        {
+          "url": "./drill.js",
+          "path": "app\\drill.js",
+          "exists": true
+        },
+        {
+          "url": "./print.js",
+          "path": "app\\print.js",
+          "exists": true
+        },
+        {
+          "url": "./term-drill.html",
+          "path": "app\\term-drill.html",
+          "exists": true
+        },
+        {
+          "url": "./term-drill.css",
+          "path": "app\\term-drill.css",
+          "exists": true
+        },
+        {
+          "url": "./term-questions.js",
+          "path": "app\\term-questions.js",
+          "exists": true
+        },
+        {
+          "url": "./term-drill.js",
+          "path": "app\\term-drill.js",
+          "exists": true
+        },
+        {
+          "url": "./term-questions-anatomy.js",
+          "path": "app\\term-questions-anatomy.js",
+          "exists": true
+        },
+        {
+          "url": "./term-questions-kinesiology.js",
+          "path": "app\\term-questions-kinesiology.js",
+          "exists": true
+        },
+        {
+          "url": "./graph.html",
+          "path": "app\\graph.html",
+          "exists": true
+        },
+        {
+          "url": "./sakuin.html",
+          "path": "app\\sakuin.html",
+          "exists": true
+        },
+        {
+          "url": "./kotoba.html",
+          "path": "app\\kotoba.html",
+          "exists": true
+        },
+        {
+          "url": "./ami.html",
+          "path": "app\\ami.html",
+          "exists": true
+        },
+        {
+          "url": "./dendrogram.html",
+          "path": "app\\dendrogram.html",
+          "exists": true
+        },
+        {
+          "url": "./lib/d3.v7.8.5.min.js",
+          "path": "app\\lib\\d3.v7.8.5.min.js",
+          "exists": true
+        },
+        {
+          "url": "./icon.png",
+          "path": "app\\icon.png",
+          "exists": true
+        },
+        {
+          "url": "./icon-192.png",
+          "path": "app\\icon-192.png",
+          "exists": true
+        },
+        {
+          "url": "./icon-512.png",
+          "path": "app\\icon-512.png",
+          "exists": true
+        },
+        {
+          "url": "./manifest.webmanifest",
+          "path": "app\\manifest.webmanifest",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "name": "統合後にJS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "統合後に予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screens": [
+    {
+      "label": "integration-home",
+      "width": 1024,
+      "height": 768,
+      "documentWidth": 1024,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 508,
+          "y": 366,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 47,
+          "y": 1548,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 764,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 47,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 764,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 47,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 864,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 107,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "home",
+      "colorScheme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 864,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 107,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 1920,
+      "height": 1080,
+      "documentWidth": 1920,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 1104,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 347,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 360,
+      "height": 844,
+      "documentWidth": 360,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 33,
+          "y": 3451,
+          "width": 141,
+          "height": 44,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 33,
+          "y": 3395,
+          "width": 141,
+          "height": 44,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-nav-last",
+      "colorScheme": "light",
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 33,
+          "y": 3395,
+          "width": 141,
+          "height": 44,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "integration-home",
+      "width": 412,
+      "height": 844,
+      "documentWidth": 412,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 33,
+          "y": 3318,
+          "width": 141,
+          "height": 44,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-feedback",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#next-question",
+          "text": "次の問題 →",
+          "x": 675,
+          "y": 455,
+          "width": 124,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    }
+  ],
+  "screenshots": [
+    "1280x720-light-home.png",
+    "1280x720-light-home-full.png",
+    "1440x900-light-home.png",
+    "1440x900-light-home-full.png",
+    "390x844-light-integration-nav-last.png",
+    "390x844-light-integration-nav-last-full.png",
+    "1280x720-light-term-feedback.png",
+    "1280x720-light-term-feedback-full.png"
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "apiWrites": 10,
+  "integrationBase": "46acfda",
+  "integrationHead": "ac54034",
+  "shellFiles": [
+    {
+      "url": "./",
+      "path": "app\\index.html",
+      "exists": true
+    },
+    {
+      "url": "./index.html",
+      "path": "app\\index.html",
+      "exists": true
+    },
+    {
+      "url": "./appbar.css",
+      "path": "app\\appbar.css",
+      "exists": true
+    },
+    {
+      "url": "./content.js",
+      "path": "app\\content.js",
+      "exists": true
+    },
+    {
+      "url": "./config.js",
+      "path": "app\\config.js",
+      "exists": true
+    },
+    {
+      "url": "./sync.js",
+      "path": "app\\sync.js",
+      "exists": true
+    },
+    {
+      "url": "./textbook.js",
+      "path": "app\\textbook.js",
+      "exists": true
+    },
+    {
+      "url": "./drill.js",
+      "path": "app\\drill.js",
+      "exists": true
+    },
+    {
+      "url": "./print.js",
+      "path": "app\\print.js",
+      "exists": true
+    },
+    {
+      "url": "./term-drill.html",
+      "path": "app\\term-drill.html",
+      "exists": true
+    },
+    {
+      "url": "./term-drill.css",
+      "path": "app\\term-drill.css",
+      "exists": true
+    },
+    {
+      "url": "./term-questions.js",
+      "path": "app\\term-questions.js",
+      "exists": true
+    },
+    {
+      "url": "./term-drill.js",
+      "path": "app\\term-drill.js",
+      "exists": true
+    },
+    {
+      "url": "./term-questions-anatomy.js",
+      "path": "app\\term-questions-anatomy.js",
+      "exists": true
+    },
+    {
+      "url": "./term-questions-kinesiology.js",
+      "path": "app\\term-questions-kinesiology.js",
+      "exists": true
+    },
+    {
+      "url": "./graph.html",
+      "path": "app\\graph.html",
+      "exists": true
+    },
+    {
+      "url": "./sakuin.html",
+      "path": "app\\sakuin.html",
+      "exists": true
+    },
+    {
+      "url": "./kotoba.html",
+      "path": "app\\kotoba.html",
+      "exists": true
+    },
+    {
+      "url": "./ami.html",
+      "path": "app\\ami.html",
+      "exists": true
+    },
+    {
+      "url": "./dendrogram.html",
+      "path": "app\\dendrogram.html",
+      "exists": true
+    },
+    {
+      "url": "./lib/d3.v7.8.5.min.js",
+      "path": "app\\lib\\d3.v7.8.5.min.js",
+      "exists": true
+    },
+    {
+      "url": "./icon.png",
+      "path": "app\\icon.png",
+      "exists": true
+    },
+    {
+      "url": "./icon-192.png",
+      "path": "app\\icon-192.png",
+      "exists": true
+    },
+    {
+      "url": "./icon-512.png",
+      "path": "app\\icon-512.png",
+      "exists": true
+    },
+    {
+      "url": "./manifest.webmanifest",
+      "path": "app\\manifest.webmanifest",
+      "exists": true
+    }
+  ],
+  "serviceWorkerLimit": "SHELLの静的対応のみ。実際のinstall・キャッシュ更新・圏外動作は未確認。",
+  "finishedAt": "2026-11-11T16:16:44.353Z"
+}

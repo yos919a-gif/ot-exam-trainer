@@ -1,0 +1,137 @@
+{
+  "phase": "after",
+  "scope": "home-buttons",
+  "baselineCommit": "f44f310",
+  "startedAt": "2026-11-11T10:35:00.468Z",
+  "checks": [
+    {
+      "name": "1280 ホームの用語入力導線を計測",
+      "pass": true,
+      "detail": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 764,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 47,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ]
+    },
+    {
+      "name": "1440 ホームの用語入力導線を計測",
+      "pass": true,
+      "detail": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 864,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 107,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ]
+    },
+    {
+      "name": "JS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screens": [
+    {
+      "label": "home-link-measurement",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 764,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 47,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "home-link-measurement",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "⌨ 用語を入力して解く",
+          "x": 864,
+          "y": 357,
+          "width": 162,
+          "height": 44,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "a[href=\"term-drill.html\"]",
+          "text": "3科目を入力で解く",
+          "x": 107,
+          "y": 1492,
+          "width": 125,
+          "height": 40,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    }
+  ],
+  "screenshots": [],
+  "errors": [],
+  "consoleErrors": [],
+  "apiWrites": 0,
+  "finishedAt": "2026-11-11T10:35:02.707Z"
+}

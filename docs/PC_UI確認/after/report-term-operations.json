@@ -1,0 +1,531 @@
+{
+  "phase": "after",
+  "scope": "term-operations",
+  "startedAt": "2026-11-11T10:31:13.284Z",
+  "checks": [
+    {
+      "name": "PC下キーで候補を選択中",
+      "pass": true
+    },
+    {
+      "name": "PC Enter1回は候補確定だけ",
+      "pass": true
+    },
+    {
+      "name": "PC Enter2回目で採点し見出しへfocus",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"repeat\":true}",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"isComposing\":true,\"keyCode\":229}",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"ctrlKey\":true}",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"altKey\":true}",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"metaKey\":true}",
+      "pass": true
+    },
+    {
+      "name": "PC採点後の誤操作Enterは次問へ進めない {\"key\":\"Enter\",\"shiftKey\":true}",
+      "pass": true
+    },
+    {
+      "name": "summaryのEnterは出典を開き次問へ進めない",
+      "pass": true
+    },
+    {
+      "name": "リンク上のEnterを次問に横取りしない",
+      "pass": true
+    },
+    {
+      "name": "PC採点後Enterで次問と入力focus",
+      "pass": true
+    },
+    {
+      "name": "次問ボタンのEnterは1問だけ進む",
+      "pass": true
+    },
+    {
+      "name": "PC下キー2回目で次候補",
+      "pass": true
+    },
+    {
+      "name": "PC上キーで前の候補",
+      "pass": true
+    },
+    {
+      "name": "PC Escapeは候補だけを閉じる",
+      "pass": true
+    },
+    {
+      "name": "例題の採点後Enterで同じ問題を再試行",
+      "pass": true
+    },
+    {
+      "name": "1280 広い読みで候補8件",
+      "pass": true
+    },
+    {
+      "name": "1280 候補8件のタップ領域",
+      "pass": true,
+      "detail": [
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 72.578125
+        },
+        {
+          "width": 554.5,
+          "height": 71.578125
+        }
+      ]
+    },
+    {
+      "name": "1280x720-light-term-eight-candidates 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "#submit-answer",
+            "text": "解答する",
+            "x": 660,
+            "y": 599,
+            "width": 92,
+            "height": 48,
+            "disabled": true,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "#give-up",
+            "text": "答えを見る",
+            "x": 759,
+            "y": 599,
+            "width": 104,
+            "height": 48,
+            "disabled": false,
+            "inViewport": true,
+            "uncovered": true
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280 候補8件 主操作を画面内で視認",
+      "pass": true,
+      "detail": {
+        "selector": "#submit-answer",
+        "text": "解答する",
+        "x": 660,
+        "y": 599,
+        "width": 92,
+        "height": 48,
+        "disabled": true,
+        "inViewport": true,
+        "uncovered": true
+      }
+    },
+    {
+      "name": "1280 下キーで8件目まで候補内スクロール",
+      "pass": true,
+      "detail": {
+        "active": "term-option-7",
+        "scrollTop": 442,
+        "rowTop": 478.234375,
+        "rowBottom": 549.8125,
+        "listTop": 411.1875,
+        "listBottom": 551.1875
+      }
+    },
+    {
+      "name": "1280x720-light-term-long-candidate 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "height": 720,
+        "documentWidth": 1280,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "#submit-answer",
+            "text": "解答する",
+            "x": 660,
+            "y": 533,
+            "width": 92,
+            "height": 48,
+            "disabled": true,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "#give-up",
+            "text": "答えを見る",
+            "x": 759,
+            "y": 533,
+            "width": 104,
+            "height": 48,
+            "disabled": false,
+            "inViewport": true,
+            "uncovered": true
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "1280 長い用語候補 主操作を画面内で視認",
+      "pass": true,
+      "detail": {
+        "selector": "#submit-answer",
+        "text": "解答する",
+        "x": 660,
+        "y": 533,
+        "width": 92,
+        "height": 48,
+        "disabled": true,
+        "inViewport": true,
+        "uncovered": true
+      }
+    },
+    {
+      "name": "390 広い読みで候補8件",
+      "pass": true
+    },
+    {
+      "name": "390 候補8件のタップ領域",
+      "pass": true,
+      "detail": [
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 72.578125
+        },
+        {
+          "width": 321,
+          "height": 71.578125
+        }
+      ]
+    },
+    {
+      "name": "390x844-light-term-eight-candidates 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "#submit-answer",
+            "text": "解答する",
+            "x": 35,
+            "y": 969,
+            "width": 323,
+            "height": 48,
+            "disabled": true,
+            "inViewport": false,
+            "uncovered": false
+          },
+          {
+            "selector": "#give-up",
+            "text": "答えを見る",
+            "x": 35,
+            "y": 1027,
+            "width": 323,
+            "height": 48,
+            "disabled": false,
+            "inViewport": false,
+            "uncovered": false
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "390 下キーで8件目まで候補内スクロール",
+      "pass": true,
+      "detail": {
+        "active": "term-option-7",
+        "scrollTop": 262,
+        "rowTop": 772.515625,
+        "rowBottom": 844.09375,
+        "listTop": 525.46875,
+        "listBottom": 845.46875
+      }
+    },
+    {
+      "name": "390x844-light-term-long-candidate 横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "documentWidth": 390,
+        "overflow": false,
+        "actions": [
+          {
+            "selector": "#submit-answer",
+            "text": "解答する",
+            "x": 35,
+            "y": 723,
+            "width": 323,
+            "height": 48,
+            "disabled": true,
+            "inViewport": true,
+            "uncovered": true
+          },
+          {
+            "selector": "#give-up",
+            "text": "答えを見る",
+            "x": 35,
+            "y": 781,
+            "width": 323,
+            "height": 48,
+            "disabled": false,
+            "inViewport": true,
+            "uncovered": true
+          }
+        ],
+        "outside": []
+      }
+    },
+    {
+      "name": "PC UI更新後も旧20問の記録と履歴を維持",
+      "pass": true
+    },
+    {
+      "name": "PC再開案内に旧20問と回答数",
+      "pass": true
+    },
+    {
+      "name": "PC旧記録の2問目を入力focusで再開",
+      "pass": true
+    },
+    {
+      "name": "PC UIから旧記録へ採点追加し履歴は保持",
+      "pass": true
+    },
+    {
+      "name": "PC UIで新セッション開始後も旧完了履歴を保持",
+      "pass": true
+    },
+    {
+      "name": "JS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screens": [
+    {
+      "label": "term-eight-candidates",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 660,
+          "y": 599,
+          "width": 92,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 759,
+          "y": 599,
+          "width": 104,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-long-candidate",
+      "colorScheme": "light",
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 660,
+          "y": 533,
+          "width": 92,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 759,
+          "y": 533,
+          "width": 104,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-eight-candidates",
+      "colorScheme": "light",
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 35,
+          "y": 969,
+          "width": 323,
+          "height": 48,
+          "disabled": true,
+          "inViewport": false,
+          "uncovered": false
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 35,
+          "y": 1027,
+          "width": 323,
+          "height": 48,
+          "disabled": false,
+          "inViewport": false,
+          "uncovered": false
+        }
+      ],
+      "outside": []
+    },
+    {
+      "label": "term-long-candidate",
+      "colorScheme": "light",
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "overflow": false,
+      "actions": [
+        {
+          "selector": "#submit-answer",
+          "text": "解答する",
+          "x": 35,
+          "y": 723,
+          "width": 323,
+          "height": 48,
+          "disabled": true,
+          "inViewport": true,
+          "uncovered": true
+        },
+        {
+          "selector": "#give-up",
+          "text": "答えを見る",
+          "x": 35,
+          "y": 781,
+          "width": 323,
+          "height": 48,
+          "disabled": false,
+          "inViewport": true,
+          "uncovered": true
+        }
+      ],
+      "outside": []
+    }
+  ],
+  "screenshots": [
+    "1280x720-light-term-eight-candidates.png",
+    "1280x720-light-term-eight-candidates-full.png",
+    "1280x720-light-term-long-candidate.png",
+    "1280x720-light-term-long-candidate-full.png",
+    "390x844-light-term-eight-candidates.png",
+    "390x844-light-term-eight-candidates-full.png",
+    "390x844-light-term-long-candidate.png",
+    "390x844-light-term-long-candidate-full.png"
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "apiWrites": 0,
+  "finishedAt": "2026-11-11T10:31:18.144Z"
+}
