@@ -1,0 +1,60 @@
+{
+  "base": "http://ot-trainer.test/app/",
+  "mode": "invalid-schema",
+  "startedAt": "2026-11-11T09:38:31.466Z",
+  "checks": [
+    {
+      "name": "用語集200/不正スキーマでエラー表示・開始無効",
+      "pass": true
+    },
+    {
+      "name": "データ不正時の科目変更とsubmitを抑止 解剖学",
+      "pass": true
+    },
+    {
+      "name": "データ不正時の科目変更とsubmitを抑止 生理学",
+      "pass": true
+    },
+    {
+      "name": "データ不正時の科目変更とsubmitを抑止 運動学",
+      "pass": true
+    },
+    {
+      "name": "データ不正時の科目変更とsubmitを抑止 all",
+      "pass": true
+    },
+    {
+      "name": "不正データ中に練習記録を作らない",
+      "pass": true
+    },
+    {
+      "name": "正常データへ再読み込みで復帰",
+      "pass": true
+    },
+    {
+      "name": "復帰後に正常セッションを開始",
+      "pass": true
+    },
+    {
+      "name": "復帰後の採点・次問を正常実行",
+      "pass": true
+    },
+    {
+      "name": "追加経路にJS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "追加経路に予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    "390-invalid-schema-error.png"
+  ],
+  "apiWrites": 0,
+  "finishedAt": "2026-11-11T09:38:34.111Z"
+}
