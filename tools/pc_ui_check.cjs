@@ -207,6 +207,11 @@ async function integrationChecks(){
   report.serviceWorkerLimit='SHELLの静的対応のみ。実際のinstall・キャッシュ更新・圏外動作は未確認。';
 }
 async function run(){
+  if(phase==='before'&&!fs.existsSync(baseline))try{
+    execFileSync('git',['cat-file','-e','f44f310^{commit}'],{cwd:root,stdio:'pipe'});
+  }catch{
+    throw Error('変更前の基準f44f310がGit履歴にありません。検証済み.baseline/app/か同コミットのオブジェクトが必要です。現行画面を変更前として使わず停止します。');
+  }
   browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   if(phase==='after'&&scope==='integration'){
     await integrationChecks();check('統合後にJS例外なし',report.errors.length===0,report.errors);check('統合後に予期しないconsoleエラーなし',report.consoleErrors.length===0,report.consoleErrors);return;
