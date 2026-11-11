@@ -6,7 +6,9 @@
   const clear = $("clear-answer"), submit = $("submit-answer"), giveUp = $("give-up");
   const demo = new URLSearchParams(location.search).get("demo") === "1";
   const STORAGE_KEY = "ot-term-drill-v1";
+  const SUBJECT_ORDER = ["解剖学", "生理学", "運動学"];
   let questions = [], byId = new Map(), glossary, entries = [], entryByLabel = new Map();
+  let dataReady = false;
   let shown = [], selected = null, active = -1, composing = false, answered = false, current = null;
   let state = {version: 1, active: null, history: []};
 
@@ -75,6 +77,31 @@
     entryByLabel = new Map(entries.map(entry => [entry.label, entry]));
   }
   function question(){ return byId.get(current.ids[current.index]); }
+  function scopeSummary(ids){
+    const counts = new Map();
+    for(const id of ids){ const subject = byId.get(id).subject; counts.set(subject, (counts.get(subject) || 0) + 1); }
+    return SUBJECT_ORDER.filter(subject => counts.has(subject)).map(subject => `${subject} ${counts.get(subject)}問`).join("・");
+  }
+  function questionPool(){
+    const scope = $("practice-subject").value;
+    if(scope !== "all") return questions.filter(q => q.subject === scope);
+    // 問題順でも短いセットに3科目が含まれるよう、各科目を1問ずつ並べる。
+    const groups = SUBJECT_ORDER.map(subject => questions.filter(q => q.subject === subject));
+    const pool = [];
+    for(let i = 0; i < Math.max(...groups.map(group => group.length)); i++) for(const group of groups) if(group[i]) pool.push(group[i]);
+    return pool;
+  }
+  function updatePracticeOptions(){
+    const pool = questionPool(), scope = $("practice-subject").value;
+    $("start-title").textContent = scope === "all" ? "3科目の用語を練習" : `${scope}の用語を練習`;
+    $("deck-description").textContent = `${scopeSummary(pool.map(q => q.id))}。解答後に解説と出典を確認できます。`;
+    for(const option of $("practice-count").options){
+      option.disabled = option.value !== "all" && Number(option.value) > pool.length;
+      if(option.value === "all") option.textContent = `すべて（${pool.length}問）`;
+    }
+    if($("practice-count").selectedOptions[0]?.disabled) $("practice-count").value = "all";
+    $("start-practice").disabled = !pool.length;
+  }
   function screen(name){
     for(const id of ["start-screen", "question-screen", "result-screen"]) $(id).hidden = id !== name;
     $("feedback").hidden = true;
@@ -128,10 +155,11 @@
   }
   function showMenu(moveFocus = true){
     current = null; closeList(); screen("start-screen");
+    updatePracticeOptions();
     $("resume-section").hidden = !state.active;
-    if(state.active) $("resume-description").textContent = `${state.active.ids.length}問中${state.active.results.length}問の回答を保存しています。`;
+    if(state.active) $("resume-description").textContent = `${scopeSummary(state.active.ids)}：${state.active.ids.length}問中${state.active.results.length}問の回答を保存しています。`;
     const recent = state.history.at(-1);
-    $("recent-summary").textContent = recent ? `前回：${recent.ids.length}問中 ${recent.results.filter(result => result.ok).length}問正解` : "";
+    $("recent-summary").textContent = recent ? `前回：${recent.ids.length}問中 ${recent.results.filter(result => result.ok).length}問正解（${scopeSummary(recent.ids)}）` : "";
     $("review-previous").hidden = !recent?.results.some(result => !result.ok);
     if(moveFocus){ $("start-title").tabIndex = -1; $("start-title").focus(); }
   }
@@ -201,6 +229,7 @@
     screen("result-screen");
     const results = current.results, correct = results.filter(result => result.ok).length;
     const revealed = results.filter(result => result.kind === "reveal").length;
+    $("result-scope").textContent = scopeSummary(current.ids);
     $("result-score").textContent = `${results.length}問中 ${correct}問正解`;
     $("result-detail").textContent = `不正解 ${results.filter(result => !result.ok && result.kind === "answer").length}問・答えを見た ${revealed}問`;
     const mistakes = results.filter(result => !result.ok).map(result => result.id);
@@ -248,25 +277,29 @@
   $("resume-practice").addEventListener("click", () => { if(state.active){ current = state.active; renderQuestion(); } });
   $("review-previous").addEventListener("click", () => startSession(state.history.at(-1).results.filter(result => !result.ok).map(result => result.id)));
   $("reload-data").addEventListener("click", () => location.reload());
+  $("practice-subject").addEventListener("change", () => { if(dataReady) updatePracticeOptions(); });
   $("start-form").addEventListener("submit", event => {
-    event.preventDefault(); if(!questions.length) return;
-    const ids = questions.map(q => q.id);
+    event.preventDefault(); if(!dataReady) return;
+    const ids = questionPool().map(q => q.id);
     if($("practice-order").value === "random") for(let i = ids.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
-    startSession(ids.slice(0, Number($("practice-count").value)));
+    const limit = $("practice-count").value === "all" ? ids.length : Number($("practice-count").value);
+    if(ids.length && limit > 0) startSession(ids.slice(0, limit));
   });
 
   cfetch("glossary/glossary.json").then(data => {
-    glossary = data; questions = window.TERM_DRILL_QUESTIONS;
+    glossary = data;
+    const decks = [window.TERM_DRILL_QUESTIONS, window.TERM_DRILL_ANATOMY_QUESTIONS, window.TERM_DRILL_KINESIOLOGY_QUESTIONS];
+    if(decks.some(deck => !Array.isArray(deck) || !deck.length)) throw new Error("Missing deck");
+    questions = decks.flat();
     if(!Array.isArray(questions) || !questions.length || questions.some(q => !q.id || !q.prompt || !q.explanation ||
-      !Object.hasOwn(glossary, q.answer) || glossary[q.answer].flag || !Array.isArray(q.sources) || !q.sources.length ||
+      !SUBJECT_ORDER.includes(q.subject) || !Object.hasOwn(glossary, q.answer) || glossary[q.answer].flag || !Array.isArray(q.sources) || !q.sources.length ||
       q.sources.some(source => !/^https:\/\//.test(source.url))) || new Set(questions.map(q => q.id)).size !== questions.length) throw new Error("Invalid deck");
     byId = new Map(questions.map(q => [q.id, q])); buildEntries(); loadState();
-    $("start-practice").disabled = false; $("load-status").hidden = true;
-    for(const option of [...$("practice-count").options]) if(Number(option.value) > questions.length) option.remove();
-    if(!$("practice-count").options.length) $("practice-count").add(new Option(`${questions.length}問`, String(questions.length)));
-    $("deck-description").textContent = `生理学 ${questions.length}問。解答後に解説と出典を確認できます。`;
+    updatePracticeOptions();
+    dataReady = true; $("load-status").hidden = true;
     if(demo) startSession([questions[0].id]); else showMenu(false);
   }).catch(() => {
+    dataReady = false; $("start-practice").disabled = true;
     $("load-status").hidden = false; $("load-status").classList.add("error-message");
     $("load-status").textContent = "問題や用語を読み込めませんでした。接続を確認し、再読み込みしてください。";
     $("reload-data").hidden = false;

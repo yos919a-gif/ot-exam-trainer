@@ -7,9 +7,11 @@ const vm = require('node:vm');
 const {chromium} = require(path.join(process.env.USERPROFILE, '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
 const base = process.env.TERM_BASE_URL || 'http://ot-trainer.test/app/';
 const root = path.resolve(__dirname,'..');
-const out = path.resolve(__dirname, '../docs/用語入力連続確認');
+const out = path.resolve(__dirname, '../docs/用語入力3科目確認');
+const supplemental = process.env.TERM_CHECK_MODE === 'invalid-schema';
+const reportName = supplemental ? 'report-invalid-schema.json' : 'report.json';
 fs.mkdirSync(out, {recursive:true});
-const report = {base, startedAt:new Date().toISOString(), checks:[], errors:[], consoleErrors:[], screenshots:[], apiWrites:0};
+const report = {base, mode:supplemental?'invalid-schema':'all', startedAt:new Date().toISOString(), checks:[], errors:[], consoleErrors:[], screenshots:[], apiWrites:0};
 let browser, debugPage;
 const storageKey = 'ot-term-drill-v1';
 const existingProgressKey = 'ot-exam-progress-v1';
@@ -17,6 +19,15 @@ const glossary = JSON.parse(fs.readFileSync(path.join(root,'content/glossary/glo
 const sandbox = {window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(root,'app/term-questions.js'),'utf8'),sandbox);
 const deck = JSON.parse(JSON.stringify(sandbox.window.TERM_DRILL_QUESTIONS));
+for(const name of ['term-questions-anatomy.js','term-questions-kinesiology.js'])
+  if(fs.existsSync(path.join(root,'app',name)))vm.runInNewContext(fs.readFileSync(path.join(root,'app',name),'utf8'),sandbox);
+const decks = {
+  '生理学':deck,
+  '解剖学':JSON.parse(JSON.stringify(sandbox.window.TERM_DRILL_ANATOMY_QUESTIONS||[])),
+  '運動学':JSON.parse(JSON.stringify(sandbox.window.TERM_DRILL_KINESIOLOGY_QUESTIONS||[])),
+};
+const subjects=['解剖学','生理学','運動学'];
+const allDeck=[...deck,...decks['解剖学'],...decks['運動学']];
 const check = (name, value, detail) => {
   report.checks.push({name, pass:!!value, ...(detail===undefined?{}:{detail})});
   assert.ok(value, name + (detail===undefined?'':': '+JSON.stringify(detail)));
@@ -69,7 +80,8 @@ async function menuReady(page) {
   await page.goto(base+'term-drill.html',{waitUntil:'load'});
   await page.waitForFunction(()=>!document.getElementById('start-practice').disabled);
 }
-async function begin(page, count=5, order='fixed') {
+async function begin(page, count=5, order='fixed', subject='生理学') {
+  await page.locator('#practice-subject').selectOption(subject);
   await page.locator('#practice-count').selectOption(String(count));
   await page.locator('#practice-order').selectOption(order);
   await page.locator('#start-practice').click();
@@ -219,8 +231,161 @@ async function practiceChecks() {
     await context.close();
   }
 }
+async function threeSubjectChecks() {
+  check('3科目が各20問・総60問',allDeck.length===60&&subjects.every(subject=>decks[subject].length===20),Object.fromEntries(subjects.map(subject=>[subject,decks[subject].length])));
+  check('60問のIDが一意・正答キーと根拠が有効',new Set(allDeck.map(q=>q.id)).size===60&&allDeck.every(q=>glossary[q.answer]&&!glossary[q.answer].flag&&q.explanation&&q.sources.length&&q.sources.every(source=>/^https:\/\//.test(source.url))));
+  const byId=new Map(allDeck.map(q=>[q.id,q]));
+  for(const width of [360,390,412,1280]){
+    const context=await contextFor(width),page=await context.newPage();watch(page);
+    await menuReady(page);
+    check(width+' 初期設定は全科目10問',await page.locator('#practice-subject').inputValue()==='all'&&await page.locator('#practice-count').inputValue()==='10');
+    check(width+' 全科目の20問ずつを表示',(await page.locator('#deck-description').innerText()).includes('解剖学 20問・生理学 20問・運動学 20問'));
+    check(width+' 全問選択の表示は60問',(await page.locator('#practice-count option[value=all]').innerText()).includes('60問'));
+    const metric=await overflow(page);check(width+' 3科目メニュー横はみ出しなし',metric.scrollWidth<=metric.width,metric);
+    if(width===390||width===1280)await shot(page,width+'-three-subject-setup');
+    for(const subject of subjects){
+      await page.locator('#practice-subject').selectOption(subject);
+      check(width+' '+subject+'の20問を表示',(await page.locator('#start-title').innerText())===subject+'の用語を練習'&&(await page.locator('#deck-description').innerText()).startsWith(subject+' 20問')&&(await page.locator('#practice-count option[value=all]').innerText()).includes('20問'));
+    }
+    await begin(page,5,'fixed','all');
+    const ids=(await stored(page)).active.ids;
+    const expected=[decks['解剖学'][0].id,deck[0].id,decks['運動学'][0].id,decks['解剖学'][1].id,deck[1].id];
+    check(width+' 全科目固定5問は3科目交互',JSON.stringify(ids)===JSON.stringify(expected),ids.map(id=>byId.get(id).subject));
+    for(let i=0;i<5;i++){
+      const q=byId.get(ids[i]);
+      check(width+' 混合問の科目と進行表示 '+i,(await page.locator('#question-subject').innerText())===q.subject&&(await page.locator('#question-count').innerText())===(i+1)+' / 5');
+      await page.locator('#give-up').click();await page.locator('#next-question').click();
+    }
+    check(width+' 混合5問の結果に実際の内訳表示',(await page.locator('#result-scope').innerText())==='解剖学 2問・生理学 2問・運動学 1問');
+    if(width===390)await shot(page,'390-three-subject-result');
+    await page.locator('#result-back').click();
+    for(const count of [5,10,20,'all']){
+      await begin(page,count,'random','all');const randomIds=(await stored(page)).active.ids;
+      const expectedCount=count==='all'?60:count;
+      check(width+' 全科目ランダム'+count+'問は選択数どおり重複なし',randomIds.length===expectedCount&&new Set(randomIds).size===expectedCount&&randomIds.every(id=>byId.has(id)));
+      await page.locator('#pause-practice').click();
+    }
+    await context.close();
+  }
+  {
+    const context=await contextFor(1280),page=await context.newPage();watch(page);
+    await menuReady(page);
+    for(const subject of subjects){
+      await begin(page,'all','fixed',subject);
+      check(subject+'の全問は該当20問だけ',(await stored(page)).active.ids.length===20&&(await stored(page)).active.ids.every(id=>byId.get(id).subject===subject));
+      for(const q of decks[subject]){
+        check(subject+' 固定順の問題 '+q.id,(await page.locator('#question-title').innerText())===q.prompt);
+        await choose(page,q.answer,glossary[q.answer].読み);
+        check(subject+' 読み検索から正解 '+q.answer,await page.locator('#verdict.correct').isVisible());
+        await page.locator('#next-question').click();
+      }
+      check(subject+'20問完走と結果内訳',(await page.locator('#result-score').innerText())==='20問中 20問正解'&&(await page.locator('#result-scope').innerText())===subject+' 20問');
+      console.log(subject+'20問の読み検索・採点・結果検証を完了');
+      await page.locator('#result-back').click();
+    }
+    await begin(page,'all','fixed','all');
+    const ids=(await stored(page)).active.ids;
+    check('全科目すべてで60問開始',ids.length===60&&new Set(ids).size===60);
+    for(let i=0;i<60;i++){
+      const q=byId.get(ids[i]);
+      check('全問60の交互順 '+i,q.subject===subjects[i%3]);
+      await choose(page,q.answer,glossary[q.answer].読み);await page.locator('#next-question').click();
+    }
+    check('全科目60問の完走集計',(await page.locator('#result-score').innerText())==='60問中 60問正解'&&await page.locator('#session-results li').count()===60);
+    check('全科目60問の正しい科目内訳',(await page.locator('#result-scope').innerText())==='解剖学 20問・生理学 20問・運動学 20問');
+    console.log('全科目60問の完走検証を完了');
+    await shot(page,'1280-sixty-result');
+    await page.locator('#result-back').click();
+    for(const q of [...decks['解剖学'],...decks['運動学']])for(const alias of q.aliases||[]){
+      await page.evaluate(([key,id])=>localStorage.setItem(key,JSON.stringify({version:1,active:{ids:[id],index:0,results:[],startedAt:Date.now()},history:[]})),[storageKey,q.id]);
+      await page.reload({waitUntil:'load'});await page.locator('#resume-practice').waitFor();await page.locator('#resume-practice').click();
+      await choose(page,alias.label,alias.reading);
+      check(q.subject+' 明示別名で正解 '+alias.label,await page.locator('#verdict.correct').isVisible());
+    }
+    await context.close();
+  }
+  {
+    const context=await contextFor(390),page=await context.newPage();watch(page);
+    await menuReady(page);const orders=[];
+    for(const subject of ['all',...subjects]){
+      await begin(page,5,'fixed',subject);
+      await page.locator('#answer-input').fill('しん');
+      orders.push(await page.locator('#answer-options .option-label').allTextContents());
+      // 他科目の問いのままでも、概日リズムの候補は検索できる。
+      await page.locator('#answer-input').fill('がいじつ');await hasCircadian(page);
+      check(subject+'でも他科目の答え候補が検索対象',await termOption(page,'概日リズム').count()===1);
+      await page.locator('#pause-practice').click();
+    }
+    check('科目を替えても候補の件数と順位が同一',orders[0].length>1&&orders.every(order=>JSON.stringify(order)===JSON.stringify(orders[0])),orders);
+    const before=await page.evaluate(key=>localStorage.getItem(key),storageKey);
+    for(const subject of ['all',...subjects])await page.locator('#practice-subject').selectOption(subject);
+    check('科目の変更だけではactive/historyを変更しない',await page.evaluate(key=>localStorage.getItem(key),storageKey)===before);
+    await context.close();
+  }
+  {
+    const context=await contextFor(390),page=await context.newPage();watch(page);
+    const oldSession={ids:deck.map(q=>q.id),index:3,results:deck.slice(0,3).map(q=>({id:q.id,picked:q.answer,ok:true,kind:'answer',t:1})),startedAt:1};
+    const oldHistory={ids:deck.map(q=>q.id),index:20,results:deck.map(q=>({id:q.id,picked:q.answer,ok:true,kind:'answer',t:1})),startedAt:1,finishedAt:2};
+    await context.addInitScript(([key,state])=>localStorage.setItem(key,JSON.stringify(state)),[storageKey,{version:1,active:oldSession,history:[oldHistory]}]);
+    await menuReady(page);
+    check('旧生理20問の中断と履歴を読み込む',await page.locator('#resume-section').isVisible()&&(await page.locator('#resume-description').innerText()).includes('生理学 20問')&&(await page.locator('#recent-summary').innerText()).includes('20問中 20問正解（生理学 20問）'));
+    const before=await stored(page);
+    await page.locator('#practice-subject').selectOption('解剖学');
+    check('科目設定が違っても旧中断記録の表示は生理学',(await page.locator('#resume-description').innerText()).startsWith('生理学 20問')&&JSON.stringify((await stored(page)).active)===JSON.stringify(before.active));
+    await page.locator('#resume-practice').click();
+    check('旧20問の4問目を正しく再開',(await page.locator('#question-count').innerText())==='4 / 20'&&(await page.locator('#question-subject').innerText())==='生理学'&&(await page.locator('#question-title').innerText())===deck[3].prompt);
+    await choose(page,deck[3].answer);check('旧中断記録へ追記して採点',await page.locator('#verdict.correct').isVisible()&&(await stored(page)).active.results.length===4);
+    await context.close();
+  }
+  for(const file of ['term-questions-anatomy.js','term-questions-kinesiology.js']){
+    const context=await contextFor(390),page=await context.newPage();const expected=[];watch(page,expected);
+    await context.route('**/app/'+file,route=>route.fulfill({status:404,body:'missing deck'}));
+    await page.goto(base+'term-drill.html',{waitUntil:'load'});await page.locator('#load-status.error-message').waitFor();
+    check('科目データ欠落を表示・開始不可 '+file,await page.locator('#start-practice').isDisabled()&&await page.locator('#reload-data').isVisible());
+    report.expectedDeckErrors=(report.expectedDeckErrors||[]).concat(expected);await context.close();
+  }
+  {
+    const context=await contextFor(390,'dark'),page=await context.newPage();watch(page);
+    await menuReady(page);await shot(page,'390-dark-three-subject-setup');
+    await begin(page,5,'fixed','解剖学');await page.locator('#answer-input').fill(glossary[decks['解剖学'][0].answer].読み);
+    await termOption(page,decks['解剖学'][0].answer).waitFor();await shot(page,'390-dark-anatomy-candidates');
+    const metric=await overflow(page);check('暗色解剖学問題の横はみ出しなし',metric.scrollWidth<=metric.width,metric);
+    await context.close();
+  }
+}
+async function invalidSchemaChecks() {
+  const context=await contextFor(390),page=await context.newPage();watch(page);
+  const glossaryPattern='**/content/glossary/glossary.json*';
+  await context.route(glossaryPattern,route=>route.fulfill({status:200,json:{}}));
+  await page.goto(base+'term-drill.html',{waitUntil:'load'});
+  await page.locator('#load-status.error-message').waitFor();
+  check('用語集200/不正スキーマでエラー表示・開始無効',await page.locator('#reload-data').isVisible()&&await page.locator('#start-practice').isDisabled());
+  for(const subject of ['解剖学','生理学','運動学','all']){
+    await page.locator('#practice-subject').selectOption(subject);
+    await page.locator('#start-form').dispatchEvent('submit');
+    check('データ不正時の科目変更とsubmitを抑止 '+subject,await page.locator('#start-practice').isDisabled()&&await page.locator('#start-screen').isVisible()&&await page.locator('#question-screen').isHidden());
+  }
+  check('不正データ中に練習記録を作らない',await stored(page)===null);
+  await shot(page,'390-invalid-schema-error');
+  await context.unroute(glossaryPattern);
+  await page.locator('#reload-data').click();
+  await page.waitForFunction(()=>!document.getElementById('start-practice').disabled);
+  check('正常データへ再読み込みで復帰',await page.locator('#load-status').isHidden()&&await page.locator('#start-screen').isVisible());
+  await begin(page,5,'fixed','生理学');
+  check('復帰後に正常セッションを開始',(await stored(page)).active.ids.length===5&&(await page.locator('#question-count').innerText())==='1 / 5');
+  await choose(page,deck[0].answer,glossary[deck[0].answer].読み);
+  await page.locator('#next-question').click();
+  check('復帰後の採点・次問を正常実行',(await page.locator('#question-count').innerText())==='2 / 5'&&(await stored(page)).active.results[0].ok===true);
+  await context.close();
+}
 async function run() {
   browser = await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+  if(supplemental){
+    await invalidSchemaChecks();
+    check('追加経路にJS例外なし',report.errors.length===0,report.errors);
+    check('追加経路に予期しないconsoleエラーなし',report.consoleErrors.length===0,report.consoleErrors);
+    return;
+  }
   for(const width of [360,390,412,1280]) {
     const context = await contextFor(width), page = await context.newPage();
     watch(page);
@@ -322,6 +487,9 @@ async function run() {
     report.expectedLoadErrors=expected; await context.close();
   }
   await practiceChecks();
+  console.log('既存の例題・連続練習回帰を完了: '+report.checks.length+'項目');
+  await threeSubjectChecks();
+  await invalidSchemaChecks();
   {
     const context=await contextFor(390),page=await context.newPage(); watch(page);
     await page.goto(base,{waitUntil:'load'});
@@ -342,12 +510,12 @@ run().catch(async error=>{
   report.failure={message:error.message,stack:error.stack};process.exitCode=1;
   if(debugPage&&!debugPage.isClosed()){
     report.failure.state=await debugPage.evaluate(()=>({text:document.body.innerText,inputs:[...document.querySelectorAll('button')].map(b=>({id:b.id,disabled:b.disabled})),saved:localStorage.getItem('ot-term-drill-v1')}));
-    await debugPage.screenshot({path:path.join(out,'failure.png'),fullPage:true});
+    await debugPage.screenshot({path:path.join(out,supplemental?'failure-invalid-schema.png':'failure.png'),fullPage:true});
   }
 })
 .finally(async()=>{
   if(browser)await browser.close();
   report.finishedAt=new Date().toISOString();
-  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
-  console.log(JSON.stringify({checks:report.checks.length,passed:report.checks.filter(c=>c.pass).length,failure:report.failure?.message,errors:report.errors.length,consoleErrors:report.consoleErrors.length,report:path.join(out,'report.json')},null,2));
+  fs.writeFileSync(path.join(out,reportName),JSON.stringify(report,null,2)+'\n');
+  console.log(JSON.stringify({checks:report.checks.length,passed:report.checks.filter(c=>c.pass).length,failure:report.failure?.message,errors:report.errors.length,consoleErrors:report.consoleErrors.length,report:path.join(out,reportName)},null,2));
 });

@@ -1,0 +1,2392 @@
+{
+  "base": "http://ot-trainer.test/app/",
+  "startedAt": "2026-11-11T09:34:43.062Z",
+  "checks": [
+    {
+      "name": "360 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "360 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "360 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "360 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 291
+        }
+      ]
+    },
+    {
+      "name": "360 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "360 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "360 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "360 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "390 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "390 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "390 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "390 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 321
+        }
+      ]
+    },
+    {
+      "name": "390 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "390 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "390 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "390 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "表記正規化 ガイジツ",
+      "pass": true
+    },
+    {
+      "name": "表記正規化 ｶﾞｲｼﾞﾂ",
+      "pass": true
+    },
+    {
+      "name": "表記正規化  がい じつ ",
+      "pass": true
+    },
+    {
+      "name": "全角英字の正規化",
+      "pass": true
+    },
+    {
+      "name": "クリアで候補・選択を解除",
+      "pass": true
+    },
+    {
+      "name": "IME変換中Enterで候補未選択",
+      "pass": true
+    },
+    {
+      "name": "Enter長押しで候補未選択",
+      "pass": true
+    },
+    {
+      "name": "Enter1回で選択のみ",
+      "pass": true
+    },
+    {
+      "name": "選択後のEnter長押しで未採点",
+      "pass": true
+    },
+    {
+      "name": "選択後の編集で即座に採点不可",
+      "pass": true
+    },
+    {
+      "name": "Enter2回目で正解",
+      "pass": true
+    },
+    {
+      "name": "下キーで先頭候補",
+      "pass": true
+    },
+    {
+      "name": "下キーで次候補",
+      "pass": true
+    },
+    {
+      "name": "上キーで前候補",
+      "pass": true
+    },
+    {
+      "name": "Escapeで候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "候補なし表示",
+      "pass": true
+    },
+    {
+      "name": "誤答表示と正答提示",
+      "pass": true
+    },
+    {
+      "name": "リトライ初期化",
+      "pass": true
+    },
+    {
+      "name": "答えを見るは採点しない",
+      "pass": true
+    },
+    {
+      "name": "明示別名も正解",
+      "pass": true
+    },
+    {
+      "name": "候補表示中の答えを見るタップが有効",
+      "pass": true
+    },
+    {
+      "name": "412 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "412 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "412 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "412 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 343
+        }
+      ]
+    },
+    {
+      "name": "412 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "412 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "412 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "412 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "1280 初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "1280 選択前は採点不可",
+      "pass": true
+    },
+    {
+      "name": "1280 初期横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 候補表示中は採点なし",
+      "pass": true
+    },
+    {
+      "name": "1280 候補44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "height": 71.578125,
+          "width": 666
+        }
+      ]
+    },
+    {
+      "name": "1280 候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 選択だけでは採点なし",
+      "pass": true
+    },
+    {
+      "name": "1280 選択後は候補を閉じる",
+      "pass": true
+    },
+    {
+      "name": "1280 正解・意味表示",
+      "pass": true
+    },
+    {
+      "name": "1280 採点後横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "暗色の背景色",
+      "pass": true,
+      "detail": {
+        "bg": "rgb(18, 27, 36)",
+        "ink": "rgb(237, 242, 244)"
+      }
+    },
+    {
+      "name": "読込失敗で全解答操作不可",
+      "pass": true
+    },
+    {
+      "name": "生理学20問・正答キー・問題IDの一意性",
+      "pass": true
+    },
+    {
+      "name": "全問題に解説と根拠HTTPSリンク",
+      "pass": true
+    },
+    {
+      "name": "360 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "360 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "すべての科目\n解剖学\n生理学\n運動学",
+          "height": 48,
+          "width": 296
+        },
+        {
+          "text": "5問\n10問\n20問\nすべて（60問）",
+          "height": 48,
+          "width": 296
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 296
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "360 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "360 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "390 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "390 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "すべての科目\n解剖学\n生理学\n運動学",
+          "height": 48,
+          "width": 326
+        },
+        {
+          "text": "5問\n10問\n20問\nすべて（60問）",
+          "height": 48,
+          "width": 326
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 326
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "390 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "390 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "412 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "412 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "すべての科目\n解剖学\n生理学\n運動学",
+          "height": 48,
+          "width": 166
+        },
+        {
+          "text": "5問\n10問\n20問\nすべて（60問）",
+          "height": 48,
+          "width": 166
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 348
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "412 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "412 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "1280 練習メニューで初期候補なし",
+      "pass": true
+    },
+    {
+      "name": "1280 メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 メニュー操作44px以上",
+      "pass": true,
+      "detail": [
+        {
+          "text": "すべての科目\n解剖学\n生理学\n運動学",
+          "height": 48,
+          "width": 218
+        },
+        {
+          "text": "5問\n10問\n20問\nすべて（60問）",
+          "height": 48,
+          "width": 218
+        },
+        {
+          "text": "ランダム\n問題順",
+          "height": 48,
+          "width": 218
+        },
+        {
+          "text": "練習を始める",
+          "height": 48,
+          "width": 128.234375
+        },
+        {
+          "text": "例題を1問試す",
+          "height": 48,
+          "width": 138.15625
+        }
+      ]
+    },
+    {
+      "name": "1280 5問開始・問題順",
+      "pass": true
+    },
+    {
+      "name": "1280 練習候補横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 練習候補タップ領域44px以上",
+      "pass": true,
+      "detail": [
+        71.578125
+      ]
+    },
+    {
+      "name": "採点後1件だけ保存",
+      "pass": true
+    },
+    {
+      "name": "二重採点で回答重複なし",
+      "pass": true
+    },
+    {
+      "name": "次問で入力と選択・採点状態を初期化",
+      "pass": true
+    },
+    {
+      "name": "誤答は正答と区別され保存",
+      "pass": true
+    },
+    {
+      "name": "リロード後に採点済み状態を再開",
+      "pass": true
+    },
+    {
+      "name": "答えを見るはrevealで正解扱いしない",
+      "pass": true
+    },
+    {
+      "name": "中断前に候補表示",
+      "pass": true
+    },
+    {
+      "name": "中断して保存済み回答数を案内",
+      "pass": true
+    },
+    {
+      "name": "未採点の問から再開・未確定入力は空",
+      "pass": true
+    },
+    {
+      "name": "5問の混在結果集計",
+      "pass": true
+    },
+    {
+      "name": "全問の回答一覧を保持",
+      "pass": true
+    },
+    {
+      "name": "終了後はactiveを消してhistoryへ1件保存",
+      "pass": true
+    },
+    {
+      "name": "別の過去問成績保存キーを不変",
+      "pass": true
+    },
+    {
+      "name": "誤答と答えを見た2問だけ再出題",
+      "pass": true
+    },
+    {
+      "name": "解き直し全問正解で再出題無効",
+      "pass": true
+    },
+    {
+      "name": "完了履歴をメニューに表示",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-circadian-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 概日リズム",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-homeostasis-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 ホメオスターシス",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-insulin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 インスリン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-glucagon-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 グルカゴン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-adh-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 抗利尿ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-oxytocin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 オキシトシン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-growth-hormone-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 成長ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-pth-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 副甲状腺ホルモン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-aldosterone-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 アルドステロン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-cortisol-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 コルチゾール",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-melatonin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 メラトニン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-calcitonin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 カルシトニン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-erythropoietin-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 エリスロポエチン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-action-potential-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 活動電位",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-acetylcholine-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 アセチルコリン",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-sinoatrial-node-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 洞房結節",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-cardiac-output-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 心拍出量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-tidal-volume-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 1回換気量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-vital-capacity-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 肺活量",
+      "pass": true
+    },
+    {
+      "name": "全20問の問題順 physiology-residual-volume-001",
+      "pass": true
+    },
+    {
+      "name": "読みから候補選択して正解 残気量",
+      "pass": true
+    },
+    {
+      "name": "20問すべて正解の集計",
+      "pass": true
+    },
+    {
+      "name": "ランダム10問の重複・欠落なし",
+      "pass": true
+    },
+    {
+      "name": "ランダム20問の重複・欠落なし",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 サーカディアンリズム",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ホメオスタシス",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 恒常性",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ADH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 バソプレシン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 GH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ソマトトロピン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 PTH",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 パラトルモン",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 EPO",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 ACh",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 洞結節",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 SA結節",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 CO",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 一回換気量",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 TV",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 VC",
+      "pass": true
+    },
+    {
+      "name": "別名の読みから候補選択して正解 RV",
+      "pass": true
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 0",
+      "pass": true,
+      "detail": "1 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 1",
+      "pass": true,
+      "detail": "2 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 2",
+      "pass": true,
+      "detail": "3 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 3",
+      "pass": true,
+      "detail": "4 / 5"
+    },
+    {
+      "name": "暗色の答えを見る後に次へ 4",
+      "pass": true,
+      "detail": "5 / 5"
+    },
+    {
+      "name": "暗色でも答えを見た5問の結果",
+      "pass": true
+    },
+    {
+      "name": "メニューから前回の間違いへ入口",
+      "pass": true
+    },
+    {
+      "name": "前回の間違いをメニューから再開",
+      "pass": true
+    },
+    {
+      "name": "保存拒否を案内して練習継続",
+      "pass": true
+    },
+    {
+      "name": "保存拒否でも採点・次問に進める",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {broken",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {broken",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":99,\"history\":[]}",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":99,\"history\":[]}",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "壊れた・旧版・不明IDの保存から新規開始可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "不正保存でも新規問題を採点可能 {\"version\":1,\"history\":[],\"act",
+      "pass": true
+    },
+    {
+      "name": "例題モードは独立記録を保存しない",
+      "pass": true
+    },
+    {
+      "name": "3科目が各20問・総60問",
+      "pass": true,
+      "detail": {
+        "解剖学": 20,
+        "生理学": 20,
+        "運動学": 20
+      }
+    },
+    {
+      "name": "60問のIDが一意・正答キーと根拠が有効",
+      "pass": true
+    },
+    {
+      "name": "360 初期設定は全科目10問",
+      "pass": true
+    },
+    {
+      "name": "360 全科目の20問ずつを表示",
+      "pass": true
+    },
+    {
+      "name": "360 全問選択の表示は60問",
+      "pass": true
+    },
+    {
+      "name": "360 3科目メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    },
+    {
+      "name": "360 解剖学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "360 生理学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "360 運動学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "360 全科目固定5問は3科目交互",
+      "pass": true,
+      "detail": [
+        "解剖学",
+        "生理学",
+        "運動学",
+        "解剖学",
+        "生理学"
+      ]
+    },
+    {
+      "name": "360 混合問の科目と進行表示 0",
+      "pass": true
+    },
+    {
+      "name": "360 混合問の科目と進行表示 1",
+      "pass": true
+    },
+    {
+      "name": "360 混合問の科目と進行表示 2",
+      "pass": true
+    },
+    {
+      "name": "360 混合問の科目と進行表示 3",
+      "pass": true
+    },
+    {
+      "name": "360 混合問の科目と進行表示 4",
+      "pass": true
+    },
+    {
+      "name": "360 混合5問の結果に実際の内訳表示",
+      "pass": true
+    },
+    {
+      "name": "360 全科目ランダム5問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "360 全科目ランダム10問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "360 全科目ランダム20問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "360 全科目ランダムall問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "390 初期設定は全科目10問",
+      "pass": true
+    },
+    {
+      "name": "390 全科目の20問ずつを表示",
+      "pass": true
+    },
+    {
+      "name": "390 全問選択の表示は60問",
+      "pass": true
+    },
+    {
+      "name": "390 3科目メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "390 解剖学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "390 生理学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "390 運動学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "390 全科目固定5問は3科目交互",
+      "pass": true,
+      "detail": [
+        "解剖学",
+        "生理学",
+        "運動学",
+        "解剖学",
+        "生理学"
+      ]
+    },
+    {
+      "name": "390 混合問の科目と進行表示 0",
+      "pass": true
+    },
+    {
+      "name": "390 混合問の科目と進行表示 1",
+      "pass": true
+    },
+    {
+      "name": "390 混合問の科目と進行表示 2",
+      "pass": true
+    },
+    {
+      "name": "390 混合問の科目と進行表示 3",
+      "pass": true
+    },
+    {
+      "name": "390 混合問の科目と進行表示 4",
+      "pass": true
+    },
+    {
+      "name": "390 混合5問の結果に実際の内訳表示",
+      "pass": true
+    },
+    {
+      "name": "390 全科目ランダム5問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "390 全科目ランダム10問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "390 全科目ランダム20問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "390 全科目ランダムall問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "412 初期設定は全科目10問",
+      "pass": true
+    },
+    {
+      "name": "412 全科目の20問ずつを表示",
+      "pass": true
+    },
+    {
+      "name": "412 全問選択の表示は60問",
+      "pass": true
+    },
+    {
+      "name": "412 3科目メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 412,
+        "scrollWidth": 412
+      }
+    },
+    {
+      "name": "412 解剖学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "412 生理学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "412 運動学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "412 全科目固定5問は3科目交互",
+      "pass": true,
+      "detail": [
+        "解剖学",
+        "生理学",
+        "運動学",
+        "解剖学",
+        "生理学"
+      ]
+    },
+    {
+      "name": "412 混合問の科目と進行表示 0",
+      "pass": true
+    },
+    {
+      "name": "412 混合問の科目と進行表示 1",
+      "pass": true
+    },
+    {
+      "name": "412 混合問の科目と進行表示 2",
+      "pass": true
+    },
+    {
+      "name": "412 混合問の科目と進行表示 3",
+      "pass": true
+    },
+    {
+      "name": "412 混合問の科目と進行表示 4",
+      "pass": true
+    },
+    {
+      "name": "412 混合5問の結果に実際の内訳表示",
+      "pass": true
+    },
+    {
+      "name": "412 全科目ランダム5問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "412 全科目ランダム10問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "412 全科目ランダム20問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "412 全科目ランダムall問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "1280 初期設定は全科目10問",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目の20問ずつを表示",
+      "pass": true
+    },
+    {
+      "name": "1280 全問選択の表示は60問",
+      "pass": true
+    },
+    {
+      "name": "1280 3科目メニュー横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 1280,
+        "scrollWidth": 1280
+      }
+    },
+    {
+      "name": "1280 解剖学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "1280 生理学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "1280 運動学の20問を表示",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目固定5問は3科目交互",
+      "pass": true,
+      "detail": [
+        "解剖学",
+        "生理学",
+        "運動学",
+        "解剖学",
+        "生理学"
+      ]
+    },
+    {
+      "name": "1280 混合問の科目と進行表示 0",
+      "pass": true
+    },
+    {
+      "name": "1280 混合問の科目と進行表示 1",
+      "pass": true
+    },
+    {
+      "name": "1280 混合問の科目と進行表示 2",
+      "pass": true
+    },
+    {
+      "name": "1280 混合問の科目と進行表示 3",
+      "pass": true
+    },
+    {
+      "name": "1280 混合問の科目と進行表示 4",
+      "pass": true
+    },
+    {
+      "name": "1280 混合5問の結果に実際の内訳表示",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目ランダム5問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目ランダム10問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目ランダム20問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "1280 全科目ランダムall問は選択数どおり重複なし",
+      "pass": true
+    },
+    {
+      "name": "解剖学の全問は該当20問だけ",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-clavicle-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 鎖骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-scapula-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 肩甲骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-humerus-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 上腕骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-radius-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 橈骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-ulna-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 尺骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-hip-bone-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 寛骨",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-atlas-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 環椎",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-axis-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 軸椎",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-median-nerve-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 正中神経",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-ulnar-nerve-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 尺骨神経",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-optic-nerve-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 視神経",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-corpus-callosum-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 脳梁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-tricuspid-valve-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 三尖弁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-mitral-valve-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 僧帽弁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-nephron-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 ネフロン",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-alveolus-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 肺胞",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-duodenum-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 十二指腸",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-gallbladder-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 胆嚢",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-tympanic-membrane-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 鼓膜",
+      "pass": true
+    },
+    {
+      "name": "解剖学 固定順の問題 anatomy-cochlea-001",
+      "pass": true
+    },
+    {
+      "name": "解剖学 読み検索から正解 蝸牛",
+      "pass": true
+    },
+    {
+      "name": "解剖学20問完走と結果内訳",
+      "pass": true
+    },
+    {
+      "name": "生理学の全問は該当20問だけ",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-circadian-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 概日リズム",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-homeostasis-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 ホメオスターシス",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-insulin-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 インスリン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-glucagon-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 グルカゴン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-adh-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 抗利尿ホルモン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-oxytocin-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 オキシトシン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-growth-hormone-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 成長ホルモン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-pth-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 副甲状腺ホルモン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-aldosterone-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 アルドステロン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-cortisol-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 コルチゾール",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-melatonin-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 メラトニン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-calcitonin-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 カルシトニン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-erythropoietin-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 エリスロポエチン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-action-potential-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 活動電位",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-acetylcholine-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 アセチルコリン",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-sinoatrial-node-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 洞房結節",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-cardiac-output-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 心拍出量",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-tidal-volume-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 1回換気量",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-vital-capacity-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 肺活量",
+      "pass": true
+    },
+    {
+      "name": "生理学 固定順の問題 physiology-residual-volume-001",
+      "pass": true
+    },
+    {
+      "name": "生理学 読み検索から正解 残気量",
+      "pass": true
+    },
+    {
+      "name": "生理学20問完走と結果内訳",
+      "pass": true
+    },
+    {
+      "name": "運動学の全問は該当20問だけ",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-isometric-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 等尺性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-isotonic-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 等張性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-concentric-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 求心性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-eccentric-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 遠心性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-sagittal-plane-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 矢状面",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-frontal-plane-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 前額面",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-transverse-plane-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 横断面",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-flexion-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 屈曲",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-extension-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 伸展",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-abduction-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 外転",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-adduction-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 内転",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-center-of-gravity-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 重心",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-base-of-support-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 支持基底面",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-lever-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 てこ",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-power-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 仕事率",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-stance-phase-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 立脚相",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-swing-phase-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 遊脚相",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-gait-cycle-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 歩行周期",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-cadence-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 歩行率",
+      "pass": true
+    },
+    {
+      "name": "運動学 固定順の問題 kinesiology-step-length-001",
+      "pass": true
+    },
+    {
+      "name": "運動学 読み検索から正解 歩幅",
+      "pass": true
+    },
+    {
+      "name": "運動学20問完走と結果内訳",
+      "pass": true
+    },
+    {
+      "name": "全科目すべてで60問開始",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 0",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 1",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 2",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 3",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 4",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 5",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 6",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 7",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 8",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 9",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 10",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 11",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 12",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 13",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 14",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 15",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 16",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 17",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 18",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 19",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 20",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 21",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 22",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 23",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 24",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 25",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 26",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 27",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 28",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 29",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 30",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 31",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 32",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 33",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 34",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 35",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 36",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 37",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 38",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 39",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 40",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 41",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 42",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 43",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 44",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 45",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 46",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 47",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 48",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 49",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 50",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 51",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 52",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 53",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 54",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 55",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 56",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 57",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 58",
+      "pass": true
+    },
+    {
+      "name": "全問60の交互順 59",
+      "pass": true
+    },
+    {
+      "name": "全科目60問の完走集計",
+      "pass": true
+    },
+    {
+      "name": "全科目60問の正しい科目内訳",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 第1頸椎",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 C1",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 第2頸椎",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 C2",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 右房室弁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 二尖弁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 左房室弁",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 胆囊",
+      "pass": true
+    },
+    {
+      "name": "解剖学 明示別名で正解 胆のう",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 等尺性運動",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 アイソメトリック収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 等張性運動",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 アイソトニック収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 求心性運動",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 短縮性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 コンセントリック収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 遠心性運動",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 伸張性収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 エキセントリック収縮",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 冠状面",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 前頭面",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 水平面",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 水平断面",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 軸平面",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 梃子",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 パワー",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 立脚期",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 遊脚期",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 ケイデンス",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 ステップ長",
+      "pass": true
+    },
+    {
+      "name": "運動学 明示別名で正解 ステップレングス",
+      "pass": true
+    },
+    {
+      "name": "allでも他科目の答え候補が検索対象",
+      "pass": true
+    },
+    {
+      "name": "解剖学でも他科目の答え候補が検索対象",
+      "pass": true
+    },
+    {
+      "name": "生理学でも他科目の答え候補が検索対象",
+      "pass": true
+    },
+    {
+      "name": "運動学でも他科目の答え候補が検索対象",
+      "pass": true
+    },
+    {
+      "name": "科目を替えても候補の件数と順位が同一",
+      "pass": true,
+      "detail": [
+        [
+          "シングルケースデザイン",
+          "伸筋",
+          "伸筋腱",
+          "伸張",
+          "伸張性収縮",
+          "伸張反射",
+          "伸展",
+          "信頼区間"
+        ],
+        [
+          "シングルケースデザイン",
+          "伸筋",
+          "伸筋腱",
+          "伸張",
+          "伸張性収縮",
+          "伸張反射",
+          "伸展",
+          "信頼区間"
+        ],
+        [
+          "シングルケースデザイン",
+          "伸筋",
+          "伸筋腱",
+          "伸張",
+          "伸張性収縮",
+          "伸張反射",
+          "伸展",
+          "信頼区間"
+        ],
+        [
+          "シングルケースデザイン",
+          "伸筋",
+          "伸筋腱",
+          "伸張",
+          "伸張性収縮",
+          "伸張反射",
+          "伸展",
+          "信頼区間"
+        ]
+      ]
+    },
+    {
+      "name": "科目の変更だけではactive/historyを変更しない",
+      "pass": true
+    },
+    {
+      "name": "旧生理20問の中断と履歴を読み込む",
+      "pass": true
+    },
+    {
+      "name": "科目設定が違っても旧中断記録の表示は生理学",
+      "pass": true
+    },
+    {
+      "name": "旧20問の4問目を正しく再開",
+      "pass": true
+    },
+    {
+      "name": "旧中断記録へ追記して採点",
+      "pass": true
+    },
+    {
+      "name": "科目データ欠落を表示・開始不可 term-questions-anatomy.js",
+      "pass": true
+    },
+    {
+      "name": "科目データ欠落を表示・開始不可 term-questions-kinesiology.js",
+      "pass": true
+    },
+    {
+      "name": "暗色解剖学問題の横はみ出しなし",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "既存過去問の採点と誤り理由",
+      "pass": true,
+      "detail": {
+        "verdict": "✖ 不正解\n正答は 2",
+        "why": 4
+      }
+    },
+    {
+      "name": "本体から用語入力への導線",
+      "pass": true
+    },
+    {
+      "name": "予期しないJS例外なし",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "予期しないconsoleエラーなし",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    "360-candidates.png",
+    "360-correct.png",
+    "390-candidates.png",
+    "390-correct.png",
+    "1280-candidates.png",
+    "1280-correct.png",
+    "390-dark-candidates.png",
+    "390-dark-correct.png",
+    "390-setup.png",
+    "390-practice-candidates.png",
+    "1280-setup.png",
+    "390-mixed-result.png",
+    "1280-all-correct-result.png",
+    "390-dark-setup.png",
+    "390-dark-practice.png",
+    "390-dark-result.png",
+    "390-three-subject-setup.png",
+    "390-three-subject-result.png",
+    "1280-three-subject-setup.png",
+    "1280-sixty-result.png",
+    "390-dark-three-subject-setup.png",
+    "390-dark-anatomy-candidates.png"
+  ],
+  "apiWrites": 2,
+  "expectedLoadErrors": [
+    {
+      "url": "http://ot-trainer.test/app/term-drill.html",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    }
+  ],
+  "expectedDeckErrors": [
+    {
+      "url": "http://ot-trainer.test/app/term-drill.html",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://ot-trainer.test/app/term-drill.html",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "finishedAt": "2026-11-11T09:35:59.608Z"
+}
