@@ -169,6 +169,7 @@ document.getElementById("q").addEventListener("input", renderList);
     document.getElementById("info").textContent = "";
     document.getElementById("card").textContent = "語の網には基本辞書が必要です。ホームの「教科書データ」から基本辞書（辞書_kotoba_…）を取り込んでください。";
     const lb = window.TEXTBOOK && TEXTBOOK.loginButton && TEXTBOOK.loginButton(); if(lb) document.getElementById("card").appendChild(lb);
+    if(window.TEXTBOOK && TEXTBOOK.diag){ const dg = document.createElement("div"); dg.style.cssText = "margin-top:14px;font-size:12px;opacity:.7"; dg.textContent = TEXTBOOK.diag(); document.getElementById("card").appendChild(dg); }
     return;
   }
   A = d.語; KEYS = Object.keys(A).sort();

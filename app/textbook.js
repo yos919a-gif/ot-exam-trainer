@@ -177,7 +177,14 @@ window.TEXTBOOK = (() => {
     b.onclick = () => SYNC.signIn().then(() => location.reload()).catch(e => { b.textContent = "ログインできませんでした: " + e.message; });
     return b;
   }
-  return {load, loginButton, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+  // 教科書データが出ないときの手がかり（画面に出す。この端末に何が入っているか）
+  function diag(){
+    const k = bookMap.kotoba;
+    const sync = !window.SYNC ? "なし" : !SYNC.signedIn() ? "未ログイン" : SYNC.status().needLogin ? "ログイン切れ" : "ログイン中";
+    return `この端末の状態: 本 ${Object.keys(bookMap).filter(id => id !== "kotoba").length}冊／基本辞書 ${k ? (k.version || "版不明") : "なし"}` +
+      `／つながり ${k && k.links && k.links.physiology ? "あり" : "なし"}／網 ${k && k.ami ? "あり" : "なし"}／Google ${sync}／${location.host}`;
+  }
+  return {load, loginButton, diag, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet(),
           // 基本辞書（語のつながり kotoba.html の説明の文。本ごとの {meta, terms}）
           hasKotoba: () => !!(bookMap.kotoba && bookMap.kotoba.kotoba),
