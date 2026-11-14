@@ -167,7 +167,17 @@ window.TEXTBOOK = (() => {
     const more = e.r.length > max ? `<div class="st">ほか ${e.r.length - max}件</div>` : "";
     return `<div class="tb"><div class="st">📚 教科書 ${e.n}冊に出る語</div><ul>${rows}</ul>${more}</div>`;
   }
-  return {load, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
+  // ホーム以外の画面で教科書データが無いとき: Google にログイン済みで期限（約1時間）が切れていれば、
+  // ほかの端末で取り込んだ本を Drive から読むためのボタンを返す（ログインの窓はボタンを押したときだけ開ける）
+  function loginButton(){
+    if(!window.SYNC || !SYNC.available() || !SYNC.signedIn() || !SYNC.status().needLogin) return null;
+    const b = document.createElement("button");
+    b.textContent = "☁ Google にログインして、ほかの端末で取り込んだデータを読み込む";
+    b.style.cssText = "display:block;margin-top:12px;padding:10px 14px;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;cursor:pointer";
+    b.onclick = () => SYNC.signIn().then(() => location.reload()).catch(e => { b.textContent = "ログインできませんでした: " + e.message; });
+    return b;
+  }
+  return {load, loginButton, importText, importFiles, removeBook, remove, info, lookup, termHtml, books, setBook, setAll, has: () => !!data,
           sakuin: () => (data && data.sakuin) || null, offIds: () => offSet(),
           // 基本辞書（語のつながり kotoba.html の説明の文。本ごとの {meta, terms}）
           hasKotoba: () => !!(bookMap.kotoba && bookMap.kotoba.kotoba),

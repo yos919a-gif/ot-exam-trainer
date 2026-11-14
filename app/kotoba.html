@@ -79,6 +79,8 @@
   </div>
 </main>
 <script src="content.js"></script>
+<script src="config.js"></script>
+<script src="sync.js"></script>
 <script src="textbook.js"></script>
 <script>
 "use strict";
@@ -139,6 +141,7 @@ let FULL = false;
   if(!d){
     document.getElementById("info").textContent = "";
     document.getElementById("card").textContent = "語のつながりは、基本辞書を取り込んだ人だけが使えます（ホームの「教科書データ」から）。";
+    const lb = window.TEXTBOOK && TEXTBOOK.loginButton && TEXTBOOK.loginButton(); if(lb) document.getElementById("card").appendChild(lb);
     return;
   }
   T = d.terms; META = d.meta; KEYS = Object.keys(T);

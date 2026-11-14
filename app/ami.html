@@ -93,6 +93,8 @@
   <div class="note">教科書3冊（解剖学・生理学・運動学）の紙面から2人で読み取り、意味を確かめた関係だけを載せています。本文は載せていません。</div>
 </main>
 <script src="content.js"></script>
+<script src="config.js"></script>
+<script src="sync.js"></script>
 <script src="textbook.js"></script>
 <script>
 "use strict";
@@ -166,6 +168,7 @@ document.getElementById("q").addEventListener("input", renderList);
   if(!d){
     document.getElementById("info").textContent = "";
     document.getElementById("card").textContent = "語の網には基本辞書が必要です。ホームの「教科書データ」から基本辞書（辞書_kotoba_…）を取り込んでください。";
+    const lb = window.TEXTBOOK && TEXTBOOK.loginButton && TEXTBOOK.loginButton(); if(lb) document.getElementById("card").appendChild(lb);
     return;
   }
   A = d.語; KEYS = Object.keys(A).sort();

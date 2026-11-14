@@ -116,6 +116,8 @@ label.ck{gap:7px;min-height:34px}label.ck input{width:17px;height:17px;accent-co
   <div id="list"></div>
 </main>
 <script src="content.js"></script>
+<script src="config.js"></script>
+<script src="sync.js"></script>
 <script src="textbook.js"></script>
 <script>
 "use strict";
@@ -204,6 +206,7 @@ function gate(msg){
   document.getElementById("info").textContent = "";
   document.getElementById("list").innerHTML = `<div class="item">${msg}<div style="margin-top:10px"><a href="index.html">ホームへ</a>
     （ホームの一番下「教科書データ」から取り込めます。Google でログインしていれば、ほかの端末で取り込んだデータも使えます）</div></div>`;
+  const lb = window.TEXTBOOK && TEXTBOOK.loginButton && TEXTBOOK.loginButton(); if(lb) document.querySelector("#list .item").appendChild(lb);
 }
 (window.TEXTBOOK ? TEXTBOOK.load() : Promise.resolve(false)).then(()=>{
   if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS);
