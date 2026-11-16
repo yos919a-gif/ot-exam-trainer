@@ -17,8 +17,8 @@
   "glossary/glossary.json": {
    "説明": "用語集（暗記カード）",
    "件数": 4563,
-   "bytes": 1302153,
-   "sha1": "e3de60b5ca"
+   "bytes": 1680755,
+   "sha1": "6af80b98e4"
   },
   "dictionary/entries.json": {
    "説明": "アプリ辞書（教科書2冊以上・Fable確認）",
@@ -41,32 +41,32 @@
   "analysis/word_graph.json": {
    "説明": "語ネットワーク",
    "件数": 3,
-   "bytes": 466917,
-   "sha1": "dcdcc2bc28"
+   "bytes": 469454,
+   "sha1": "fd8e00b934"
   },
   "analysis/choice_words.json": {
    "説明": "問題ごとの語",
    "件数": 2400,
-   "bytes": 380890,
-   "sha1": "389db187ca"
+   "bytes": 381976,
+   "sha1": "e2ee932c9f"
   },
   "analysis/word_readings.json": {
    "説明": "語の読み",
    "件数": 4418,
-   "bytes": 163137,
-   "sha1": "26ab583280"
+   "bytes": 163493,
+   "sha1": "9ca5abf159"
   },
   "analysis/word_families.json": {
    "説明": "語族",
    "件数": 1232,
-   "bytes": 34285,
-   "sha1": "7dd5f1adfc"
+   "bytes": 34114,
+   "sha1": "e57c303c98"
   },
   "analysis/confusion_graph.json": {
    "説明": "引っ掛け分析",
    "件数": 5,
-   "bytes": 1461034,
-   "sha1": "ed5ed5e314"
+   "bytes": 1472186,
+   "sha1": "fd169397b9"
   },
   "analysis/anomalies.json": {
    "説明": "類問",
@@ -77,8 +77,8 @@
   "analysis/dendrogram.json": {
    "説明": "デンドログラム",
    "件数": 2,
-   "bytes": 11361,
-   "sha1": "9885bf193f"
+   "bytes": 11375,
+   "sha1": "7a210eac08"
   },
   "refs/総合索引.json": {
    "説明": "教科書の総合索引",
