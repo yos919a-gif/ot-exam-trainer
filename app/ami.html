@@ -59,6 +59,7 @@
     .crumb{gap:4px 8px;line-height:1.8}.crumb button{min-width:44px;min-height:44px;padding:7px 6px;font-size:14px;max-width:100%;overflow-wrap:anywhere}
     .note{font-size:13px;line-height:1.85}.note a{display:inline-block;min-height:44px;padding-block:8px}
   }
+.att{display:flex;align-items:baseline;gap:6px;margin:2px 0}.att .hd{font-size:12px;opacity:.7;min-width:3em}.att .raw{font-size:14px;padding:4px 2px}
 </style>
 <link rel="stylesheet" href="appbar.css">
 <style>
@@ -142,8 +143,24 @@ function show(w, push=true){
     if(t.下流.length) h += `<div class="lab sub" style="margin-top:6px">下流（ここから流れていく）</div>` + flowChips(t.下流);
     h += `<div style="margin-top:8px">${t.下流.length?`<button class="tbtn" data-tree="下流">下流をたどる</button>`:""}${t.上流.length?`<button class="tbtn" data-tree="上流">上流をたどる</button>`:""}</div><div id="tree"></div>`;
   }
+  // 起始・停止（筋のカード）と、付く筋・靱帯（骨・部位のカード）。表示は紙面の字、網に語があれば押せる
+  const site = ([txt, to, head]) => `<div class="att">${head?`<span class="hd">${esc(head)}</span>`:""}${to && A[to] ? `<button class="chip" data-w="${esc(to)}">${esc(txt)}</button>` : `<span class="raw">${esc(txt)}</span>`}</div>`;
+  const ATT = ["起始","停止","付着"].filter(k=>(t[k]||[]).length);
+  if(ATT.length) h += `<h3>起始・停止 <small>筋頭があれば頭ごと</small></h3>` + ATT.map(k=>`<div class="grp"><span class="lab">${k}</span><div>${t[k].map(site).join("")}</div></div>`).join("");
+  if((t.付く||[]).length){
+    h += `<h3>ここに付く筋・靱帯</h3>` + ["起始","停止","付着"].map(k=>{ const L = t.付く.filter(x=>x[0]===k); return L.length ? `<div class="grp"><span class="lab">${k}</span><span class="chips" style="display:contents">${L.map(([,m,who,txt])=>`<button class="chip" data-w="${esc(m)}" title="${esc(txt)}">${esc(who)}</button>`).join("")}</span></div>` : ""; }).join("");
+  }
+  // 神経の支配（筋のカードに支配神経、神経のカードに支配する筋と髄節）
+  const link2 = ([txt, to]) => to && A[to] ? `<button class="chip" data-w="${esc(to)}">${esc(txt)}</button>` : `<span class="chip raw">${esc(txt)}</span>`;
+  const INN = (t.支配神経||[]).length + (t.支配する筋||[]).length + (t.髄節||[]).length;
+  if(INN){
+    h += `<h3>神経の支配</h3>`;
+    if((t.支配神経||[]).length) h += `<div class="grp"><span class="lab">支配神経</span><span class="chips" style="display:contents">${t.支配神経.map(link2).join("")}</span></div>`;
+    if((t.支配する筋||[]).length) h += `<div class="grp"><span class="lab">支配する筋</span><span class="chips" style="display:contents">${t.支配する筋.map(link2).join("")}</span></div>`;
+    if((t.髄節||[]).length) h += `<div class="grp"><span class="lab">髄節</span><span>${t.髄節.map(esc).join("、")}</span></div>`;
+  }
   if(t.つながり.length) h += `<h3>つながり <small>説明の中に出てくる語</small></h3><div class="chips">${t.つながり.slice(0,60).map(x=>chip(x,"use")).join("")}</div>`;
-  if(!par.length && !kids.length && !t.上流.length && !t.下流.length && !t.同じ.length && !t.つながり.length) h += `<p class="none">この語の関係はまだ記録されていません。</p>`;
+  if(!par.length && !kids.length && !t.上流.length && !t.下流.length && !t.同じ.length && !t.つながり.length && !ATT.length && !(t.付く||[]).length && !INN) h += `<p class="none">この語の関係はまだ記録されていません。</p>`;
   const card = document.getElementById("card"); card.innerHTML = h; card.dataset.w = w;
   renderList();
   const u = new URL(location); u.searchParams.set("w", w); history.replaceState(null,"",u);
