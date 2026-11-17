@@ -17,8 +17,8 @@
   "glossary/glossary.json": {
    "説明": "用語集（暗記カード）",
    "件数": 7060,
-   "bytes": 2106628,
-   "sha1": "52e2e865dc"
+   "bytes": 2106741,
+   "sha1": "5e04933e8a"
   },
   "dictionary/entries.json": {
    "説明": "アプリ辞書（教科書2冊以上・Fable確認）",
