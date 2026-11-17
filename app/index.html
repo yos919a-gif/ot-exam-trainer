@@ -636,22 +636,40 @@ function termHtml(text){
   }
   return out + esc(text.slice(last));
 }
+// 国試での出方。PHASE2（11/17）の語は説明文にだけ出て、問題文には出ないことがある（出題数 0）
+function glossFreq(g){
+  const subs = (g.科目||[]).map(s=>s[0]).join("・");
+  return g.出題数 ? `${g.出題数}問に出題（第${g.初出}〜${g.最終}回）${subs ? "・" + esc(subs) : ""}` : "国試の問題文には出ない語（用語の説明に出てくる語）";
+}
+// 説明文の中の語もタップで引ける（PHASE2）。たどった語は戻るボタンで戻る
+let termTrail = [];
 function showTerm(el){
-  const g = GLOSS[el.dataset.w]; if(!g) return;
+  const w = el.dataset.w, g = GLOSS[w]; if(!g) return;
   let box = document.getElementById("termBox");
   if(!box){ box = document.createElement("div"); box.id = "termBox"; document.body.appendChild(box); }
-  const subs = (g.科目||[]).map(s=>s[0]).join("・");
-  box.innerHTML = `<button class="btn small term-close" type="button" onclick="closeTerm()" aria-label="用語の説明を閉じる">閉じる</button><b>${esc(el.textContent)}</b> <span class="rd">${esc(g.読み||"")}</span>
+  const inBox = box.contains(el);
+  if(!inBox) termTrail = [];
+  else if(termTrail[termTrail.length - 1] !== box.dataset.w && box.dataset.w) termTrail.push(box.dataset.w);
+  box.dataset.w = w;
+  const back = termTrail.length ? `<button class="btn small" type="button" onclick="termBack()" aria-label="前の用語に戻る">← ${esc(termTrail[termTrail.length - 1])}</button> ` : "";
+  box.innerHTML = `<button class="btn small term-close" type="button" onclick="closeTerm()" aria-label="用語の説明を閉じる">閉じる</button>${back}<b>${esc(inBox ? w : el.textContent)}</b> <span class="rd">${esc(g.読み||"")}</span>
     ${g.flag?`<span class="chk" title="${esc(g.flag)}">要確認</span>`:""}
     ${g.別名?`<div class="st">＝ ${esc(g.別名)}</div>`:""}
-    <div class="mn">${esc(g.意味||"（意味は準備中）")}</div>
-    <div class="st">${g.出題数}問に出題（第${g.初出}〜${g.最終}回）・${esc(subs)}</div>
+    <div class="mn">${g.意味 ? termHtml(g.意味) : "（意味は準備中）"}</div>
+    <div class="st">${glossFreq(g)}</div>
     ${g.出典?`<div class="st">📖 ${esc(g.出典)}</div>`:""}
-    ${window.TEXTBOOK && TEXTBOOK.has() ? TEXTBOOK.termHtml(el.dataset.w) || TEXTBOOK.termHtml(g.別名) : ""}`;
+    ${window.TEXTBOOK && TEXTBOOK.has() ? TEXTBOOK.termHtml(w) || TEXTBOOK.termHtml(g.別名) : ""}`;
+  if(inBox) return;   // 吹き出しの中でたどるときは位置を動かさない
   const r = el.getBoundingClientRect();
   box.style.display = "block";
   box.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - box.offsetWidth - 8)) + "px";
   box.style.top = (r.bottom + scrollY + 6) + "px";
+}
+function termBack(){
+  const box = document.getElementById("termBox"), w = termTrail.pop();
+  if(!box || !w) return;
+  const tmp = document.createElement("span"); tmp.dataset.w = w; tmp.textContent = w;
+  box.appendChild(tmp); delete box.dataset.w; showTerm(tmp);
 }
 function closeTerm(){
   const box = document.getElementById("termBox");
@@ -670,7 +688,8 @@ if(matchMedia("(hover: hover) and (pointer: fine)").matches){
   const hideBox = ()=>{ const b = document.getElementById("termBox"); if(b) b.style.display = "none"; };
   document.addEventListener("mouseover", e=>{
     const t = e.target.closest(".term");
-    if(t){ clearTimeout(hoverTimer); hoverTimer = setTimeout(()=>showTerm(t), 200); return; }
+    // 吹き出しの中の語（説明文の語）はクリックでたどる。カーソルを置くだけでは切り替えない
+    if(t && !t.closest("#termBox")){ clearTimeout(hoverTimer); hoverTimer = setTimeout(()=>showTerm(t), 200); return; }
     if(e.target.closest("#termBox")) clearTimeout(hoverTimer);
   });
   document.addEventListener("mouseout", e=>{
@@ -1633,7 +1652,7 @@ function explainThis(id){ startExplain(id); }
 const WORD_DEF = {sub:"all", book:"all", target:"today", order:"freq", limit:"20", dir:"w2m"};
 let wsess = null;
 function wordPref(){ return Object.assign({}, WORD_DEF, S.pref.word||{}); }
-function wordOk(w){ const g = GLOSS[w]; return g && g.意味 && !g.flag && !g.別名 && !String(g.意味).startsWith("?"); } // 別名（正式名など）は対象語のカードで覚える
+function wordOk(w){ const g = GLOSS[w]; return g && g.意味 && g.出題数 > 0 && !g.flag && !g.別名 && !String(g.意味).startsWith("?"); } // 別名（正式名など）は対象語のカードで覚える。問題文に出ない説明用の語（PHASE2）はカードにしない
 function wordSub(w){ const s = GLOSS[w].科目; return s && s.length ? s[0][0] : ""; }
 function wordDueList(){
   const end = dayStart(Date.now()) + DAY;
@@ -1708,7 +1727,7 @@ function renderWord(back){
     <div class="qmeta"><span class="count">🃏 暗記カード ${s.idx+1} / ${s.list.length}</span><span class="tag">${esc(wordSub(w))}</span>
       ${r?`<span>復習 段階${r.b}</span>`:`<span>はじめて</span>`}</div>
     <div class="flash" data-subject="${esc(wordSub(w))}" ${back?"":`onclick="renderWord(true)" style="cursor:pointer"`}>
-      ${back ? full + `<div class="fs">${g.出題数}問に出題（第${g.初出}〜${g.最終}回）・${esc(subs)}</div>
+      ${back ? full + `<div class="fs">${glossFreq(g)}</div>
                        ${g.出典?`<span class="src">📖 ${esc(g.出典)}</span>`:""}`
              : front + `<div class="fs">タップ（またはスペース）で裏返す</div>`}
     </div>

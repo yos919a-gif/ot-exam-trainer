@@ -158,7 +158,7 @@ function tipHtml(k){
   const subs = g ? (g.科目||[]).map(s=>s[0]).join("・") : "";
   return `<b>${esc(k)}</b> <span class="rd">${esc((g && g.読み) || t.r || "")}</span>
     ${g ? `<div class="mn">${esc(g.意味 || "（意味は準備中）")}</div>
-    <div class="st">国試 ${g.出題数}問（第${g.初出}〜${g.最終}回）${subs ? "・" + esc(subs) : ""}</div>${g.出典 ? `<div class="st">📖 ${esc(g.出典)}</div>` : ""}` : ""}
+    <div class="st">${g.出題数 ? `国試 ${g.出題数}問（第${g.初出}〜${g.最終}回）${subs ? "・" + esc(subs) : ""}` : "国試の問題文には出ない語（用語の説明に出てくる語）"}</div>${g.出典 ? `<div class="st">📖 ${esc(g.出典)}</div>` : ""}` : ""}
     ${tb}`;
 }
 function showTip(el){
