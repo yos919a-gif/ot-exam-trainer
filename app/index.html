@@ -1393,6 +1393,8 @@ function yoArrange(sessions){
 function startYosou(nSess){
   const sessions = nSess === 2 ? ["午前", "午後"] : ["午前"];
   const arr = yoArrange(sessions), used = new Set(), A = store().attempts, list = [];
+  // 2段目（11/19 夜）: 番号×分野で出たことのあるテーマを優先、同じ番号の午前・午後で同じテーマを避ける、1回の中のテーマの数を過去の最多までに
+  const QTH = BLUEPRINT.問題のテーマ || {}, tcount = {}, slotTheme = {};
   for(const s of sessions) for(let p = 1; p <= 100; p++){
     const {f} = arr[p + s], [, a, b] = yoBlock(p);
     const pick = pool=>{
@@ -1402,13 +1404,21 @@ function startYosou(nSess){
         const at = A[q.id], qp = qPos(q);
         let sc = Math.random() * 0.3 - Math.abs(qp - p) * 0.03 + (qp === p ? 0.5 : 0) + (q.区分 === s ? 0.1 : 0);
         if(!at || !at.length) sc += 2; else if(at[at.length - 1].ok === 0) sc += 1.5;
+        const t = QTH[q.id];
+        if(t && BLUEPRINT.番号のテーマ){
+          const d = (BLUEPRINT.番号のテーマ[p] || {})[f] || {}, tot = Object.values(d).reduce((x, y)=>x + y, 0) || 1;
+          sc += 2.0 * (d[t] || 0) / tot;
+          if(s === "午後" && slotTheme[p + "午前"] === t) sc -= 1.5;
+          const cap = (BLUEPRINT.テーマ || {})[t] || {平均: 1, 最多: 1};
+          if((tcount[t] || 0) >= cap.最多) sc -= 3; else if((tcount[t] || 0) >= cap.平均 * sessions.length / 2 + 1) sc -= 0.8;
+        }
         if(sc > bs){ bs = sc; best = q; }
       }
       return best;
     };
     const inBlock = Q.filter(q=>{ const qp = qPos(q); return qp >= a && qp <= b; });
     const q = pick(inBlock.filter(q=>QFIELD[q.id] === f)) || pick(inBlock);
-    if(q){ used.add(q.id); list.push(q); }
+    if(q){ used.add(q.id); list.push(q); const t = QTH[q.id]; if(t){ tcount[t] = (tcount[t] || 0) + 1; slotTheme[p + s] = t; } }
   }
   session = {list, idx: 0, mode: "yosou", results: [], t0: Date.now(), label: nSess === 2 ? "200問" : "午前100問"};
   renderQuestion();
