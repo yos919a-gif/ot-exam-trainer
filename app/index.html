@@ -490,6 +490,20 @@ body:has(.loopbar) #app{padding-bottom:110px}
 .radar .rhit:hover{fill:color-mix(in srgb,var(--accent,#2b6cb0) 10%,transparent)}
 .radar .rl{cursor:pointer}
 .radar .rl:hover tspan:first-child{text-decoration:underline}
+.radarhead .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.radarhead .seg button{border:0;background:transparent;color:var(--sub);font:inherit;font-size:12.5px;padding:4px 10px;cursor:pointer}
+.radarhead .seg button.on{background:var(--accent,#2b6cb0);color:#fff;font-weight:700}
+.radar.v-seen .rseen{fill:color-mix(in srgb,var(--teal,#0f766e) 30%,transparent);stroke:var(--teal,#0f766e);stroke-width:2;stroke-dasharray:none}
+.radar.v-seen .racc{fill:none;stroke:var(--accent,#2b6cb0);stroke-width:1;stroke-dasharray:3 3;opacity:.7}
+.radar .rseen-dot{fill:var(--teal,#0f766e)}
+.radarcard:has(.v-seen) .radarhead .sw.rseen{border:2px solid var(--teal,#0f766e);background:color-mix(in srgb,var(--teal,#0f766e) 30%,transparent)}
+.radarcard:has(.v-seen) .radarhead .sw.racc{border:1px dashed var(--accent,#2b6cb0);background:transparent}
+.radar .rl.low tspan{fill:var(--ng,#c53030)}
+.radarcard .thin{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px}
+.radarcard .thin .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.radarcard .thin .chip b{font-weight:700;font-variant-numeric:tabular-nums;color:var(--sub)}
+.radarcard .thin .chip.t0 b{color:var(--ng,#c53030)}
+.radarcard .thin .chip.t1 b{color:var(--amber,#b7791f)}
 </style>
 </head>
 <body>
@@ -831,7 +845,14 @@ function fieldStats(){
   }
   return st;
 }
+/* レーダーの見方: "seen"＝取り組み量（解いた割合を主役に。まだ手をつけていない範囲が凹んで見える）、"acc"＝正答率を主役に（11/19） */
+function radarView(){ try{ return localStorage.getItem("ot.radarView") === "acc" ? "acc" : "seen"; }catch(e){ return "seen"; } }
+function setRadarView(v){
+  try{ localStorage.setItem("ot.radarView", v); }catch(e){}
+  const el = document.querySelector(".radarcard"); if(el) el.outerHTML = radarCard();
+}
 function radarSvg(group, st){
+  const view = radarView();
   const axes = FIELD_AXES[group], N = axes.length, cx = 160, cy = 150, R = 100;
   const pt = (i, v)=>{ const a = -Math.PI/2 + 2*Math.PI*i/N; return [cx + R*v*Math.cos(a), cy + R*v*Math.sin(a)]; };   // i は小数も可（扇形の端）
   const poly = vals=>vals.map((v, i)=>pt(i, v).map(n=>n.toFixed(1)).join(",")).join(" ");
@@ -840,8 +861,14 @@ function radarSvg(group, st){
   axes.forEach((_, i)=>{ const [x, y] = pt(i, 1); g += `<line class="rg" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; });
   const seen = axes.map(f=>{ const x = st[group + "|" + f]; return x.total ? x.seen / x.total : 0; });
   const acc = axes.map(f=>{ const x = st[group + "|" + f]; return x.n ? x.ok / x.n : 0; });
-  g += `<polygon class="rseen" points="${poly(seen)}"/><polygon class="racc" points="${poly(acc)}"/>`;
-  acc.forEach((v, i)=>{ if(st[group + "|" + axes[i]].n){ const [x, y] = pt(i, v); g += `<circle class="racc-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`; } });
+  // 主役を後に描いて上に重ねる
+  if(view === "acc"){
+    g += `<polygon class="rseen" points="${poly(seen)}"/><polygon class="racc" points="${poly(acc)}"/>`;
+    acc.forEach((v, i)=>{ if(st[group + "|" + axes[i]].n){ const [x, y] = pt(i, v); g += `<circle class="racc-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`; } });
+  }else{
+    g += `<polygon class="racc" points="${poly(acc)}"/><polygon class="rseen" points="${poly(seen)}"/>`;
+    seen.forEach((v, i)=>{ const [x, y] = pt(i, v); g += `<circle class="rseen-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`; });
+  }
   axes.forEach((f, i)=>{   // 押せる範囲: 軸の両側の半分ずつの扇形（中心〜外周）
     const p1 = pt(i - 0.5, 1.12), p2 = pt(i + 0.5, 1.12), [xo, yo] = pt(i, 1.12);
     g += `<path class="rhit" d="M${cx},${cy} L${p1[0].toFixed(1)},${p1[1].toFixed(1)} L${xo.toFixed(1)},${yo.toFixed(1)} L${p2[0].toFixed(1)},${p2[1].toFixed(1)} Z" onclick="startFieldQ('${group}','${f}')"><title>${esc(f)}の問題を解く</title></path>`;
@@ -850,9 +877,11 @@ function radarSvg(group, st){
     const [x, y] = pt(i, 1.17), x0 = st[group + "|" + f];
     const anchor = Math.abs(x - cx) < 8 ? "middle" : (x > cx ? "start" : "end");
     const pct = x0.n ? Math.round(100 * x0.ok / x0.n) + "%" : "—";
-    g += `<text class="rl" onclick="startFieldQ('${group}','${f}')" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"><tspan>${esc(f)}</tspan><tspan class="rv" x="${x.toFixed(1)}" dy="13">${pct}・${x0.seen}/${x0.total}</tspan></text>`;
+    const sp = x0.total ? Math.round(100 * x0.seen / x0.total) : 0;
+    const val = view === "acc" ? `${pct}・${x0.seen}/${x0.total}` : `${sp}%・${x0.seen}/${x0.total}`;
+    g += `<text class="rl${x0.total && sp < 20 ? " low" : ""}" onclick="startFieldQ('${group}','${f}')" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"><tspan>${esc(f)}</tspan><tspan class="rv" x="${x.toFixed(1)}" dy="13">${val}</tspan></text>`;
   });
-  return `<svg viewBox="-30 0 380 310" class="radar" role="img" aria-label="${group}の分野別 解いた割合と正答率">${g}</svg>`;
+  return `<svg viewBox="-30 0 380 310" class="radar v-${view}" role="img" aria-label="${group}の分野別 解いた割合と正答率">${g}</svg>`;
 }
 /* レーダーの分野を押したとき: その分野（専門／専門基礎）の問題を20問。未回答 → 最後に間違えた → それ以外 の順に、それぞれの中はランダム */
 function startFieldQ(group, f){
@@ -866,15 +895,28 @@ function startFieldQ(group, f){
 }
 function radarCard(){
   if(!Object.keys(QFIELD).length) return "";
-  const st = fieldStats();
+  const st = fieldStats(), view = radarView();
+  // 次に解く分野（ユーザー指定の優先順 11/20）: ①解いていない分野（解いた割合20%未満・低い順）
+  // → ②正答率の低い分野（60%未満・低い順）→ ③出題頻度の高い分野（1回あたりの問題数が多い順）。同じ段では出題の多い方を先に
+  const KAI = new Set(Q.map(q=>q.回)).size || 1;
+  const thin = Object.entries(st).filter(([, x])=>x.total).map(([k, x])=>{
+    const r = x.seen / x.total, a = x.n ? x.ok / x.n : 0, per = x.total / KAI;
+    const tier = r < 0.2 ? 0 : a < 0.6 ? 1 : 2;
+    const key = tier === 0 ? r : tier === 1 ? a : -per;
+    const why = tier === 0 ? `解いた ${Math.round(100 * r)}%` : tier === 1 ? `正答率 ${Math.round(100 * a)}%` : `毎回 約${Math.round(per)}問`;
+    return {g: k.split("|")[0], f: k.split("|")[1], tier, key, per, why};
+  }).sort((a, b)=>a.tier - b.tier || a.key - b.key || b.per - a.per).slice(0, 4);
   return `<div class="card radarcard">
     <div class="radarhead"><h3>分野別の成績</h3>
-      <span class="lg"><i class="sw racc"></i>正答率</span><span class="lg"><i class="sw rseen"></i>解いた割合</span></div>
+      <span class="seg" role="group" aria-label="レーダーの見方">
+        <button class="${view === "seen" ? "on" : ""}" onclick="setRadarView('seen')">取り組み量</button><button class="${view === "acc" ? "on" : ""}" onclick="setRadarView('acc')">正答率</button></span>
+      <span class="lg"><i class="sw rseen"></i>解いた割合</span><span class="lg"><i class="sw racc"></i>正答率</span></div>
+    <div class="thin"><span class="muted">次に解く:</span>${thin.map(t=>`<button class="chip t${t.tier}" onclick="startFieldQ('${t.g}','${t.f}')">${esc(t.g === "専門" ? t.f : t.f + "（基礎）")} <b>${t.why}</b></button>`).join("")}</div>
     <div class="radars">
       <figure><figcaption>専門分野（1〜50番）</figcaption>${radarSvg("専門", st)}</figure>
       <figure><figcaption>専門基礎分野（51〜100番）</figcaption>${radarSvg("専門基礎", st)}</figure>
     </div>
-    <div class="muted" style="font-size:12px">分野名か、その範囲を押すと、その分野の問題を20問（まだ解いていない問題・間違えた問題を優先）解けます。数字は 正答率・解いた問題/その分野の問題数。</div>
+    <div class="muted" style="font-size:12px">分野名か、その範囲を押すと、その分野の問題を20問（まだ解いていない問題・間違えた問題を優先）解けます。「次に解く」は 解いていない分野 → 正答率の低い分野 → よく出る分野 の順。数字は ${view === "acc" ? "正答率" : "解いた割合"}・解いた問題/その分野の問題数。赤字は解いた割合が20%未満の分野。</div>
   </div>`;
 }
 function accuracyBySubject(){
