@@ -11,8 +11,8 @@
   "exam/explanations.json": {
    "説明": "選択肢の誤り理由",
    "件数": 2400,
-   "bytes": 772712,
-   "sha1": "e3edf2bc8d"
+   "bytes": 767191,
+   "sha1": "0fad5b6c98"
   },
   "glossary/glossary.json": {
    "説明": "用語集（暗記カード）",
@@ -23,20 +23,20 @@
   "dictionary/entries.json": {
    "説明": "アプリ辞書（教科書2冊以上・Fable確認）",
    "件数": 6337,
-   "bytes": 7016498,
-   "sha1": "f2cc18bec7"
+   "bytes": 5564808,
+   "sha1": "a4e2a2d2c1"
   },
   "dictionary/index.json": {
    "説明": "アプリ辞書の索引",
    "件数": 7680,
-   "bytes": 301317,
-   "sha1": "20054a857c"
+   "bytes": 301397,
+   "sha1": "2318246298"
   },
   "dictionary/meta.json": {
    "説明": "アプリ辞書の版情報",
    "件数": 10,
    "bytes": 1306,
-   "sha1": "dfcf775b96"
+   "sha1": "37569e661c"
   },
   "analysis/word_graph.json": {
    "説明": "語ネットワーク",
@@ -83,8 +83,8 @@
   "refs/総合索引.json": {
    "説明": "教科書の総合索引",
    "件数": 24163,
-   "bytes": 3984750,
-   "sha1": "4bb2e68f03"
+   "bytes": 4655664,
+   "sha1": "911d0347bd"
   },
   "images/": {
    "説明": "問題の図（別冊・切り抜き）",
