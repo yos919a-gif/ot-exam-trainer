@@ -486,6 +486,8 @@ let wordNodes = [];         // 語グラフ
 let specificWords = [];     // 一般語を除いた専門語（長い順）
 let similarKey = {};        // id -> 類問グループキー
 let confusion = {};         // 語 -> [{other, co, selfCorrect, otherCorrect}]
+let MARU = {};              // 1文の○×（content/exam/maru.json。11/18 ユーザー決定「1文の○×式で、合っていたら○、間違っていたら修正」）
+let FEYN = {};              // 「私に説明して」の要点 {id: {要点: [{語, 別の言い方, 理由}]}}（content/exam/feynman.json。11/18）
 const LS_KEY = "ot-exam-progress-v1";
 
 /* 学習記録（セーブデータ）は別JSON user/progress.json で管理する（USBごとに個別。tools/serve.py の API）。
@@ -731,6 +733,8 @@ async function loadAll(){
     ASSESS.forEach(t=>t.ids.forEach(i=>ASSESS_IDS.add(i)));
   }catch(e){ console.warn("評価タグなし", e); }
   try{ ADL = await cfetch("exam/adl.json"); }catch(e){ console.warn("ADL のまとめなし", e); }
+  try{ FEYN = await cfetch("exam/feynman.json"); }catch(e){ console.warn("説明の要点なし", e); }
+  try{ MARU = await cfetch("exam/maru.json"); }catch(e){ console.warn("1文の○×なし", e); }
   try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
   try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); }); }
   catch(e){ console.warn("用語集なし", e); }
@@ -1167,8 +1171,8 @@ function home(){
   <div class="tiles">
     ${wordDeckCard()}
     ${markCard()}
-    <div class="tile c6"><div class="top"><span class="ic">🎙️</span><h3>私に説明して</h3></div>
-      <p>正答の理由を声で説明し、キーワードのカバー率を判定（Chrome推奨）。</p>
+    <div class="tile c6"><div class="top"><span class="ic">⭕</span><h3>1文の○×</h3></div>
+      <p>過去問の選択肢を1文にした○×（×なら正しく直す）と、「〜を1つ挙げて」の問い。声でも入力でも。</p>
       <div class="acts"><button class="btn primary" onclick="startExplain()">はじめる</button></div></div>
   </div>
   <div class="sec">科目別の成績 <span style="margin-left:auto"><button class="btn small" onclick="renderTrend()">📈 成績の推移</button></span></div>
@@ -1176,7 +1180,7 @@ function home(){
     <details class="opts" style="border-top:0;margin:0;padding:0"><summary>18科目の正答率を見る</summary><div class="subj" style="margin-top:10px">${rows}</div></details>
     <details class="opts"><summary>教科書データ${window.TEXTBOOK && TEXTBOOK.has() ? "（取り込み済み）" : ""}</summary><div style="margin-top:8px">${textbookUi()}</div></details>
     <details class="opts"><summary>学習記録（同期・書き出し・取り込み）</summary>
-      <div style="margin-top:8px">${syncUi()}
+      <div style="margin-top:8px">${aiUi()}${syncUi()}
         <button class="btn small" onclick="exportProgress()">書き出す（JSON）</button>
         <button class="btn small" onclick="importProgress()">取り込む</button>
         <button class="btn small" onclick="resetProgress()">リセット</button>
@@ -1339,7 +1343,7 @@ function renderQuestion(showAnswer=false, picked=[]){
       ${showAnswer
         ? `<button class="btn primary big" onclick="nextQ()">${session.idx+1<n?"次の問題 →":"結果を見る"}</button>
            ${last?.ok?`<button class="btn" onclick="markUnsure('${q.id}',this)">🤔 自信なし</button>`:""}
-           <button class="btn" onclick="explainThis('${q.id}')">🎙️ 説明する</button>
+           <button class="btn" onclick="explainThis('${q.id}')">⭕ 1文で確認</button>
            <span class="spacer"></span><button class="btn ghost small" onclick="quitSession()">終了</button>`
         : `<button class="btn primary big" onclick="submitQ()">解答する</button>
            <button class="btn" onclick="skipQ()">スキップ</button>
@@ -1544,7 +1548,8 @@ function retryWrong(){
 
 /* ---------- 説明してモード ---------- */
 let rec=null, recText="";
-function startExplain(id){
+function startExplain(id){ startMaru(id); }
+function startExplainOld(id){
   // 弱点から1問（または指定id）
   const q = id ? byId[id] : buildWeakSet(1)[0];
   const kws = keywordsFor(q);
@@ -1584,7 +1589,14 @@ function confusionNote(kws){
   if(!items.length) return "";
   return `<p style="font-size:13px;color:var(--warn)">⚠️ 試験で混同させられやすい語: ${items.slice(0,5).map(esc).join(" ／ ")}</p>`;
 }
+// 書き起こしと要点を同じ形にならす（全半角・空白・カタカナ→ひらがな・英字の大小）
+function feynNorm(x){
+  return String(x).normalize("NFKC").replace(/[\s、。・,.]/g, "").toLowerCase()
+    .replace(/[ァ-ヶ]/g, c=>String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
 function keywordsFor(q){
+  const pts = FEYN[q.id] && FEYN[q.id].要点;
+  if(pts && pts.length) return pts.map(p=>p.語);   // 問題ごとの要点（正答の理由）があればそれを使う
   const text = q.問題文 + " " + q.選択肢.filter((c,i)=>q.正答.includes(i+1)).join(" ");
   const hit = [];
   for(const w of specificWords){
@@ -1622,12 +1634,20 @@ function gradeExplain(qid){
   const said = box.textContent.replace(/\s/g,"");
   const kws = JSON.parse(box.dataset.kws || "[]");
   if(said.length < 10){ alert("まず説明を録音（または入力）してください"); return; }
-  const hits = kws.filter(w=>said.includes(w));
+  const pts = (FEYN[qid] && FEYN[qid].要点) || null;
+  const nsaid = feynNorm(said);
+  // 要点: 語か別の言い方のどれかが言えていれば当たり（かな・カタカナ・略語の違いは問わない）
+  const hits = kws.filter(w=>{
+    const p = pts && pts.find(x=>x.語 === w);
+    return [w, ...((p && p.別の言い方) || [])].some(a=>a && nsaid.includes(feynNorm(a)));
+  });
   const pct = kws.length ? Math.round(100*hits.length/kws.length) : 0;
-  const chips = kws.map(w=>`<span class="kw ${hits.includes(w)?"hit":"miss"}">${esc(w)}</span>`).join("");
+  const chips = pts
+    ? `<ul class="feyn">${pts.map(p=>`<li><span class="kw ${hits.includes(p.語)?"hit":"miss"}">${esc(p.語)}</span> <span style="font-size:13px;color:var(--sub)">${esc(p.理由||"")}</span></li>`).join("")}</ul>`
+    : kws.map(w=>`<span class="kw ${hits.includes(w)?"hit":"miss"}">${esc(w)}</span>`).join("");
   document.getElementById("gradeBox").innerHTML = `
     <div class="card">
-      <b>キーワードカバー率 ${pct}%</b>（${hits.length}/${kws.length}）
+      <b>${pts ? "説明の要点" : "キーワード"}カバー率 ${pct}%</b>（${hits.length}/${kws.length}）
       <div style="margin:8px 0">${chips}</div>
       <p style="font-size:13px;color:var(--sub)">※漢字語は音声認識の表記ゆれで検出漏れすることがあります。言えていれば自己評価でOKにしてください。</p>
       <div>自己評価:
@@ -1644,6 +1664,130 @@ function selfGrade(qid, ok){
   startExplain();
 }
 function explainThis(id){ startExplain(id); }
+
+/* ---------- 1文の○×（11/18） ----------
+   過去問の選択肢を1文にした ○× 問題。× の文は正しく直して答え、直した文に要点が入っているかで採点する */
+let maru = null;   // {list: [[qid, 番号]], idx, ok}
+function maruItems(qid){
+  return Object.entries(MARU[qid] || {}).filter(([n, v])=>v && (v.文 || (n === "問い" && v.問い))).map(([n])=>[qid, n]);
+}
+function startMaru(id){
+  let list = [];
+  if(id) list = maruItems(id);
+  else {
+    for(const q of buildWeakSet(40)){
+      const its = maruItems(q.id);
+      if(!its.length) continue;
+      // × の文が7割あるので、○・×・問い の種類を先に等しく選んでから文を選ぶ
+      const kinds = {};
+      its.forEach(x=>{ const v = MARU[x[0]][x[1]]; const k = x[1] === "問い" ? "問い" : v.正誤; (kinds[k] = kinds[k] || []).push(x); });
+      const ks = Object.keys(kinds), pick = kinds[ks[Math.floor(Math.random()*ks.length)]];
+      list.push(pick[Math.floor(Math.random()*pick.length)]);
+      if(list.length >= 10) break;
+    }
+  }
+  if(!list.length){ startExplainOld(id); return; }
+  maru = {list, idx: 0, ok: 0};
+  renderMaru();
+}
+function renderMaru(){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n], q = byId[qid];
+  if(n === "問い"){ renderAsk(qid, it, q); return; }
+  app.innerHTML = `<div class="card">
+    <div class="qmeta"><span>⭕ 1文の○× ${maru.idx+1} / ${maru.list.length}</span>
+      <span>第${q.回}回 ${q.区分} 問${q.問題番号} の選択肢${n}</span><span class="tag">${esc(q.科目)}</span></div>
+    <p style="font-size:18px;line-height:1.7">${termHtml(it.文)}</p>
+    <div id="maruAct" style="display:flex;gap:12px;margin:12px 0">
+      <button class="btn primary big" onclick="maruAnswer('○')">○ 正しい</button>
+      <button class="btn big" onclick="maruAnswer('×')">× 誤り</button>
+    </div>
+    <div id="maruBox"></div>
+    <div class="actions"><span class="spacer"></span><button class="btn ghost small" onclick="home()">終了</button></div>
+  </div>`;
+}
+function maruAnswer(a){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n];
+  document.getElementById("maruAct").innerHTML = `<span class="pill">あなたの答え: ${a}</span>`;
+  const box = document.getElementById("maruBox");
+  if(a === "×" && it.正誤 === "×"){
+    box.innerHTML = `<p><b>× で合っています。</b>では、正しい文に直してください（声でも入力でも）。</p>
+      <div style="margin:6px 0"><button class="btn" id="micBtn" onclick="toggleRec()">🎙️ 録音開始</button>
+        <button class="btn primary" onclick="maruGrade()">直した文を採点</button></div>
+      <div id="micBox" contenteditable="true" style="min-height:3em">ここに直した文を入力（または録音）</div>`;
+    recText = "";
+    return;
+  }
+  const ok = a === it.正誤;
+  maruFinish(ok, ok ? "正解です。この文は正しい内容です。" : (it.正誤 === "○" ? "不正解。この文は正しい内容です（○）。" : "不正解。この文は誤りです（×）。"), null);
+}
+function maruGrade(){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n];
+  maru.said = document.getElementById("micBox").textContent;
+  const said = feynNorm(maru.said);
+  const pts = it.要点 || [];
+  const hits = pts.filter(p=>[p.語, ...(p.別の言い方||[])].some(x=>x && said.includes(feynNorm(x))));
+  const ok = pts.length ? hits.length >= Math.ceil(pts.length/2) : said.length > 4;
+  const chips = pts.map(p=>`<span class="kw ${hits.includes(p)?"hit":"miss"}">${esc(p.語)}</span>`).join("");
+  maruFinish(ok, (ok ? "直せています。" : "直し方が足りません。") + (pts.length ? `<div style="margin:6px 0">要点: ${chips}</div>` : ""), true);
+}
+function maruFinish(ok, msg, corrected){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n], q = byId[qid];
+  if(ok) maru.ok++;
+  recordAttempt(qid, !!ok, "maru");
+  const ex = (EXPL[qid] && EXPL[qid].c && EXPL[qid].c[n]) || "";
+  document.getElementById("maruBox").innerHTML = `<div class="card" style="background:var(--accent2);border:none">
+    <p>${ok ? "✅" : "❌"} ${msg}</p>
+    ${it.正誤 === "×" ? `<p><b>正しい文:</b> ${termHtml(it.直した文 || "")}</p>` : ""}
+    ${ex && it.正誤 === "×" ? `<p style="font-size:13px;color:var(--sub)">誤り理由: ${esc(ex)}</p>` : ""}
+    <p style="font-size:13px;color:var(--sub)">元の問題: ${esc(q.問題文.slice(0, 80))}… 正答 ${q.正答.join("・")}</p>
+    ${corrected ? `<div style="margin:6px 0">${aiBtn("fix")}</div><div>自己評価: <button class="btn small" onclick="maruSelf(1)">◎ 直せた</button> <button class="btn small" onclick="maruSelf(0)">△ まだ怪しい</button></div>` : ""}
+  </div>
+  <div class="actions"><button class="btn primary big" onclick="maruNext()">${maru.idx+1 < maru.list.length ? "次の文 →" : "結果を見る"}</button></div>`;
+}
+/* 「1つ挙げて」の問い: 答えのどれか1つ（別の言い方も）が言えていれば当たり */
+function renderAsk(qid, it, q){
+  app.innerHTML = `<div class="card">
+    <div class="qmeta"><span>💬 1つ挙げて ${maru.idx+1} / ${maru.list.length}</span>
+      <span>第${q.回}回 ${q.区分} 問${q.問題番号} から</span><span class="tag">${esc(q.科目)}</span></div>
+    <p style="font-size:18px;line-height:1.7">${esc(it.問い)}</p>
+    <div style="margin:6px 0"><button class="btn" id="micBtn" onclick="toggleRec()">🎙️ 録音開始</button>
+      <button class="btn primary" onclick="askGrade()">答え合わせ</button></div>
+    <div id="micBox" contenteditable="true" style="min-height:3em">ここに答えを入力（または録音）</div>
+    <div id="maruBox"></div>
+    <div class="actions"><span class="spacer"></span><button class="btn ghost small" onclick="home()">終了</button></div>
+  </div>`;
+  recText = "";
+}
+function askGrade(){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n], q = byId[qid];
+  maru.said = document.getElementById("micBox").textContent;
+  const said = feynNorm(maru.said);
+  const ans = it.答え || [];
+  const hits = ans.filter(p=>[p.語, ...(p.別の言い方||[])].some(x=>x && said.includes(feynNorm(x))));
+  const ok = hits.length > 0;
+  if(ok) maru.ok++;
+  recordAttempt(qid, ok, "ask");
+  document.getElementById("maruBox").innerHTML = `<div class="card" style="background:var(--accent2);border:none">
+    <p>${ok ? "✅ 正解" : "❌ 答えの例に入っていません"}</p>
+    <p>答えの例: ${ans.map(p=>`<span class="kw ${hits.includes(p)?"hit":"miss"}">${esc(p.語)}</span>`).join(" ")}</p>
+    <p style="font-size:13px;color:var(--sub)">答えの例は元の問題（${esc(q.問題文.slice(0, 60))}…）の中で正しいものだけ。ほかにも正しい答えはありえます。</p>
+    <div style="margin:6px 0">${aiBtn("ask")}</div>
+    <div>自己評価: <button class="btn small" onclick="maruSelf(1)">◎ 言えた</button> <button class="btn small" onclick="maruSelf(0)">△ 言えなかった</button></div>
+  </div>
+  <div class="actions"><button class="btn primary big" onclick="maruNext()">${maru.idx+1 < maru.list.length ? "次へ →" : "結果を見る"}</button></div>`;
+}
+function maruSelf(v){   // 書き起こしの表記ゆれで要点が外れたとき、自分の判断で直す
+  const [qid] = maru.list[maru.idx];
+  const s = store(), a = s.attempts[qid];
+  if(a && a.length){ if(a[a.length-1].ok !== v) maru.ok += v ? 1 : -1; a[a.length-1].ok = v; save(s); }
+  maruNext();
+}
+function maruNext(){
+  maru.idx++;
+  if(maru.idx < maru.list.length){ renderMaru(); return; }
+  app.innerHTML = `<div class="card"><h2>1文の○× 結果</h2><p>${maru.ok} / ${maru.list.length} 文</p>
+    <div class="actions"><button class="btn primary" onclick="startMaru()">もう一度（別の文）</button><button class="btn" onclick="home()">ホーム</button></div></div>`;
+}
 
 /* ================= 暗記カード（用語集） =================
    用語集の語を表=語／裏=意味（逆向きも可）で回す。間隔は問題の復習と同じ 1→3→7→14→30日。
@@ -1812,6 +1956,48 @@ function importTextbook(inp){
     alert(`${r.names.length}冊を取り込みました。${r.errors.length ? "\n\n取り込めなかったファイル:\n" + r.errors.join("\n") : ""}`);
     inp.value = ""; TEXTBOOK.applyGlossSrc(GLOSS); home();
   });
+}
+/* AI 採点（中継 worker/grade.js）。URL と合言葉はこの端末にだけ保存 */
+function aiCfg(){ try{ return JSON.parse(localStorage.getItem("ot_ai") || "{}"); }catch(e){ return {}; } }
+function aiSave(){
+  const u = document.getElementById("aiUrl").value.trim(), c = document.getElementById("aiCode").value.trim();
+  try{ localStorage.setItem("ot_ai", JSON.stringify({url: u, code: c})); }catch(e){}
+  document.getElementById("aiMsg").textContent = u && c ? "保存しました" : "空にしました（AI 採点を使わない）";
+}
+function aiUi(){
+  const a = aiCfg();
+  return `<div style="margin-bottom:10px"><b>🤖 AI 採点</b>（1文の○× の直した文・「1つ挙げて」の答えを意味で採点）<br>
+    <input id="aiUrl" placeholder="中継の URL（https://…workers.dev）" value="${esc(a.url||"")}" style="width:60%">
+    <input id="aiCode" type="password" placeholder="合言葉" value="${esc(a.code||"")}" style="width:25%">
+    <button class="btn small" onclick="aiSave()">保存</button> <span class="muted" id="aiMsg"></span></div>`;
+}
+async function aiGrade(payload){
+  const a = aiCfg();
+  if(!a.url || !a.code) throw new Error("設定で中継の URL と合言葉を入れてください");
+  const r = await fetch(a.url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({code: a.code, ...payload})});
+  const j = await r.json().catch(()=>({error: "応答を読めません"}));
+  if(!r.ok || j.error) throw new Error(j.error || ("エラー " + r.status));
+  return j;   // {判定: 正|部分|誤, 理由, 例に無い}
+}
+/* AI に採点してもらい、結果で記録を直す（キーワードの判定より優先） */
+async function aiRegrade(kind){
+  const [qid, n] = maru.list[maru.idx], it = MARU[qid][n];
+  const el = document.getElementById("aiRes");
+  el.textContent = "AI が採点中…";
+  try{
+    const said = maru.said || "";
+    const g = await aiGrade(kind === "ask"
+      ? {kind: "ask", 問い: it.問い, 答え: (it.答え||[]).map(p=>p.語), 回答: said}
+      : {kind: "fix", 文: it.文, 直した文: it.直した文, 要点: (it.要点||[]).map(p=>p.語), 回答: said});
+    const ok = g.判定 === "正" ? 1 : 0;
+    el.innerHTML = `🤖 <b>${g.判定 === "正" ? "◎ 正" : g.判定 === "部分" ? "△ 部分的" : "✕ 誤"}</b> ${esc(g.理由||"")}${g.例に無い ? "（答えの例に無いが正しい）" : ""}`;
+    const s = store(), a = s.attempts[qid];
+    if(a && a.length){ if(a[a.length-1].ok !== ok) maru.ok += ok ? 1 : -1; a[a.length-1].ok = ok; save(s); }
+  }catch(e){ el.textContent = "AI 採点できませんでした: " + e.message; }
+}
+function aiBtn(kind){
+  const a = aiCfg();
+  return a.url && a.code ? `<button class="btn small" onclick="aiRegrade('${kind}')">🤖 AI に採点してもらう</button> <span id="aiRes"></span>` : "";
 }
 function syncUi(){
   if(!window.SYNC) return "";

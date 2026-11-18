@@ -1,0 +1,11 @@
+name = "ot-grade"
+main = "grade.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+DAILY_LIMIT = "200"
+
+# 1日の回数を数えるとき（任意）: npx wrangler kv namespace create COUNTS で出た id を入れて、下の3行の # を外す
+# [[kv_namespaces]]
+# binding = "COUNTS"
+# id = "ここに id"
