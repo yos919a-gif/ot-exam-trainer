@@ -132,7 +132,14 @@ def main():
         raise SystemExit(f"diseases.json に無い疾患名: {unknown}")
     pats = {k: re.compile(v) for k, v in ADL.items()}
     cats = [{"name": k, "ids": []} for k in ADL]
+    qp = CONTENT / "exam" / "qtags.json"
+    qt = json.loads(qp.read_text(encoding="utf-8")) if qp.exists() else None
     for q in qs:
+        if qt is not None:   # 11/18: 問題を読んで付けた ADL の項目（その ADL を問う問題だけ）
+            for c in cats:
+                if c["name"] in (qt.get(q["id"]) or {}).get("ADL", []):
+                    c["ids"].append(q["id"])
+            continue
         text = q["問題文"] + " " + " ".join(q["選択肢"])
         for c in cats:
             if pats[c["name"]].search(text):

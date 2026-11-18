@@ -40,6 +40,12 @@ GROUPS = {
 }
 
 
+def load_qtags():
+    """content/exam/qtags.json（問題ごとの 疾患・評価・ADL・主題語。11/18 作業場で問題を読んで付けた）"""
+    p = CONTENT / "exam" / "qtags.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
 def main():
     qs = json.loads((CONTENT / "exam" / "questions.json").read_text(encoding="utf-8"))
     try:
@@ -49,8 +55,15 @@ def main():
     pats = {g: re.compile("|".join(map(re.escape, words))) for g, words in GROUPS.items()}
     groups = [{"name": g, "words": w, "ids": []} for g, w in GROUPS.items()]
     tagged = set()
+    qt = load_qtags()
     for q in qs:
         if q.get("採点除外"):
+            continue
+        if qt is not None:   # 11/18: 問題を読んで付けたタグ（qtags.json）があればそれを使う。誤答の選択肢にだけ出る疾患は入らない
+            for g in groups:
+                if g["name"] in (qt.get(q["id"]) or {}).get("疾患", []):
+                    g["ids"].append(q["id"])
+                    tagged.add(q["id"])
             continue
         reasons = (ex.get(q["id"], {}).get("c") or {}).values()
         text = q["問題文"] + "\n" + "\n".join(q["選択肢"]) + "\n" + "\n".join(reasons)
@@ -58,7 +71,7 @@ def main():
             if pats[g["name"]].search(text):
                 g["ids"].append(q["id"])
                 tagged.add(q["id"])
-    out = {"説明": "疾患別模試のグループ（問題文・選択肢・誤り理由の語で自動タグ付け）",
+    out = {"説明": "疾患別模試のグループ（qtags.json があれば問題を読んで付けたタグ、無ければ語で自動タグ付け）",
            "対象問題数": len(tagged), "groups": groups}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     raw = json.dumps(out, ensure_ascii=False, indent=1).encode("utf-8")

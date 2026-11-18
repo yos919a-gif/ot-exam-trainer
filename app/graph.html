@@ -168,6 +168,7 @@ td,th{padding:9px;line-height:1.8;overflow-wrap:anywhere}table{table-layout:fixe
         <option value="kana">あいうえお順</option>
         <option value="freq">登場回数順</option>
       </select></label>
+      <label title="選んだ語がその問題の中心（問題文・正答で問われていること）になっている問題だけにする。誤答の選択肢にだけ出る問題は外れる"><input type="checkbox" id="mainOnly" checked> 主題の問題だけ</label>
       <span class="hint">下のリストをクリックで絞り込み（AND）／空欄に戻すと全語リスト</span>
     </div>
     <div id="confBody"></div>
@@ -182,7 +183,7 @@ td,th{padding:9px;line-height:1.8;overflow-wrap:anywhere}table{table-layout:fixe
 <script src="content.js"></script>
 <script>
 "use strict";
-let qMeta={}, cWords={}, R={}, FAM={};
+let qMeta={}, cWords={}, R={}, FAM={}, QTAG={};  // QTAG: 問題ごとの主題語（content/exam/qtags.json。11/18）
 const expandedFams = new Set();
 const GROUPS = [
   ["基礎医学",   ["解剖学","生理学","運動学"],                             "var(--g1)"],
@@ -222,6 +223,7 @@ async function load(){
     cfetch("analysis/choice_words.json").catch(()=>({})),
     cfetch("analysis/word_readings.json").catch(()=>({})),
     cfetch("analysis/word_families.json").catch(()=>({})),
+    cfetch("exam/qtags.json").then(j=>{ QTAG=j; }).catch(()=>{}),
   ]);
   QS.forEach(q=>qMeta[q.id]={回:q.回, 区分:q.区分, 番号:q.問題番号, 文:q.問題文, 正答:q.正答, 選択肢:q.選択肢, 画像:q.画像, 採点方式:q.採点方式});
   // 入力欄の候補 = 全ファセット語（登場回数の多い順）
@@ -239,6 +241,19 @@ async function load(){
 /* ---------- 引っ掛けマップ ---------- */
 document.getElementById("confWord").addEventListener("change", drawConf);
 document.getElementById("sortMode").addEventListener("change", drawConf);
+document.getElementById("mainOnly").addEventListener("change", drawConf);
+/* 主題の問題だけ: 選んだ語（語幹*は前方一致）が、その問題の主題語のどれかに含まれる（または主題語を含む）とき */
+function isMain(id, terms){
+  const box = document.getElementById("mainOnly");
+  if(!box || !box.checked || !terms.length) return true;
+  const nz = x => String(x).normalize("NFKC").replace(/\s+/g, "").toLowerCase();   // 「Parkinson 病」の空白・全半角をならす
+  const zs = ((QTAG[id] && QTAG[id].主題語) || []).map(nz);
+  if(!zs.length) return true;   // タグの無い問題は外さない
+  return terms.some(t=>{
+    const s = nz(t.endsWith("*") ? t.slice(0,-1) : t);
+    return zs.some(z=>z.includes(s) || s.includes(z));
+  });
+}
 /* 「嚥下*」のような語幹条件は語族全体（前方一致）にマッチする */
 function termMatch(t, w){
   return t.endsWith("*") ? w.startsWith(t.slice(0, -1)) : w === t;
@@ -250,7 +265,8 @@ function andSearch(terms){
     const cw = cWords[id];
     const all = new Set(cw.s); cw.c.forEach(a=>a.forEach(x=>all.add(x)));
     return exact.every(t=>all.has(t))
-        && star.every(t=>{ for(const w of all) if(termMatch(t,w)) return true; return false; });
+        && star.every(t=>{ for(const w of all) if(termMatch(t,w)) return true; return false; })
+        && isMain(id, terms);
   });
   const hit = w => exact.includes(w) || star.some(t=>termMatch(t,w));
   const stat = {};           // 選択肢語 -> [正答側, 誤答側]

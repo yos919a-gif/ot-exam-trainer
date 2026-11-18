@@ -72,7 +72,16 @@ def main():
                 alias[a] = disp
     pat = re.compile("|".join(map(re.escape, sorted(alias, key=len, reverse=True))))
     ids = {}
-    for q in qs:
+    qp = CONTENT / "exam" / "qtags.json"
+    qt = json.loads(qp.read_text(encoding="utf-8")) if qp.exists() else None
+    if qt is not None:   # 11/18: 問題を読んで付けた評価（誤答の選択肢にだけ出る評価は入らない）。表記は alias で表示名にそろえる
+        norm = {re.sub(r"\s+", "", a): d for a, d in alias.items()}
+        for q in qs:
+            if q.get("採点除外"):
+                continue
+            for n in (qt.get(q["id"]) or {}).get("評価", []):
+                ids.setdefault(norm.get(re.sub(r"\s+", "", n), MERGE.get(n, n)), []).append(q["id"])
+    for q in ([] if qt is not None else qs):
         if q.get("採点除外"):
             continue
         text = re.sub(r"\s+", "", q["問題文"] + " " + " ".join(q["選択肢"]))
