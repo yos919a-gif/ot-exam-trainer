@@ -5,8 +5,8 @@
   "exam/questions.json": {
    "説明": "国家試験の問題（第50〜61回）",
    "件数": 2400,
-   "bytes": 1793305,
-   "sha1": "ff4170565e"
+   "bytes": 1793178,
+   "sha1": "e0186f1398"
   },
   "exam/explanations.json": {
    "説明": "選択肢の誤り理由",
