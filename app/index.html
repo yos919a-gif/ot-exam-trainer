@@ -486,6 +486,10 @@ body:has(.loopbar) #app{padding-bottom:110px}
 .radar .racc-dot{fill:var(--accent,#2b6cb0)}
 .radar .rl{font-size:11.5px;fill:var(--ink)}
 .radar .rv{font-size:10.5px;fill:var(--sub);font-variant-numeric:tabular-nums}
+.radar .rhit{fill:transparent;cursor:pointer}
+.radar .rhit:hover{fill:color-mix(in srgb,var(--accent,#2b6cb0) 10%,transparent)}
+.radar .rl{cursor:pointer}
+.radar .rl:hover tspan:first-child{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -829,7 +833,7 @@ function fieldStats(){
 }
 function radarSvg(group, st){
   const axes = FIELD_AXES[group], N = axes.length, cx = 160, cy = 150, R = 100;
-  const pt = (i, v)=>{ const a = -Math.PI/2 + 2*Math.PI*i/N; return [cx + R*v*Math.cos(a), cy + R*v*Math.sin(a)]; };
+  const pt = (i, v)=>{ const a = -Math.PI/2 + 2*Math.PI*i/N; return [cx + R*v*Math.cos(a), cy + R*v*Math.sin(a)]; };   // i は小数も可（扇形の端）
   const poly = vals=>vals.map((v, i)=>pt(i, v).map(n=>n.toFixed(1)).join(",")).join(" ");
   let g = "";
   for(const r of [0.25, 0.5, 0.75, 1]) g += `<polygon class="rg" points="${poly(axes.map(()=>r))}"/>`;
@@ -838,13 +842,27 @@ function radarSvg(group, st){
   const acc = axes.map(f=>{ const x = st[group + "|" + f]; return x.n ? x.ok / x.n : 0; });
   g += `<polygon class="rseen" points="${poly(seen)}"/><polygon class="racc" points="${poly(acc)}"/>`;
   acc.forEach((v, i)=>{ if(st[group + "|" + axes[i]].n){ const [x, y] = pt(i, v); g += `<circle class="racc-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`; } });
+  axes.forEach((f, i)=>{   // 押せる範囲: 軸の両側の半分ずつの扇形（中心〜外周）
+    const p1 = pt(i - 0.5, 1.12), p2 = pt(i + 0.5, 1.12), [xo, yo] = pt(i, 1.12);
+    g += `<path class="rhit" d="M${cx},${cy} L${p1[0].toFixed(1)},${p1[1].toFixed(1)} L${xo.toFixed(1)},${yo.toFixed(1)} L${p2[0].toFixed(1)},${p2[1].toFixed(1)} Z" onclick="startFieldQ('${group}','${f}')"><title>${esc(f)}の問題を解く</title></path>`;
+  });
   axes.forEach((f, i)=>{
     const [x, y] = pt(i, 1.17), x0 = st[group + "|" + f];
     const anchor = Math.abs(x - cx) < 8 ? "middle" : (x > cx ? "start" : "end");
     const pct = x0.n ? Math.round(100 * x0.ok / x0.n) + "%" : "—";
-    g += `<text class="rl" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"><tspan>${esc(f)}</tspan><tspan class="rv" x="${x.toFixed(1)}" dy="13">${pct}・${x0.seen}/${x0.total}</tspan></text>`;
+    g += `<text class="rl" onclick="startFieldQ('${group}','${f}')" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"><tspan>${esc(f)}</tspan><tspan class="rv" x="${x.toFixed(1)}" dy="13">${pct}・${x0.seen}/${x0.total}</tspan></text>`;
   });
   return `<svg viewBox="-30 0 380 310" class="radar" role="img" aria-label="${group}の分野別 解いた割合と正答率">${g}</svg>`;
+}
+/* レーダーの分野を押したとき: その分野（専門／専門基礎）の問題を20問。未回答 → 最後に間違えた → それ以外 の順に、それぞれの中はランダム */
+function startFieldQ(group, f){
+  const A = store().attempts;
+  const pool = Q.filter(q=>QFIELD[q.id] === f && ((qPos(q) <= 50) === (group === "専門")));
+  const rank = q=>{ const a = A[q.id]; return !a || !a.length ? 0 : a[a.length - 1].ok === 0 ? 1 : 2; };
+  const list = shuffle(pool.slice()).sort((x, y)=>rank(x) - rank(y)).slice(0, 20);
+  if(!list.length) return;
+  session = {list, idx: 0, mode: "fieldq", results: [], t0: Date.now(), label: `${group}・${f}`};
+  renderQuestion();
 }
 function radarCard(){
   if(!Object.keys(QFIELD).length) return "";
@@ -856,7 +874,7 @@ function radarCard(){
       <figure><figcaption>専門分野（1〜50番）</figcaption>${radarSvg("専門", st)}</figure>
       <figure><figcaption>専門基礎分野（51〜100番）</figcaption>${radarSvg("専門基礎", st)}</figure>
     </div>
-    <div class="muted" style="font-size:12px">各分野の数字は 正答率・解いた問題/その分野の問題数。</div>
+    <div class="muted" style="font-size:12px">分野名か、その範囲を押すと、その分野の問題を20問（まだ解いていない問題・間違えた問題を優先）解けます。数字は 正答率・解いた問題/その分野の問題数。</div>
   </div>`;
 }
 function accuracyBySubject(){
@@ -1178,7 +1196,7 @@ function dzEvalHtml(q){
   return blocks;
 }
 
-const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明", loop:"🔁 全問正解ループ", yosou:"予想模試", num:"番号で解く"};
+const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明", loop:"🔁 全問正解ループ", yosou:"予想模試", fieldq:"分野"};
 
 /* ================= 採点 ================= */
 function judge(q, picked){ // picked: 数値の配列
@@ -1240,11 +1258,6 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
     ${BLUEPRINT && Object.keys(QFIELD).length ? `<div class="tile c1"><div class="top"><span class="ic">🎯</span><h3>予想模試</h3></div>
       <p>過去12回の「何番に何の分野が出たか」の設計図どおりに並べる本番型。各番号には同じ区分の過去問から、まだ解いていない問題・間違えた問題を優先して入れる。</p>
       <div class="acts"><button class="btn primary" onclick="startYosou(2)">本番型 200問</button><button class="btn" onclick="startYosou(1)">午前だけ 100問</button></div></div>` : ""}
-    <div class="tile c3"><div class="top"><span class="ic">🔢</span><h3>番号で解く</h3></div>
-      <p>同じ番号の問題を、第50〜61回の全部で解く（例: 1番＝ROM・MMT、68番＝ホルモン）。</p>
-      <div class="acts"><select id="numP" aria-label="問題番号">${Array.from({length:100},(_,i)=>`<option value="${i+1}">${i+1}番</option>`).join("")}</select>
-        <select id="numS" aria-label="午前・午後"><option value="both">午前・午後</option><option value="午前">午前だけ</option><option value="午後">午後だけ</option></select>
-        <button class="btn primary" onclick="startNum()">はじめる</button></div></div>
     <div class="tile c1"><div class="top"><span class="ic">📝</span><h3>オリジナル模試</h3></div>
       <p>直近4回の科目バランスで編成。実地3点換算で合格ラインを判定。</p>
       <div class="acts"><button class="btn primary" onclick="startMock(200)">本試験型 200問</button><button class="btn" onclick="startMock(100)">100問</button><button class="btn" onclick="startMock(50)">50問</button></div></div>
@@ -1398,13 +1411,6 @@ function startYosou(nSess){
     if(q){ used.add(q.id); list.push(q); }
   }
   session = {list, idx: 0, mode: "yosou", results: [], t0: Date.now(), label: nSess === 2 ? "200問" : "午前100問"};
-  renderQuestion();
-}
-/* 番号で解く: 同じ番号（1〜100）の過去問を回の順に */
-function startNum(){
-  const p = +document.getElementById("numP").value, s = document.getElementById("numS").value;
-  const list = Q.filter(q=>qPos(q) === p && (s === "both" || q.区分 === s)).sort((x, y)=>x.回 - y.回 || (x.区分 === "午前" ? -1 : 1));
-  session = {list, idx: 0, mode: "num", results: [], t0: Date.now(), label: `${p}番${s === "both" ? "" : "・" + s}`};
   renderQuestion();
 }
 function startMock(n){ session = {list: buildMockSet(n), idx:0, mode:"mock", results:[], t0:Date.now()}; renderQuestion(); }
@@ -1664,7 +1670,7 @@ function renderResult(){
   res.forEach(r=>{ const k=byId[r.id].科目; (bySub[k]=bySub[k]||{ok:0,n:0});
                    bySub[k].n++; if(r.ok)bySub[k].ok++; });
   const sanka = session.mode === "sanka";  // 三科目模試: 解いた科目すべてで60%以上なら合格ライン（実地の換算なし）
-  const themed = ["field", "disease", "assess", "rommmt", "num"].includes(session.mode);  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
+  const themed = ["field", "disease", "assess", "rommmt", "fieldq"].includes(session.mode);  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
   const pass = sanka ? (res.length > 0 && Object.values(bySub).every(v=>v.ok/v.n >= 0.6))
              : themed ? (res.length > 0 && okN/res.length >= 0.6)
                      : ptMax ? (pt/ptMax >= 0.6 && jp >= jNeed) : false;
