@@ -453,6 +453,20 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 /* タブが5つ（語の網を足した、11/11）になり狭い画面で収まらないので、帯の中だけ横にスクロールさせる */
 .appbar .tabs{min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.appbar .tabs::-webkit-scrollbar{display:none}
 @media(max-width:640px){.appbar .tabs a{flex:0 0 auto;padding-inline:10px}}
+/* 全問正解ループのタイマー（画面下に固定。大きく見やすく） */
+.loopbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:center;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(16,24,40,.10)}
+.loopclock{position:relative;width:64px;height:64px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink)}
+.loopclock svg{width:64px;height:64px;transform:rotate(-90deg)}
+.loopclock circle{fill:none;stroke-width:4}
+.loopclock .bg{stroke:var(--line)}
+.loopclock .fg{stroke:var(--accent,#2b6cb0);stroke-dasharray:119.4;transition:stroke-dashoffset .9s linear}
+.loopclock.paused .fg{stroke:var(--sub)}
+.loopclock span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.loopmsg{font-size:14px;color:var(--sub)}
+body:has(.loopbar) .actions.sticky{display:none}
+body:has(.loopbar) #app{padding-bottom:110px}
+@media (prefers-reduced-motion:reduce){.loopclock .fg{transition:none}}
 </style>
 </head>
 <body>
@@ -1089,7 +1103,7 @@ function dzEvalHtml(q){
   return blocks;
 }
 
-const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明"};
+const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明", loop:"🔁 全問正解ループ"};
 
 /* ================= 採点 ================= */
 function judge(q, picked){ // picked: 数値の配列
@@ -1114,7 +1128,7 @@ function ringSvg(pct){ // 正答率の輪
       stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
 }
 function barCls(p){ return p===null ? "" : p<50 ? "lo" : p<70 ? "mid" : "hi"; } // 科目の成績バーの色（50%未満・70%未満・それ以上）
-function home(){
+function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
   session = null; wsess = null; if(window.DRILL) DRILL.reset(); if(window.PRINT) PRINT.reset();
   const s = store();
   const answered = Object.keys(s.attempts).length;
@@ -1169,6 +1183,12 @@ function home(){
   </div>
   <div class="sec">暗記・復習</div>
   <div class="tiles">
+    <div class="tile c6"><div class="top"><span class="ic">🔁</span><h3>全問正解ループ</h3></div>
+      <p>弱点から選んだ問題を、全部正解するまで繰り返す。答えると正誤が出て、数秒後に自動で次へ（画面を押すと一時停止）。</p>
+      <div class="acts">
+        <select id="loopN" aria-label="問題数">${[5,10,20].map(n=>`<option value="${n}" ${n===loopPref().n?"selected":""}>${n}問</option>`).join("")}</select>
+        <select id="loopS" aria-label="次へ進むまでの秒数">${[5,10,15].map(n=>`<option value="${n}" ${n===loopPref().s?"selected":""}>${n}秒で次へ</option>`).join("")}</select>
+        <button class="btn primary" onclick="startLoop()">はじめる</button></div></div>
     ${wordDeckCard()}
     ${markCard()}
     <div class="tile c6"><div class="top"><span class="ic">⭕</span><h3>1文の○×</h3></div>
@@ -1377,6 +1397,7 @@ function submitQ(){
   session.results.push({id:q.id, ok, picked});
   recordAttempt(q.id, ok, session.mode);
   renderQuestion(true, picked);
+  if(session.mode === "loop") loopAfterAnswer(q, ok);
 }
 function skipQ(){
   const q = session.list[session.idx];
@@ -1385,10 +1406,98 @@ function skipQ(){
   nextQ();
 }
 function nextQ(){
-  if(session.idx+1 < session.list.length){ session.idx++; renderQuestion(); }
+  loopStopTimer();
+  if(session.mode === "loop" && session.idx+1 >= session.list.length){ loopNextLap(); return; }
+  if(session.idx+1 < session.list.length){ session.idx++; if(session.mode === "loop") loopLabel(); renderQuestion(); }
   else renderResult();
 }
-function quitSession(){ session.list = session.list.slice(0, session.idx); renderResult(); }
+function quitSession(){
+  loopStopTimer();
+  if(session.mode === "loop"){ loopDone(true); return; }
+  session.list = session.list.slice(0, session.idx); renderResult();
+}
+
+/* ================= 全問正解ループ（11/18 ユーザー構想） =================
+   N問（既定10）を、全部正解するまで繰り返す。1周目の後は、その周に間違えた問題だけを順番を混ぜて出し直す。
+   答えると正誤が出て、S秒（既定10）で自動で次へ。画面（タイマー）を押すと一時停止。
+   同じ問題を3回続けて間違えたら自動では進めず、解説を読んでから自分で次へ */
+let loopT = null;
+function loopPref(){
+  try{ const v = JSON.parse(localStorage.getItem("ot_loop") || "{}"); return {n: v.n || 10, s: v.s || 10}; }
+  catch(e){ return {n: 10, s: 10}; }
+}
+function shuffle(a){ a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function startLoop(){
+  const n = +(document.getElementById("loopN")?.value || loopPref().n), sec = +(document.getElementById("loopS")?.value || loopPref().s);
+  try{ localStorage.setItem("ot_loop", JSON.stringify({n, s: sec})); }catch(e){}
+  const list = buildWeakSet(n);
+  session = {list, idx: 0, mode: "loop", results: [], t0: Date.now(),
+             loop: {lap: 1, total: list.length, sec, cleared: 0, miss: {}, streak: {}, answers: 0}};
+  loopLabel(); renderQuestion();
+}
+function loopLabel(){
+  const L = session.loop;
+  session.label = `${L.lap}周目・この周 残り${session.list.length - session.idx}問（全${L.total}問中 正解済み${L.cleared}）`;
+}
+function loopAfterAnswer(q, ok){
+  const L = session.loop;
+  L.answers++;
+  if(ok){ L.cleared++; L.streak[q.id] = 0; }
+  else { L.miss[q.id] = (L.miss[q.id] || 0) + 1; L.streak[q.id] = (L.streak[q.id] || 0) + 1; }
+  const box = document.createElement("div");
+  box.className = "loopbar";
+  if(!ok && L.streak[q.id] >= 3){
+    box.innerHTML = `<b>この問題は3回続けて間違えました。</b>選択肢の解説を読んでから「次へ」を押してください。<button class="btn primary" onclick="nextQ()">次へ →</button><button class="btn ghost small" onclick="quitSession()">終了</button>`;
+    document.body.appendChild(box);
+    return;
+  }
+  let left = L.sec, paused = false;
+  const draw = ()=>{
+    box.innerHTML = `<button class="loopclock ${paused ? "paused" : ""}" aria-label="${paused ? "再開" : "一時停止"}">
+        <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" class="bg"/><circle cx="22" cy="22" r="19" class="fg" style="stroke-dashoffset:${(119.4 * (1 - left / L.sec)).toFixed(1)}"/></svg>
+        <span>${paused ? "Ⅱ" : left}</span></button>
+      <span class="loopmsg">${paused ? "一時停止中（押すと再開）" : `${left}秒で次の問題へ（押すと一時停止）`}</span>
+      <button class="btn primary" onclick="nextQ()">今すぐ次へ →</button>
+      <button class="btn ghost small" onclick="quitSession()">終了</button>`;
+    box.querySelector(".loopclock").onclick = ()=>{ paused = !paused; draw(); };
+  };
+  draw();
+  document.body.appendChild(box);
+  loopT = setInterval(()=>{
+    if(paused) return;
+    left--;
+    if(left <= 0){ nextQ(); return; }
+    draw();
+  }, 1000);
+}
+function loopStopTimer(){
+  if(loopT){ clearInterval(loopT); loopT = null; }
+  document.querySelectorAll(".loopbar").forEach(el=>el.remove());
+}
+function loopNextLap(){
+  const L = session.loop;
+  const lapStart = session.results.length - session.list.length;
+  const wrong = session.results.slice(lapStart).filter(r=>!r.ok).map(r=>byId[r.id]);
+  if(!wrong.length){ loopDone(false); return; }
+  L.lap++;
+  session.list = shuffle(wrong); session.idx = 0;
+  loopLabel(); renderQuestion();
+}
+function loopDone(quit){
+  const L = session.loop, min = Math.max(1, Math.round((Date.now() - session.t0) / 60000));
+  const hard = Object.entries(L.miss).sort((a,b)=>b[1]-a[1]).map(([id, n])=>{ const q = byId[id];
+    return `<li>第${q.回}回 ${q.区分} 問${q.問題番号}（${esc(q.科目)}）… ${n}回まちがい <button class="btn small" onclick="startRetryOne('${id}')">もう一度</button></li>`; }).join("");
+  app.innerHTML = `<div class="card">
+    <h2>${quit ? "全問正解ループ（中断）" : "🎉 全問正解！"}</h2>
+    <p>${L.total}問 ／ ${L.lap}周 ／ 解いた回数 ${L.answers} ／ 約${min}分${quit ? `（正解済み ${L.cleared}/${L.total}）` : ""}</p>
+    ${hard ? `<p>まちがえた問題</p><ol>${hard}</ol>` : "<p>1周目で全問正解でした。</p>"}
+    <div class="actions"><button class="btn primary" onclick="startLoop()">もう1セット</button><button class="btn" onclick="home()">ホーム</button></div></div>`;
+}
+function startRetryOne(id){
+  session = {list: [byId[id]], idx: 0, mode: "loop", results: [], t0: Date.now(),
+             loop: {lap: 1, total: 1, sec: loopPref().s, cleared: 0, miss: {}, streak: {}, answers: 0}};
+  loopLabel(); renderQuestion();
+}
 
 function renderResult(){
   const res = session.results;
