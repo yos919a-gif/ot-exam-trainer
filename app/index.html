@@ -456,12 +456,12 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 /* 全問正解ループのタイマー（画面下に固定。大きく見やすく） */
 .loopbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:center;
   padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(16,24,40,.10)}
-.loopclock{position:relative;width:64px;height:64px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink)}
+.loopclock{position:relative;width:64px;height:64px;color:var(--ink);display:inline-block}
 .loopclock svg{width:64px;height:64px;transform:rotate(-90deg)}
 .loopclock circle{fill:none;stroke-width:4}
 .loopclock .bg{stroke:var(--line)}
 .loopclock .fg{stroke:var(--accent,#2b6cb0);stroke-dasharray:119.4;transition:stroke-dashoffset .9s linear}
-.loopclock.paused .fg{stroke:var(--sub)}
+.loopclock .fg.warn{stroke:var(--ng,#c0392b)}
 .loopclock span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
 .loopmsg{font-size:14px;color:var(--sub)}
 body:has(.loopbar) .actions.sticky{display:none}
@@ -1184,10 +1184,10 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
   <div class="sec">暗記・復習</div>
   <div class="tiles">
     <div class="tile c6"><div class="top"><span class="ic">🔁</span><h3>全問正解ループ</h3></div>
-      <p>弱点から選んだ問題を、全部正解するまで繰り返す。答えると正誤が出て、数秒後に自動で次へ（画面を押すと一時停止）。</p>
+      <p>弱点から選んだ問題を、全部正解するまで繰り返す。解いている間にタイマーが進み、時間切れは不正解。正解なら自動で次へ、まちがいは解説を見てから次へ。</p>
       <div class="acts">
         <select id="loopN" aria-label="問題数">${[5,10,20].map(n=>`<option value="${n}" ${n===loopPref().n?"selected":""}>${n}問</option>`).join("")}</select>
-        <select id="loopS" aria-label="次へ進むまでの秒数">${[5,10,15].map(n=>`<option value="${n}" ${n===loopPref().s?"selected":""}>${n}秒で次へ</option>`).join("")}</select>
+        <select id="loopS" aria-label="1問の制限時間">${[10,20,30,60].map(n=>`<option value="${n}" ${n===loopPref().s?"selected":""}>1問 ${n}秒</option>`).join("")}</select>
         <button class="btn primary" onclick="startLoop()">はじめる</button></div></div>
     ${wordDeckCard()}
     ${markCard()}
@@ -1370,6 +1370,7 @@ function renderQuestion(showAnswer=false, picked=[]){
            <span class="spacer"></span><button class="btn ghost small" onclick="quitSession()">中断して結果</button>`}
     </div>
   </div>`;
+  if(!showAnswer && session.mode === "loop") setTimeout(loopAnswerTimer, 0);
   if(!showAnswer){
     // 固定バーから次へ進んだときも、新しい問題文を先頭から読めるようにする。
     window.scrollTo(0, 0);
@@ -1389,10 +1390,11 @@ function renderQuestion(showAnswer=false, picked=[]){
 function currentPicked(){
   return [...document.querySelectorAll(".choice input:checked")].map(el=>+el.value);
 }
-function submitQ(){
+function submitQ(timeUp){
   const q = session.list[session.idx];
   const picked = currentPicked();
-  if(picked.length===0){ alert("選択肢を選んでください"); return; }
+  if(session.mode === "loop") loopStopTimer();
+  if(picked.length===0 && !timeUp){ alert("選択肢を選んでください"); return; }
   const ok = judge(q, picked);
   session.results.push({id:q.id, ok, picked});
   recordAttempt(q.id, ok, session.mode);
@@ -1439,36 +1441,49 @@ function loopLabel(){
   const L = session.loop;
   session.label = `${L.lap}周目・この周 残り${session.list.length - session.idx}問（全${L.total}問中 正解済み${L.cleared}）`;
 }
-function loopAfterAnswer(q, ok){
-  const L = session.loop;
-  L.answers++;
-  if(ok){ L.cleared++; L.streak[q.id] = 0; }
-  else { L.miss[q.id] = (L.miss[q.id] || 0) + 1; L.streak[q.id] = (L.streak[q.id] || 0) + 1; }
+function loopClock(left, total, label){
+  return `<span class="loopclock" aria-hidden="true">
+      <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" class="bg"/><circle cx="22" cy="22" r="19" class="fg ${left <= 3 ? "warn" : ""}" style="stroke-dashoffset:${(119.4 * (1 - left / total)).toFixed(1)}"/></svg>
+      <span>${left}</span></span><span class="loopmsg">${label}</span>`;
+}
+/* 解いている間のタイマー: 制限時間が来たら、選んでいる答えで採点（何も選んでいなければ時間切れで不正解） */
+function loopAnswerTimer(){
+  loopStopTimer();
+  const L = session.loop, total = L.sec;
+  let left = total;
   const box = document.createElement("div");
   box.className = "loopbar";
-  if(!ok && L.streak[q.id] >= 3){
-    box.innerHTML = `<b>この問題は3回続けて間違えました。</b>選択肢の解説を読んでから「次へ」を押してください。<button class="btn primary" onclick="nextQ()">次へ →</button><button class="btn ghost small" onclick="quitSession()">終了</button>`;
-    document.body.appendChild(box);
-    return;
-  }
-  let left = L.sec, paused = false;
   const draw = ()=>{
-    box.innerHTML = `<button class="loopclock ${paused ? "paused" : ""}" aria-label="${paused ? "再開" : "一時停止"}">
-        <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" class="bg"/><circle cx="22" cy="22" r="19" class="fg" style="stroke-dashoffset:${(119.4 * (1 - left / L.sec)).toFixed(1)}"/></svg>
-        <span>${paused ? "Ⅱ" : left}</span></button>
-      <span class="loopmsg">${paused ? "一時停止中（押すと再開）" : `${left}秒で次の問題へ（押すと一時停止）`}</span>
-      <button class="btn primary" onclick="nextQ()">今すぐ次へ →</button>
-      <button class="btn ghost small" onclick="quitSession()">終了</button>`;
-    box.querySelector(".loopclock").onclick = ()=>{ paused = !paused; draw(); };
+    box.innerHTML = loopClock(left, total, `残り${left}秒（時間切れは不正解）`) +
+      `<button class="btn primary" onclick="submitQ()">解答する</button><button class="btn ghost small" onclick="quitSession()">終了</button>`;
   };
   draw();
   document.body.appendChild(box);
   loopT = setInterval(()=>{
-    if(paused) return;
     left--;
-    if(left <= 0){ nextQ(); return; }
+    if(left <= 0){ L.timeUp = true; submitQ(true); return; }
     draw();
   }, 1000);
+}
+function loopAfterAnswer(q, ok){
+  const L = session.loop;
+  L.answers++;
+  const timeUp = L.timeUp; L.timeUp = false;
+  if(ok){ L.cleared++; L.streak[q.id] = 0; }
+  else { L.miss[q.id] = (L.miss[q.id] || 0) + 1; L.streak[q.id] = (L.streak[q.id] || 0) + 1; }
+  const box = document.createElement("div");
+  box.className = "loopbar";
+  if(!ok){
+    const msg = timeUp && !session.results[session.results.length - 1].picked.length ? "⏰ 時間切れ" : "✖ まちがい";
+    box.innerHTML = `<b>${msg}</b><span class="loopmsg">${L.streak[q.id] >= 3 ? "3回続けてまちがえました。" : ""}解説を読んでから次へ</span>
+      <button class="btn primary" onclick="nextQ()">次へ →</button><button class="btn ghost small" onclick="quitSession()">終了</button>`;
+    document.body.appendChild(box);
+    return;
+  }
+  let left = 2;
+  box.innerHTML = `<b>⭕ 正解</b><span class="loopmsg">${left}秒で次へ</span><button class="btn primary" onclick="nextQ()">今すぐ次へ →</button>`;
+  document.body.appendChild(box);
+  loopT = setInterval(()=>{ left--; if(left <= 0){ nextQ(); return; } box.querySelector(".loopmsg").textContent = `${left}秒で次へ`; }, 1000);
 }
 function loopStopTimer(){
   if(loopT){ clearInterval(loopT); loopT = null; }
