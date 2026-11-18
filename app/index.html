@@ -519,6 +519,7 @@ let wordNodes = [];         // 語グラフ
 let specificWords = [];     // 一般語を除いた専門語（長い順）
 let similarKey = {};        // id -> 類問グループキー
 let confusion = {};         // 語 -> [{other, co, selfCorrect, otherCorrect}]
+let BLUEPRINT = null;       // 出題の設計図（content/exam/blueprint.json。番号ごとの分野の分布・区分ごとの分野の数。11/19）
 let QFIELD = {};            // 問題ごとの学習分野（content/exam/fields.json。11/19 ユーザーが決めた 専門12・専門基礎10 分野）
 let MARU = {};              // 1文の○×（content/exam/maru.json。11/18 ユーザー決定「1文の○×式で、合っていたら○、間違っていたら修正」）
 let FEYN = {};              // 「私に説明して」の要点 {id: {要点: [{語, 別の言い方, 理由}]}}（content/exam/feynman.json。11/18）
@@ -770,6 +771,7 @@ async function loadAll(){
   try{ FEYN = await cfetch("exam/feynman.json"); }catch(e){ console.warn("説明の要点なし", e); }
   try{ MARU = await cfetch("exam/maru.json"); }catch(e){ console.warn("1文の○×なし", e); }
   try{ QFIELD = await cfetch("exam/fields.json"); }catch(e){ console.warn("分野の分類なし", e); }
+  try{ BLUEPRINT = await cfetch("exam/blueprint.json"); }catch(e){ console.warn("設計図なし", e); }
   try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
   try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); }); }
   catch(e){ console.warn("用語集なし", e); }
@@ -1176,7 +1178,7 @@ function dzEvalHtml(q){
   return blocks;
 }
 
-const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明", loop:"🔁 全問正解ループ"};
+const MODE_LABEL = {mock:"模試", sanka:"三科目模試", field:"分野別模試", disease:"疾患別模試", assess:"評価別模試", rommmt:"ROM・MMT", weak:"弱点集中", range:"範囲演習", review:"今日の復習", mark:"しおり", explain:"説明", loop:"🔁 全問正解ループ", yosou:"予想模試", num:"番号で解く"};
 
 /* ================= 採点 ================= */
 function judge(q, picked){ // picked: 数値の配列
@@ -1235,6 +1237,14 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
   <div class="today">${reviewCard()}${wordTodayCard()}</div>
   <div class="sec">模試・演習 <span style="margin-left:auto"><button class="btn small ${lookupOn()?"primary":""}" onclick="toggleLookup()" title="オンにすると、解答する前から問題文・選択肢の用語に下線が出て、タップで意味を見られます">📖 用語を見ながら解く: ${lookupOn()?"オン":"オフ"}</button></span></div>
   <div class="tiles">
+    ${BLUEPRINT && Object.keys(QFIELD).length ? `<div class="tile c1"><div class="top"><span class="ic">🎯</span><h3>予想模試</h3></div>
+      <p>過去12回の「何番に何の分野が出たか」の設計図どおりに並べる本番型。各番号には同じ区分の過去問から、まだ解いていない問題・間違えた問題を優先して入れる。</p>
+      <div class="acts"><button class="btn primary" onclick="startYosou(2)">本番型 200問</button><button class="btn" onclick="startYosou(1)">午前だけ 100問</button></div></div>` : ""}
+    <div class="tile c3"><div class="top"><span class="ic">🔢</span><h3>番号で解く</h3></div>
+      <p>同じ番号の問題を、第50〜61回の全部で解く（例: 1番＝ROM・MMT、68番＝ホルモン）。</p>
+      <div class="acts"><select id="numP" aria-label="問題番号">${Array.from({length:100},(_,i)=>`<option value="${i+1}">${i+1}番</option>`).join("")}</select>
+        <select id="numS" aria-label="午前・午後"><option value="both">午前・午後</option><option value="午前">午前だけ</option><option value="午後">午後だけ</option></select>
+        <button class="btn primary" onclick="startNum()">はじめる</button></div></div>
     <div class="tile c1"><div class="top"><span class="ic">📝</span><h3>オリジナル模試</h3></div>
       <p>直近4回の科目バランスで編成。実地3点換算で合格ラインを判定。</p>
       <div class="acts"><button class="btn primary" onclick="startMock(200)">本試験型 200問</button><button class="btn" onclick="startMock(100)">100問</button><button class="btn" onclick="startMock(50)">50問</button></div></div>
@@ -1264,16 +1274,13 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
         <button class="btn primary" onclick="startLoop()">はじめる</button></div></div>
     ${wordDeckCard()}
     ${markCard()}
-    <div class="tile c6"><div class="top"><span class="ic">⭕</span><h3>1文の○×</h3></div>
-      <p>過去問の選択肢を1文にした○×（×なら正しく直す）と、「〜を1つ挙げて」の問い。声でも入力でも。</p>
-      <div class="acts"><button class="btn primary" onclick="startExplain()">はじめる</button></div></div>
   </div>
   <div class="sec">科目別の成績 <span style="margin-left:auto"><button class="btn small" onclick="renderTrend()">📈 成績の推移</button></span></div>
   <div class="card">
     <details class="opts" style="border-top:0;margin:0;padding:0"><summary>18科目の正答率を見る</summary><div class="subj" style="margin-top:10px">${rows}</div></details>
     <details class="opts"><summary>教科書データ${window.TEXTBOOK && TEXTBOOK.has() ? "（取り込み済み）" : ""}</summary><div style="margin-top:8px">${textbookUi()}</div></details>
     <details class="opts"><summary>学習記録（同期・書き出し・取り込み）</summary>
-      <div style="margin-top:8px">${aiUi()}${syncUi()}
+      <div style="margin-top:8px">${syncUi()}
         <button class="btn small" onclick="exportProgress()">書き出す（JSON）</button>
         <button class="btn small" onclick="importProgress()">取り込む</button>
         <button class="btn small" onclick="resetProgress()">リセット</button>
@@ -1341,6 +1348,65 @@ function renderNotes(){
 }
 
 /* ---------- 出題共通 ---------- */
+/* ================= 予想模試（11/19） =================
+   設計図（BLUEPRINT）で 1〜100番の分野を決め（区分ごとに分野の数を決めて、その分野がよく出る番号へ割り当てる）、
+   各番号に同じ区分の過去問を入れる。まだ解いていない問題 → 最後に間違えた問題 → 同じ番号の問題 の順に優先 */
+const YO_BLOCKS = [["実地",1,20],["OT専門",21,50],["基礎3科目",51,74],["共通",75,100]];
+function qPos(q){ return q.問題番号 > 100 ? q.問題番号 - 100 : q.問題番号; }
+function yoBlock(p){ return YO_BLOCKS.find(([,a,b])=>p>=a && p<=b); }
+function yoArrange(sessions){
+  const out = {};
+  for(const [name, a, b] of YO_BLOCKS){
+    const q = BLUEPRINT.区分ごとの数[name] || {};
+    const total = (b - a + 1) * sessions.length;
+    // 平均±1 の範囲で揺らし（最小〜最大に収める）、合計を区分の問題数にそろえる
+    const want = {}; for(const f in q) want[f] = Math.min(q[f].最大, Math.max(q[f].最小, q[f].平均 * sessions.length / 2 + (Math.random() * 2 - 1)));
+    const cnt = {}; let sum = 0; for(const f in want){ cnt[f] = Math.floor(want[f]); sum += cnt[f]; }
+    const frac = Object.keys(want).sort((x, y)=>(want[y] - cnt[y]) - (want[x] - cnt[x]));
+    for(let i = 0; sum < total; i = (i + 1) % frac.length){ cnt[frac[i]]++; sum++; }
+    while(sum > total){ const f = Object.keys(cnt).filter(f=>cnt[f] > 0).sort((x, y)=>want[x] - want[y])[0]; cnt[f]--; sum--; }
+    const score = [];
+    for(let p = a; p <= b; p++) for(const s of sessions){
+      const d = BLUEPRINT.番号[p] || {}; const tot = Object.values(d).reduce((x, y)=>x + y, 0) || 1;
+      for(const f in cnt) if(cnt[f]) score.push([(d[f] || 0) / tot + Math.random() * 0.05, p, s, f]);
+    }
+    score.sort((x, y)=>y[0] - x[0]);
+    const left = {...cnt};
+    for(const [, p, s, f] of score){ const k = p + s; if(out[k] || !left[f]) continue; out[k] = {p, s, f}; left[f]--; }
+    for(let p = a; p <= b; p++) for(const s of sessions){ const k = p + s; if(!out[k]){ const f = Object.keys(left).sort((x, y)=>left[y] - left[x])[0]; out[k] = {p, s, f}; left[f]--; } }
+  }
+  return out;
+}
+function startYosou(nSess){
+  const sessions = nSess === 2 ? ["午前", "午後"] : ["午前"];
+  const arr = yoArrange(sessions), used = new Set(), A = store().attempts, list = [];
+  for(const s of sessions) for(let p = 1; p <= 100; p++){
+    const {f} = arr[p + s], [, a, b] = yoBlock(p);
+    const pick = pool=>{
+      let best = null, bs = -1e9;
+      for(const q of pool){
+        if(used.has(q.id)) continue;
+        const at = A[q.id], qp = qPos(q);
+        let sc = Math.random() * 0.3 - Math.abs(qp - p) * 0.03 + (qp === p ? 0.5 : 0) + (q.区分 === s ? 0.1 : 0);
+        if(!at || !at.length) sc += 2; else if(at[at.length - 1].ok === 0) sc += 1.5;
+        if(sc > bs){ bs = sc; best = q; }
+      }
+      return best;
+    };
+    const inBlock = Q.filter(q=>{ const qp = qPos(q); return qp >= a && qp <= b; });
+    const q = pick(inBlock.filter(q=>QFIELD[q.id] === f)) || pick(inBlock);
+    if(q){ used.add(q.id); list.push(q); }
+  }
+  session = {list, idx: 0, mode: "yosou", results: [], t0: Date.now(), label: nSess === 2 ? "200問" : "午前100問"};
+  renderQuestion();
+}
+/* 番号で解く: 同じ番号（1〜100）の過去問を回の順に */
+function startNum(){
+  const p = +document.getElementById("numP").value, s = document.getElementById("numS").value;
+  const list = Q.filter(q=>qPos(q) === p && (s === "both" || q.区分 === s)).sort((x, y)=>x.回 - y.回 || (x.区分 === "午前" ? -1 : 1));
+  session = {list, idx: 0, mode: "num", results: [], t0: Date.now(), label: `${p}番${s === "both" ? "" : "・" + s}`};
+  renderQuestion();
+}
 function startMock(n){ session = {list: buildMockSet(n), idx:0, mode:"mock", results:[], t0:Date.now()}; renderQuestion(); }
 function startWeak(n){ session = {list: buildWeakSet(n), idx:0, mode:"weak", results:[], t0:Date.now()}; renderQuestion(); }
 
@@ -1436,7 +1502,6 @@ function renderQuestion(showAnswer=false, picked=[]){
       ${showAnswer
         ? `<button class="btn primary big" onclick="nextQ()">${session.idx+1<n?"次の問題 →":"結果を見る"}</button>
            ${last?.ok?`<button class="btn" onclick="markUnsure('${q.id}',this)">🤔 自信なし</button>`:""}
-           <button class="btn" onclick="explainThis('${q.id}')">⭕ 1文で確認</button>
            <span class="spacer"></span><button class="btn ghost small" onclick="quitSession()">終了</button>`
         : `<button class="btn primary big" onclick="submitQ()">解答する</button>
            <button class="btn" onclick="skipQ()">スキップ</button>
@@ -1599,7 +1664,7 @@ function renderResult(){
   res.forEach(r=>{ const k=byId[r.id].科目; (bySub[k]=bySub[k]||{ok:0,n:0});
                    bySub[k].n++; if(r.ok)bySub[k].ok++; });
   const sanka = session.mode === "sanka";  // 三科目模試: 解いた科目すべてで60%以上なら合格ライン（実地の換算なし）
-  const themed = ["field", "disease", "assess", "rommmt"].includes(session.mode);  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
+  const themed = ["field", "disease", "assess", "rommmt", "num"].includes(session.mode);  // 分野別・疾患別: 全体の正答率60%以上（実地の換算なし）
   const pass = sanka ? (res.length > 0 && Object.values(bySub).every(v=>v.ok/v.n >= 0.6))
              : themed ? (res.length > 0 && okN/res.length >= 0.6)
                      : ptMax ? (pt/ptMax >= 0.6 && jp >= jNeed) : false;
