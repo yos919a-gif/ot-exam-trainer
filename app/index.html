@@ -467,6 +467,25 @@ select{min-height:40px;max-width:100%;font-size:14px}.fields{gap:12px}.fields la
 body:has(.loopbar) .actions.sticky{display:none}
 body:has(.loopbar) #app{padding-bottom:110px}
 @media (prefers-reduced-motion:reduce){.loopclock .fg{transition:none}}
+/* 分野別レーダーチャート */
+.hero .grid.g2{grid-template-columns:repeat(2,1fr)}
+.radarcard{margin:12px 0;display:grid;gap:6px}
+.radarhead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.radarhead h3{margin:0;font-size:16px;margin-right:auto}
+.radarhead .lg{font-size:12.5px;color:var(--sub);display:inline-flex;align-items:center;gap:5px}
+.radarhead .sw{width:14px;height:10px;border-radius:2px;display:inline-block}
+.radars{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 16px}
+.radars figure{margin:0;min-width:0}
+.radars figcaption{font-size:13px;font-weight:700;text-align:center}
+.radar{width:100%;height:auto;display:block}
+.radar .rg{fill:none;stroke:var(--line);stroke-width:1}
+.radar .rseen,.radarhead .sw.rseen{fill:color-mix(in srgb,var(--sub) 22%,transparent);stroke:var(--sub);stroke-width:1;stroke-dasharray:3 3}
+.radarhead .sw.rseen{border:1px dashed var(--sub);background:color-mix(in srgb,var(--sub) 22%,transparent)}
+.radarhead .sw.racc{border:2px solid var(--accent,#2b6cb0);background:color-mix(in srgb,var(--accent,#2b6cb0) 30%,transparent)}
+.radar .racc,.radarhead .sw.racc{fill:color-mix(in srgb,var(--accent,#2b6cb0) 30%,transparent);stroke:var(--accent,#2b6cb0);stroke-width:2}
+.radar .racc-dot{fill:var(--accent,#2b6cb0)}
+.radar .rl{font-size:11.5px;fill:var(--ink)}
+.radar .rv{font-size:10.5px;fill:var(--sub);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -500,6 +519,7 @@ let wordNodes = [];         // 語グラフ
 let specificWords = [];     // 一般語を除いた専門語（長い順）
 let similarKey = {};        // id -> 類問グループキー
 let confusion = {};         // 語 -> [{other, co, selfCorrect, otherCorrect}]
+let QFIELD = {};            // 問題ごとの学習分野（content/exam/fields.json。11/19 ユーザーが決めた 専門12・専門基礎10 分野）
 let MARU = {};              // 1文の○×（content/exam/maru.json。11/18 ユーザー決定「1文の○×式で、合っていたら○、間違っていたら修正」）
 let FEYN = {};              // 「私に説明して」の要点 {id: {要点: [{語, 別の言い方, 理由}]}}（content/exam/feynman.json。11/18）
 const LS_KEY = "ot-exam-progress-v1";
@@ -749,6 +769,7 @@ async function loadAll(){
   try{ ADL = await cfetch("exam/adl.json"); }catch(e){ console.warn("ADL のまとめなし", e); }
   try{ FEYN = await cfetch("exam/feynman.json"); }catch(e){ console.warn("説明の要点なし", e); }
   try{ MARU = await cfetch("exam/maru.json"); }catch(e){ console.warn("1文の○×なし", e); }
+  try{ QFIELD = await cfetch("exam/fields.json"); }catch(e){ console.warn("分野の分類なし", e); }
   try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
   try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); }); }
   catch(e){ console.warn("用語集なし", e); }
@@ -784,6 +805,58 @@ const SUBJECTS = ["解剖学","生理学","運動学","病理学・内科学","�
   "老年期作業療法","高次脳機能障害","地域・社会制度"];
 function isJitsuchi(q){ return (+q.問題番号 - 1) % 100 + 1 <= 20; } // 問題番号は午後が101〜200の通し番号 // 実地問題=午前・午後の問1〜20（1問3点）。共通/専門の別ではない
 function lastSeen(id){ const a = store().attempts[id]; return a ? a[a.length-1].t : 0; }
+/* ================= 分野のレーダーチャート（11/19） =================
+   専門（1〜50番）12分野・専門基礎（51〜100番）10分野。各分野の「解いた割合」（その分野の問題のうち1回以上解いた）と
+   「正答率」（その分野で答えた回数のうち正解）を 0〜100% で重ねて描く */
+const FIELD_AXES = {
+  "専門": ["基礎作業療法学","基礎・基本評価","基本介入手段","義肢装具","ADL・QOL","精神心理","骨関節","中枢神経","神経筋","運動発達障害","内科系疾患","地域作業療法学"],
+  "専門基礎": ["解剖","運動","生理","臨床医学","精神","骨関節","神経・筋","小児","老年期","リハ医学"],
+};
+function fieldStats(){
+  const s = store(), st = {};
+  for(const g in FIELD_AXES) for(const f of FIELD_AXES[g]) st[g + "|" + f] = {total: 0, seen: 0, ok: 0, n: 0};
+  for(const q of Q){
+    const f = QFIELD[q.id]; if(!f) continue;
+    const g = (q.問題番号 > 100 ? q.問題番号 - 100 : q.問題番号) <= 50 ? "専門" : "専門基礎";
+    const x = st[g + "|" + f]; if(!x) continue;
+    x.total++;
+    const a = s.attempts[q.id];
+    if(a && a.length){ x.seen++; x.n += a.length; x.ok += a.reduce((t, y)=>t + y.ok, 0); }
+  }
+  return st;
+}
+function radarSvg(group, st){
+  const axes = FIELD_AXES[group], N = axes.length, cx = 160, cy = 150, R = 100;
+  const pt = (i, v)=>{ const a = -Math.PI/2 + 2*Math.PI*i/N; return [cx + R*v*Math.cos(a), cy + R*v*Math.sin(a)]; };
+  const poly = vals=>vals.map((v, i)=>pt(i, v).map(n=>n.toFixed(1)).join(",")).join(" ");
+  let g = "";
+  for(const r of [0.25, 0.5, 0.75, 1]) g += `<polygon class="rg" points="${poly(axes.map(()=>r))}"/>`;
+  axes.forEach((_, i)=>{ const [x, y] = pt(i, 1); g += `<line class="rg" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; });
+  const seen = axes.map(f=>{ const x = st[group + "|" + f]; return x.total ? x.seen / x.total : 0; });
+  const acc = axes.map(f=>{ const x = st[group + "|" + f]; return x.n ? x.ok / x.n : 0; });
+  g += `<polygon class="rseen" points="${poly(seen)}"/><polygon class="racc" points="${poly(acc)}"/>`;
+  acc.forEach((v, i)=>{ if(st[group + "|" + axes[i]].n){ const [x, y] = pt(i, v); g += `<circle class="racc-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`; } });
+  axes.forEach((f, i)=>{
+    const [x, y] = pt(i, 1.17), x0 = st[group + "|" + f];
+    const anchor = Math.abs(x - cx) < 8 ? "middle" : (x > cx ? "start" : "end");
+    const pct = x0.n ? Math.round(100 * x0.ok / x0.n) + "%" : "—";
+    g += `<text class="rl" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"><tspan>${esc(f)}</tspan><tspan class="rv" x="${x.toFixed(1)}" dy="13">${pct}・${x0.seen}/${x0.total}</tspan></text>`;
+  });
+  return `<svg viewBox="-30 0 380 310" class="radar" role="img" aria-label="${group}の分野別 解いた割合と正答率">${g}</svg>`;
+}
+function radarCard(){
+  if(!Object.keys(QFIELD).length) return "";
+  const st = fieldStats();
+  return `<div class="card radarcard">
+    <div class="radarhead"><h3>分野別の成績</h3>
+      <span class="lg"><i class="sw racc"></i>正答率</span><span class="lg"><i class="sw rseen"></i>解いた割合</span></div>
+    <div class="radars">
+      <figure><figcaption>専門分野（1〜50番）</figcaption>${radarSvg("専門", st)}</figure>
+      <figure><figcaption>専門基礎分野（51〜100番）</figcaption>${radarSvg("専門基礎", st)}</figure>
+    </div>
+    <div class="muted" style="font-size:12px">各分野の数字は 正答率・解いた問題/その分野の問題数。</div>
+  </div>`;
+}
 function accuracyBySubject(){
   const s = store(); const agg = {};
   SUBJECTS.forEach(k=>agg[k]={ok:0,n:0});
@@ -1150,13 +1223,13 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
       <h2>今日も一歩ずつ</h2>
       <div class="muted" style="margin:0">過去問 ${Q.length}問のうち <b style="color:var(--ink)">${answered}問</b> に挑戦（${cover}%）</div>
       <div class="meter"><i style="width:${cover}%"></i></div>
-      <div class="grid">
+      <div class="grid g2">
         <div class="stat">解いた問題<b>${answered}</b></div>
         <div class="stat">国試まで<b>${daysToExam()>0 ? daysToExam()+"日" : "—"}</b></div>
-        <div class="stat">カードで学習中の語<b>${Object.keys(S.wsrs).length}</b></div>
       </div>
     </div>
   </div>
+  ${radarCard()}
   ${window.SYNC && SYNC.status().on && SYNC.status().needLogin ? `<div class="card" style="padding:12px 16px;margin:12px 0">☁ 同期のログインが切れています。<button class="btn small primary" onclick="SYNC.signIn().then(()=>home()).catch(e=>alert('ログインできませんでした: '+e.message))">もう一度ログインして同期</button></div>` : ""}
   <div class="sec">今日やること <small>${today}</small></div>
   <div class="today">${reviewCard()}${wordTodayCard()}</div>
@@ -1428,7 +1501,6 @@ function loopPref(){
   try{ const v = JSON.parse(localStorage.getItem("ot_loop") || "{}"); return {n: v.n || 10, s: v.s || 10}; }
   catch(e){ return {n: 10, s: 10}; }
 }
-function shuffle(a){ a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function startLoop(){
   const n = +(document.getElementById("loopN")?.value || loopPref().n), sec = +(document.getElementById("loopS")?.value || loopPref().s);
   try{ localStorage.setItem("ot_loop", JSON.stringify({n, s: sec})); }catch(e){}
