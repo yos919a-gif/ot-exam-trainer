@@ -210,6 +210,10 @@
   .grade{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .grade .btn{margin:0;width:100%;justify-content:center;padding:12px}
   .btn.ngb{border-color:var(--ng);color:var(--ng);background:var(--ng2)} .btn.okb{border-color:var(--ok);color:var(--ok);background:var(--ok2)}
+  .kin-ans{margin-top:14px;width:100%;max-width:640px;text-align:left;display:grid;gap:10px}
+  .kin-row{display:grid;grid-template-columns:5.5em 1fr;gap:8px;align-items:baseline;font-size:16px;line-height:1.7}
+  .kin-lab{font-weight:800;color:var(--violet);font-size:14px}.kin-sub{font-size:14px;color:var(--sub)}.kin-sub .kin-lab{color:var(--sub)}
+  .kin-site+.kin-site{margin-top:2px}.kin-hd{display:inline-block;font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:0 8px;margin-right:6px}
   #chartTip{position:absolute;z-index:50;display:none;pointer-events:none;background:var(--card);border:1px solid var(--line);
     border-radius:10px;padding:8px 10px;box-shadow:var(--shadow-lg);font-size:13px;width:max-content;max-width:min(260px,calc(100vw - 16px))}
   .score{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
@@ -527,6 +531,7 @@ body:has(.loopbar) #app{padding-bottom:110px}
 <script src="sync.js"></script>
 <script src="textbook.js"></script>
 <script src="drill.js"></script>
+<script src="kin.js"></script>
 <script src="print.js"></script>
 <script>
 "use strict";
@@ -758,7 +763,7 @@ if(matchMedia("(hover: hover) and (pointer: fine)").matches){
 async function loadAll(){
   await initStore();
   if(window.SYNC) SYNC.init({get: ()=>store(), put: s=>save(normS(s)),
-    onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && !(window.PRINT && PRINT.active()) && typeof home==="function") home(); }});
+    onMerged: ()=>{ if(!session && !wsess && !(window.DRILL && DRILL.active()) && !(window.PRINT && PRINT.active()) && !(window.KIN && KIN.active()) && typeof home==="function") home(); }});
   srsMigrate();
   const tbReady = window.TEXTBOOK ? TEXTBOOK.load().catch(()=>{}) : Promise.resolve();
   const qs = await cfetch("exam/questions.json");
@@ -791,7 +796,7 @@ async function loadAll(){
   try{ QFIELD = await cfetch("exam/fields.json"); }catch(e){ console.warn("分野の分類なし", e); }
   try{ BLUEPRINT = await cfetch("exam/blueprint.json"); }catch(e){ console.warn("設計図なし", e); }
   try{ NOTES = (await cfetch("exam/notes.json")).notes || []; }catch(e){ console.warn("まとめノートなし", e); }
-  try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); }); }
+  try{ GLOSS = await cfetch("glossary/glossary.json"); buildGlossRe(); tbReady.then(()=>{ if(window.TEXTBOOK) TEXTBOOK.applyGlossSrc(GLOSS); if(window.KIN) KIN.refreshTile(); }); }
   catch(e){ console.warn("用語集なし", e); }
   try{
     const an =await cfetch("analysis/anomalies.json");
@@ -1264,7 +1269,7 @@ function ringSvg(pct){ // 正答率の輪
 }
 function barCls(p){ return p===null ? "" : p<50 ? "lo" : p<70 ? "mid" : "hi"; } // 科目の成績バーの色（50%未満・70%未満・それ以上）
 function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
-  session = null; wsess = null; if(window.DRILL) DRILL.reset(); if(window.PRINT) PRINT.reset();
+  session = null; wsess = null; if(window.DRILL) DRILL.reset(); if(window.PRINT) PRINT.reset(); if(window.KIN) KIN.reset();
   const s = store();
   const answered = Object.keys(s.attempts).length;
   const attempts = Object.values(s.attempts).reduce((a,b)=>a+b.length,0);
@@ -1328,6 +1333,7 @@ function home(){ if(typeof loopStopTimer==="function") loopStopTimer();
         <select id="loopS" aria-label="1問の制限時間">${[10,20,30,60].map(n=>`<option value="${n}" ${n===loopPref().s?"selected":""}>1問 ${n}秒</option>`).join("")}</select>
         <button class="btn primary" onclick="startLoop()">はじめる</button></div></div>
     ${wordDeckCard()}
+    ${window.KIN ? KIN.tile() : ""}
     ${markCard()}
   </div>
   <div class="sec">科目別の成績 <span style="margin-left:auto"><button class="btn small" onclick="renderTrend()">📈 成績の推移</button></span></div>
