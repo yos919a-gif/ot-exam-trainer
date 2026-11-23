@@ -11,8 +11,8 @@
   "exam/explanations.json": {
    "説明": "選択肢の誤り理由",
    "件数": 2400,
-   "bytes": 767191,
-   "sha1": "0fad5b6c98"
+   "bytes": 767951,
+   "sha1": "3749ccace3"
   },
   "glossary/glossary.json": {
    "説明": "用語集（暗記カード）",
